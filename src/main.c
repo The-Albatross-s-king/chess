@@ -4,24 +4,20 @@
 #include "board.h"
 
 int main(){
-    Piece* board[64]; //le plateau
-    Piece* blacks[16]; //toutes les pieces noires dans l'ordre de debut de partie
-    Piece* whites[16]; //same
+    Game g;
     for(int i = 0; i < 64; i++)
-        board[i] = NULL; //init a 0 toutes les pieces
-    SetPieces(board, blacks, whites); //remplit le plateau de pieces
+        g.board[i] = NULL; //init a 0 toutes les pieces
+    set_game(&g); //remplit le plateau de pieces
 
-    printf("value : %d\n",Move(board,board[GetPos(0,4)],6,4));
-    Display(board); //fonction temporaire pour debugger
+    printf("value : %d\n",move(&g,0,4,6,4));
+    display(&g); //fonction temporaire pour debugger
     printf("\n");
 
-    printf("value : %d\n",Move(board,board[GetPos(6,4)],4,4));
-    Display(board);
+    printf("value : %d\n",move(&g,6,4,4,4));
+    display(&g);
 
-    //check les pieces
-    for(int i = 0; i < 16; i++)
-        printf("%d ",whites[i]->value);
-    printf("\n");
 
+
+    free_game(&g);
     return 0;
 }

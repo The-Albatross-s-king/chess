@@ -1,45 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "board.h"
+#include <err.h>
 
-const int BLACK=0;
-const int WHITE=1;
-
-const int PAWN=1;
-const int ROOK=2;
-const int KNIGHT=3;
-const int BISHOP=4;
-const int QUEEN=5;
-const int KING=6;
-
-int GetPos(int x, int y)
+int get_pos(int x, int y)
 {
+    if(x>8 || y>8)
+        errx(3, "Error, out of bound\n");
     return x*8+y;
 }
 
-int Move(Piece* board[64],Piece* p, int x, int y)
+int move(Game* g,int x, int y, int x2, int y2)
 {
-    int pos=GetPos(x,y);
-    Piece* target=board[pos];
+
+    Piece* p=g->board[get_pos(x,y)];
+    if(p==NULL)
+        errx(3, "Error, case vide\n");
+    int pos=get_pos(x2,y2);
+    Piece* target=g->board[pos];
     if(target==NULL) //bouge simplement la piece
     {
-        board[pos]=p;
-        board[GetPos(p->pos[0],p->pos[1])]=NULL; //old place empty
-        p->pos[0]=x;
-        p->pos[1]=y;
-        return 0;
+        g->board[pos]=p;
+        g->board[get_pos(x,y)]=NULL; //old place empty
+        p->x=x2;
+        p->y=y2;
+        return -1;
     }
     target->alive=0;
-    board[GetPos(p->pos[0],p->pos[1])]=NULL; //old place empty
-    p->pos[0]=x;
-    p->pos[1]=y;
+    g->board[get_pos(x,y)]=NULL; //old place empty
+    p->x=x2;
+    p->y=y2;
 
-    board[pos]=p;
-    return target->value;
+    g->board[pos]=p;
+    return target->type;
 }
 
 
-void SetPieces(Piece* board[64], Piece* blacks[16], Piece* whites[16])
+void set_game(Game* g)
 {
     // 1 : malloc les pieces et mets les pointe communs
     // 2 : set value, et type specifiquement
@@ -48,13 +45,14 @@ void SetPieces(Piece* board[64], Piece* blacks[16], Piece* whites[16])
     {
         for(int j=0;j<8;j++)
         {
-            int x=GetPos(i,j);
-            board[x]=malloc(sizeof(Piece));
-            board[x]->color=BLACK;
-            board[x]->pos[0]=i;
-            board[x]->pos[1]=j;
-            board[x]->alive=1;
-            blacks[x]=board[x];
+            int x=get_pos(i,j);
+            g->board[x]=malloc(sizeof(Piece));
+            g->board[x]->color=BLACK;
+            g->board[x]->x=i;
+            g->board[x]->y=j;
+            g->board[x]->alive=1;
+            g->board[x]->moved=0;
+            g->blacks[x]=g->board[x];
         }
     }
     //deux dernieres lignes
@@ -62,53 +60,61 @@ void SetPieces(Piece* board[64], Piece* blacks[16], Piece* whites[16])
     {
         for(int j=0;j<8;j++)
         {
-            int x=GetPos(i,j);
-            board[x]=malloc(sizeof(Piece));
-            board[x]->color=WHITE;
-            board[x]->pos[0]=i;
-            board[x]->pos[1]=j;
-            board[x]->alive=1;
-            whites[(x+8)%16]=board[x];//+8 pour que les pions soit de 8 a 15
+            int x=get_pos(i,j);
+            g->board[x]=malloc(sizeof(Piece));
+            g->board[x]->color=WHITE;
+            g->board[x]->x=i;
+            g->board[x]->y=j;
+            g->board[x]->alive=1;
+            g->board[x]->moved=0;
+            g->whites[(x+8)%16]=g->board[x];//+8 pour que les pions soit de 8 a 15
         }
     }
 
     int types[8]={ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK};
-    int values[8]={500,300,300,0,900,300,300,500};
     for(int j=0;j<8;j++)
     {
-        board[GetPos(0,j)]->value=values[j];
-        board[GetPos(0,j)]->type=types[j];
+        g->board[get_pos(0,j)]->type=types[j];
 
     }
     for(int j=0;j<8;j++)
     {
-        board[GetPos(1,j)]->value=100;
+        g->board[get_pos(1,j)]->type=PAWN;
     }
     for(int j=0;j<8;j++)
     {
-        board[GetPos(6,j)]->value=100;
+        g->board[get_pos(6,j)]->type=PAWN;
     }
     for(int j=0;j<8;j++)
     {
-        board[GetPos(7,j)]->value=values[j];
-        board[GetPos(0,j)]->type=types[j];
+        g->board[get_pos(7,j)]->type=types[j];
     }
 
 
 }
 
 
-void Display(Piece* b[64])
+void free_game(Game* g)
+{
+    for(int i = 0; i < 16 ; i++)
+    { 
+        free(g->blacks[i]);
+        free(g->whites[i]);
+    }
+}
+
+
+void display(Game* g)
 {
     for(int i=0;i<8;i++)
     {
         for(int j=0; j<8;j++)
         {
-            int x=GetPos(i,j);
-            if(b[x]==NULL)
-                printf("0   ");
+            int x=get_pos(i,j);
+            if(g->board[x]==NULL)
+                printf("   x");
             else{
-                printf("%3d ",b[x]->type);
+                printf("%3d ",g->board[x]->type);
             }
         }
 
