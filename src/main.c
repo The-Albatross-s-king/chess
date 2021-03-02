@@ -9,12 +9,19 @@ int main(){
         g.board[i] = NULL; //init a 0 toutes les pieces
     set_game(&g); //remplit le plateau de pieces
 
-    printf("value : %d\n",move(&g,0,4,6,4));
-    display(&g); //fonction temporaire pour debugger
-    printf("\n");
-
-    printf("value : %d\n",move(&g,6,4,4,4));
+    
+    int len;
+    Move_list* l;
     display(&g);
+    l=get_pawn_moves(&g, g.board[get_pos(1,4)], &len);
+    display_list(l);
+
+    move(&g, 6, 3, 2, 3);
+    move(&g, 6, 4, 3, 4);
+    display(&g);
+    l=get_pawn_moves(&g, g.board[get_pos(1,4)], &len);
+    display_list(l);
+
 
 
 
