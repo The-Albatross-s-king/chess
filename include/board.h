@@ -1,5 +1,6 @@
 #pragma once
 
+#include "list.h"
 
 enum pieces_colors 
 {
@@ -34,14 +35,6 @@ typedef struct Game
     Piece whites[16];
 }Game;
 
-typedef struct Move_list
-{
-    struct Move_list *next;
-    int x;
-    int y;
-}Move_list;
-
-
 
 
 //returns in p the piece at x,y. return 0  if out of bound
@@ -49,20 +42,6 @@ int get_piece(Game* g, int x, int y, Piece** p);
 
 //return 1 if pos occupied by opposite color or empty
 int can_move_to(Game* g, int x, int y, Piece* p);
-
-Move_list* init_list();
-
-int is_empty(Move_list* list);
-
-void add_list(Move_list* list, int x, int y);
-
-int pop_list(Move_list* list, int* x, int* y);
-
-int in_list(Move_list* list, int x, int y);
-
-void free_list(Move_list* list);
-
-void display_list(Move_list* l);
 
 int get_pos(int x, int y);
 
@@ -82,10 +61,8 @@ Move_list* get_moves(Game* g, int x, int y);
 //malloc pieces and init board
 void set_game(Game* g);
 
-
 //debugging fonction
 void display(Game* g);
-
 
 //free board
 void free_game(Game* g);
