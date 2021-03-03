@@ -15,15 +15,15 @@ int get_piece(Game* g, int x, int y, Piece** p)
 {
     if(x>=8 || y>=8 || x<0 || y<0)
         return 0;
-            *p=g->board[get_pos(x,y)];
+    *p=g->board[get_pos(x,y)];
     return 1;
 }
 
 //return 1 if pos occupied by opposite color or empty
 int can_move_to(Game* g, int x, int y, Piece* p)
 {
-    Piece* target;
-    if((get_piece(g, x, y, &target) && target==NULL) \
+    Piece* target=NULL;
+    if((get_piece(g, x, y, &target) && (target==NULL && p->type != PAWN)) \
             || (target!=NULL && target->color != p->color))
         return 1;
     return 0;
@@ -45,6 +45,17 @@ void add_list(Move_list* list, int x, int y)
     list->next=new;
 }
 
+size_t get_size_list(Move_list* list)
+{
+    size_t len=0;
+    list=list->next;
+    while(list!=NULL)
+    {
+        len++;
+        list=list->next;
+    }
+    return len;
+}
 // reads list and free the pop, returns 1 if valide 0 otherwise
 int pop_list(Move_list* list, int* x, int* y)
 {
@@ -57,9 +68,39 @@ int pop_list(Move_list* list, int* x, int* y)
     free(tmp);
     return 1;
 }
+//return 1 if x,y in the list
+int in_list(Move_list* list, int x, int y)
+{
+list=list->next;
+while(list!=NULL)
+{
+    if(list->x==x && list->y==y)
+        return 1;
+    list=list->next;
+}
+return 0;
+}
 
+int is_empty(Move_list* list)
+{
+    if(list==NULL)
+        errx(3, "is_empty : try to use NULL pointeuri\n");
+    return list->next==NULL;
+}
 
-void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
+void free_list(Move_list* list)
+{
+
+Move_list* tmp;
+while(list!=NULL)
+{
+    tmp=list;
+    list=list->next;
+    free(tmp);
+}
+}
+
+void get_cross_moves(Game* g, Piece* p, Move_list* l)
 {
     int x=p->x+1;
     int y=p->y;
@@ -69,7 +110,6 @@ void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -82,7 +122,6 @@ void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -96,7 +135,6 @@ void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -109,7 +147,6 @@ void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -117,7 +154,7 @@ void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
     }
 }
 
-void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
+void get_diagonal_moves(Game* g, Piece* p, Move_list* l)
 {
     int x=p->x+1;
     int y=p->y+1;
@@ -127,7 +164,6 @@ void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -142,7 +178,6 @@ void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -158,7 +193,6 @@ void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -173,7 +207,6 @@ void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
     if(can_move_to(g, x, y, p))
         {
             add_list(l,x,y);
-            (*len)++;
         }
     if(g->board[get_pos(x,y)]!=NULL)
         break;
@@ -183,11 +216,8 @@ void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
 
 }
 
-Move_list* get_pawn_moves(Game* g, Piece* p,int* len)
+Move_list* get_pawn_moves(Game* g, Piece* p)
 {
-    *len=0;
-    if(p->type!=PAWN)
-        errx(3, "get_pawn_moves without a pawn\n");
     Move_list* l=init_list();
     int s=1;//sens
     if(p->color==WHITE) //bottom of the board
@@ -195,33 +225,26 @@ Move_list* get_pawn_moves(Game* g, Piece* p,int* len)
     if(g->board[get_pos(p->x+s,p->y)]==NULL)
     {
         add_list(l, p->x+s, p->y);
-        (*len)++;
     }
     if(can_move_to(g, p->x+s, p->y+s, p))
     {
-        add_list(l, p->x+s, p->y);
-        (*len)++;
+        add_list(l, p->x+s, p->y+s);
     }
     if(can_move_to(g, p->x+s, p->y-s, p))
     {
         add_list(l, p->x+s, p->y-s);
-        (*len)++;
     }
     if(!p->moved && g->board[get_pos(p->x+s,p->y)]==NULL && \
             g->board[get_pos(p->x+2*s,p->y)]==NULL)
     {       
         add_list(l,p->x+2*s,p->y);
-        (*len)++;
     }
     return l;
 }
 
 
-Move_list* get_knight_moves(Game* g, Piece* p, int* len)
+Move_list* get_knight_moves(Game* g, Piece* p)
 {
-    *len=0;
-    if(p->type!=KNIGHT)
-        errx(3, "get_knight_moves without a pawn\n");
     Move_list* l=init_list();
 
     int moves_x[8]={+2,+2,-2,-2,+1,+1,-1,-1};
@@ -231,49 +254,36 @@ Move_list* get_knight_moves(Game* g, Piece* p, int* len)
         if(can_move_to(g, p->x+moves_x[i], p->y+moves_y[i], p))
         {
             add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
-            (*len)++;
         }
     }
     return l;
 }
 
-Move_list* get_bishop_moves(Game* g, Piece* p, int* len)
+Move_list* get_bishop_moves(Game* g, Piece* p)
 {
-    *len=0;
-    if(p->type!=BISHOP)
-        errx(3, "get_bishop_moves without a bishop\n");
     Move_list* l=init_list();
-    get_diagonal_moves(g,p,len,l);
+    get_diagonal_moves(g,p,l);
     return l;
 
 } 
-Move_list* get_rook_moves(Game* g, Piece* p, int* len)
+Move_list* get_rook_moves(Game* g, Piece* p)
 {
-    *len=0;
-    if(p->type!=ROOK)
-        errx(3, "get_rook_moves without a pawn\n");
     Move_list* l=init_list();
-    get_cross_moves(g,p,len,l);
+    get_cross_moves(g,p,l);
     return l;
 
 } 
 
-Move_list* get_queen_moves(Game* g,Piece* p, int* len)
+Move_list* get_queen_moves(Game* g,Piece* p)
 {
-    *len=0;
-    if(p->type!=QUEEN)
-        errx(3, "get_queen_moves without a queen\n");
     Move_list* l=init_list();
-    get_cross_moves(g,p,len,l);
-    get_diagonal_moves(g,p,len,l);
+    get_cross_moves(g,p,l);
+    get_diagonal_moves(g,p,l);
     return l;
 
 }
-Move_list* get_king_moves(Game* g, Piece* p, int* len)
+Move_list* get_king_moves(Game* g, Piece* p)
 {
-    *len=0;
-    if(p->type!=KING)
-        errx(3, "get_king_moves without a king\n");
     Move_list* l=init_list();
     int moves_x[8]={1,1,1,-1,-1,-1,0,0};
     int moves_y[8]={1,-1,0,1,-1,0,1, -1};
@@ -281,20 +291,67 @@ Move_list* get_king_moves(Game* g, Piece* p, int* len)
         if(can_move_to(g, p->x+moves_x[i], p->y+moves_y[i], p))
         {
             add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
-            (*len)++;
         }
     }
     return l;
 }
 
+Move_list* get_moves(Game* g, int x, int y)
+{
+    
+    Move_list* l;
+    Piece* p=g->board[get_pos(x,y)];
+    if(p==NULL)
+    {
+        l=init_list();
+        return l;
+    }
+    switch(p->type)
+    {
+        case PAWN:
+            l=get_pawn_moves(g,p);
+            break;
+        case ROOK:
+            l=get_rook_moves(g,p);
+            break;
+        case BISHOP:
+            l=get_bishop_moves(g,p);
+            break;
+        case KNIGHT:
+            l=get_knight_moves(g,p);
+            break;
+         case QUEEN:
+            l=get_queen_moves(g,p);
+            break;
+        case KING:
+            l=get_king_moves(g,p);
+            break;
+        default:
+            errx(3, "invalid type\n");
+    }
+    return l;
 
 
-int move(Game* g,int x, int y, int x2, int y2)
+}
+//return 1 if move applied
+int move(Game* g, int x, int y, int x2, int y2)
+{
+    Move_list* l=get_moves(g, x, y);
+    if(in_list(l, x2, y2)){
+        free_list(l);
+        apply_move(g, x, y, x2, y2);
+        return 1;
+    }
+    free_list(l);
+    return 0;
+}
+int apply_move(Game* g,int x, int y, int x2, int y2)
 {
 
     Piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
         errx(3, "Error, case vide\n");
+    p->moved=1;
     int pos=get_pos(x2,y2);
     Piece* target=g->board[pos];
     if(target==NULL) //empty destination
@@ -317,9 +374,9 @@ int move(Game* g,int x, int y, int x2, int y2)
 
 void set_game(Game* g)
 {
-    // 1 : malloc les pieces et mets les pointe communs
-    // 2 : set value, et type specifiquement
-    //deux premieres lignes
+    // 1 : malloc pieces and init basic data
+    // 2 : set type 
+    //set blacks (up)
     for(int i=0; i<2; i++)
     {
         for(int j=0;j<8;j++)
@@ -334,7 +391,7 @@ void set_game(Game* g)
             g->blacks[x]=g->board[x];
         }
     }
-    //deux dernieres lignes
+    //set whites (down)s
     for(int i=6; i<8; i++)
     {
         for(int j=0;j<8;j++)
@@ -346,7 +403,7 @@ void set_game(Game* g)
             g->board[x]->y=j;
             g->board[x]->alive=1;
             g->board[x]->moved=0;
-            g->whites[(x+8)%16]=g->board[x];//+8 pour que les pions soit de 8 a 15
+            g->whites[(x+8)%16]=g->board[x];//+8 to keep same order of white 
         }
     }
 

@@ -47,24 +47,33 @@ int can_move_to(Game* g, int x, int y, Piece* p);
 
 Move_list* init_list();
 
+int is_empty(Move_list* list);
+
 void add_list(Move_list* list, int x, int y);
 
 int pop_list(Move_list* list, int* x, int* y);
 
+int in_list(Move_list* list, int x, int y);
+
+void free_list(Move_list* list);
+
 void display_list(Move_list* l);
+
 int get_pos(int x, int y);
 
+//check if valid and return 1 if move applied, use apply_move for no condition
+int move(Game* g, int x, int y, int x2, int y2);
 //return type of eaten piece, -1 if None.
-int move(Game* g,int x, int y, int x2, int y2);
+int apply_move(Game* g,int x, int y, int x2, int y2);
 
 
-
-Move_list* get_knight_moves(Game* g, Piece* p, int* len);
-Move_list* get_pawn_moves(Game* g, Piece* p,int* len);
-Move_list* get_rook_moves(Game* g, Piece* p,int* len);
-Move_list* get_king_moves(Game* g, Piece* p, int* len);
-Move_list* get_bishop_moves(Game* g, Piece* p, int* len);
-Move_list* get_queen_moves(Game* g,Piece* p, int* len);
+Move_list* get_knight_moves(Game* g, Piece* p);
+Move_list* get_pawn_moves(Game* g, Piece* p);
+Move_list* get_rook_moves(Game* g, Piece* p);
+Move_list* get_king_moves(Game* g, Piece* p);
+Move_list* get_bishop_moves(Game* g, Piece* p);
+Move_list* get_queen_moves(Game* g,Piece* p);
+Move_list* get_moves(Game* g, int x, int y);
 //malloc pieces and init board
 void set_game(Game* g);
 
