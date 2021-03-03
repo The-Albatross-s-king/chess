@@ -59,10 +59,12 @@ int move(Game* g,int x, int y, int x2, int y2);
 
 
 
+Move_list* get_knight_moves(Game* g, Piece* p, int* len);
 Move_list* get_pawn_moves(Game* g, Piece* p,int* len);
-
-
-
+Move_list* get_rook_moves(Game* g, Piece* p,int* len);
+Move_list* get_king_moves(Game* g, Piece* p, int* len);
+Move_list* get_bishop_moves(Game* g, Piece* p, int* len);
+Move_list* get_queen_moves(Game* g,Piece* p, int* len);
 //malloc pieces and init board
 void set_game(Game* g);
 

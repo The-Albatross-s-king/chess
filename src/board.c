@@ -23,7 +23,8 @@ int get_piece(Game* g, int x, int y, Piece** p)
 int can_move_to(Game* g, int x, int y, Piece* p)
 {
     Piece* target;
-    if(get_piece(g, x, y, &target) && target!=NULL && target->color != p->color)
+    if((get_piece(g, x, y, &target) && target==NULL) \
+            || (target!=NULL && target->color != p->color))
         return 1;
     return 0;
 }
@@ -58,6 +59,129 @@ int pop_list(Move_list* list, int* x, int* y)
 }
 
 
+void get_cross_moves(Game* g, Piece* p, int* len, Move_list* l)
+{
+    int x=p->x+1;
+    int y=p->y;
+    //moves up
+    while(x<8)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    x++;
+    }
+    //moves down
+    x=p->x-1;
+    while(x>=0)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    x--;
+    }
+
+    x=p->x;
+    y=p->y+1;
+    while(y<8)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    y++;
+    }
+    //moves down
+    y=p->y-1;
+    while(y>=0)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    y--;
+    }
+}
+
+void get_diagonal_moves(Game* g, Piece* p, int* len, Move_list* l)
+{
+    int x=p->x+1;
+    int y=p->y+1;
+    //moves down right
+    while(x<8 && y<8)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    x++;
+    y++;
+    }
+    //moves down left
+    x=p->x+1;
+    y=p->y-1;
+    while(x<8 && y>=0 )
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    x++;
+    y--;
+    }
+
+    x=p->x-1;
+    y=p->y+1;
+    //moves up right 
+    while(x>=0 && y<8)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    x--; 
+    y++;
+    }
+    //moves up left
+    x=p->x-1;
+    y=p->y-1;
+    while(x>=0 && y>=0)
+    {
+    if(can_move_to(g, x, y, p))
+        {
+            add_list(l,x,y);
+            (*len)++;
+        }
+    if(g->board[get_pos(x,y)]!=NULL)
+        break;
+    y--;
+    x--;
+    }
+
+}
 
 Move_list* get_pawn_moves(Game* g, Piece* p,int* len)
 {
@@ -93,6 +217,75 @@ Move_list* get_pawn_moves(Game* g, Piece* p,int* len)
 }
 
 
+Move_list* get_knight_moves(Game* g, Piece* p, int* len)
+{
+    *len=0;
+    if(p->type!=KNIGHT)
+        errx(3, "get_knight_moves without a pawn\n");
+    Move_list* l=init_list();
+
+    int moves_x[8]={+2,+2,-2,-2,+1,+1,-1,-1};
+    int moves_y[8]={+1,-1,+1,-1,+2,-2,+2,-2};
+    //+2+1; +2-1; -2+1; -2   ;+1+2; -1+2; +1-2; -1-2; 
+    for(int i=0; i<8; i++){
+        if(can_move_to(g, p->x+moves_x[i], p->y+moves_y[i], p))
+        {
+            add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
+            (*len)++;
+        }
+    }
+    return l;
+}
+
+Move_list* get_bishop_moves(Game* g, Piece* p, int* len)
+{
+    *len=0;
+    if(p->type!=BISHOP)
+        errx(3, "get_bishop_moves without a bishop\n");
+    Move_list* l=init_list();
+    get_diagonal_moves(g,p,len,l);
+    return l;
+
+} 
+Move_list* get_rook_moves(Game* g, Piece* p, int* len)
+{
+    *len=0;
+    if(p->type!=ROOK)
+        errx(3, "get_rook_moves without a pawn\n");
+    Move_list* l=init_list();
+    get_cross_moves(g,p,len,l);
+    return l;
+
+} 
+
+Move_list* get_queen_moves(Game* g,Piece* p, int* len)
+{
+    *len=0;
+    if(p->type!=QUEEN)
+        errx(3, "get_queen_moves without a queen\n");
+    Move_list* l=init_list();
+    get_cross_moves(g,p,len,l);
+    get_diagonal_moves(g,p,len,l);
+    return l;
+
+}
+Move_list* get_king_moves(Game* g, Piece* p, int* len)
+{
+    *len=0;
+    if(p->type!=KING)
+        errx(3, "get_king_moves without a king\n");
+    Move_list* l=init_list();
+    int moves_x[8]={1,1,1,-1,-1,-1,0,0};
+    int moves_y[8]={1,-1,0,1,-1,0,1, -1};
+    for(int i=0; i<8; i++){
+        if(can_move_to(g, p->x+moves_x[i], p->y+moves_y[i], p))
+        {
+            add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
+            (*len)++;
+        }
+    }
+    return l;
+}
 
 
 
