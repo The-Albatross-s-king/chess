@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BOARD_H
+#define BOARD_H
 
 enum pieces
 {
@@ -10,12 +11,12 @@ enum color
     WHITE, BLACK
 };
 
-struct piece
+typedef struct piece
 {
-    enum pieces piece;
+    enum pieces piece_type;
     enum color color;
-};
+}piece;
 
-struct piece board[8][8];
+void set_board(piece *board);
 
-void set_board();
+#endif

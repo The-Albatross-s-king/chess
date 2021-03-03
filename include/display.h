@@ -1,6 +1,8 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-void display_table();
+#include "board.h"
+
+void display_board(piece *board);
 
 #endif
