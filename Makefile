@@ -1,23 +1,43 @@
-# Makefile
+# OCR Makefile
+CC := gcc
+CFLAGS := -Werror -Wall -Wextra -std=c99 -O3 # -g
+LDFLAGS := -Iinclude/ 
+C_SRC := $(shell find src/ -name *.c -printf "%P\n")
+SRC := $(shell find -name *.c) $(shell find -name *.h)
+SRC_DIR := src
+BUILD_DIR := build
+SANDBOX_DIR := sandbox
+OBJ := $(patsubst %,$(BUILD_DIR)/$(SANDBOX_DIR)/%,$(C_SRC:.c=.o))
+FMT := clang-format
+FMT_FLAGS := -Werror -style=file
+EXAMPLE_DIR := example
+EXAMPLES := $(shell find $(EXAMPLE_DIR)/ -name *.c -printf "%P\n")
+NAME := library
 
-CC = gcc
-CPPFLAGS = -Iinclude
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O0 -g3
-LDFLAGS =
-LDLIBS =
+.PHONY: all example compile mrproper clean
 
-BIN = main
-SRC = ${shell find ./src/ -name *.c}
-OBJ = ${SRC:.c=.o}
+all: mrproper $(EXAMPLES)
 
+#check: $(EXAMPLES) # test-format
 
-all: ${BIN}
+#format:
+#	$(FMT) $(FMT_FLAGS) -i $(SRC)
 
-${BIN}: ${OBJ}
-	${CC} ${CPPFLAGS} ${CFLAGS} $^ -o $@ ${LDLIBS} ${LDFLAGS}
+#test-format:
+#	$(FMT) $(FMT_FLAGS) --dry-run $(SRC)
+
+compile: $(OBJ)
+	ar -q $(BUILD_DIR)/lib$(NAME).a $^ 
+$(BUILD_DIR)/$(SANDBOX_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(shell dirname $@)
+	$(CC) -c $^ -o $@ $(CFLAGS) $(LDFLAGS)
+
+$(EXAMPLES): compile
+	mkdir -p $(BUILD_DIR)/$(EXAMPLE_DIR)
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(EXAMPLE_DIR)/$(@:.c=) $(EXAMPLE_DIR)/$@ $(LDFLAGS) -L$(BUILD_DIR) -l$(NAME) -lm
+
+mrproper:
+	rm -rf $(BUILD_DIR)
 
 clean:
-	rm -f ${OBJ} ${BIN}
-
-.PHONY: all clean
-# END
+	rm -rf $(BUILD_DIR)/$(SANDBOX_DIR)

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "board.h"
+#include "display.h"
 
 int main(){
     Game g;
@@ -16,7 +17,7 @@ int main(){
     printf("value : %d\n",move(&g,6,4,4,4));
     display(&g);
 
-
+    display_board(*g.board);
 
     free_game(&g);
     return 0;

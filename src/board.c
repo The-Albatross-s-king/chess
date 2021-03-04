@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "board.h"
 #include <err.h>
@@ -13,11 +14,11 @@ int get_pos(int x, int y)
 int move(Game* g,int x, int y, int x2, int y2)
 {
 
-    Piece* p=g->board[get_pos(x,y)];
+    piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
         errx(3, "Error, case vide\n");
     int pos=get_pos(x2,y2);
-    Piece* target=g->board[pos];
+    piece* target=g->board[pos];
     if(target==NULL) //bouge simplement la piece
     {
         g->board[pos]=p;
@@ -46,7 +47,7 @@ void set_game(Game* g)
         for(int j=0;j<8;j++)
         {
             int x=get_pos(i,j);
-            g->board[x]=malloc(sizeof(Piece));
+            g->board[x]=malloc(sizeof(piece));
             g->board[x]->color=BLACK;
             g->board[x]->x=i;
             g->board[x]->y=j;
@@ -61,7 +62,7 @@ void set_game(Game* g)
         for(int j=0;j<8;j++)
         {
             int x=get_pos(i,j);
-            g->board[x]=malloc(sizeof(Piece));
+            g->board[x]=malloc(sizeof(piece));
             g->board[x]->color=WHITE;
             g->board[x]->x=i;
             g->board[x]->y=j;
@@ -120,5 +121,54 @@ void display(Game* g)
 
         printf("\n");
     }
+}
 
+// Mean to set the color and starting piece position.
+void set_board(piece *board)
+{
+    memset(board, 0, 64 * sizeof(piece));
+    piece p = {ROOK, 1, 0, BLACK, 0, 0};
+    board[0] = p;
+    board[7] = p;
+
+    p.type = KNIGHT;
+    board[1] = p;
+    board[6] = p;
+
+    p.type = BISHOP;
+    board[2] = p;
+    board[5] = p;
+
+    p.type = QUEEN;
+    board[3] = p;
+
+    p.type = KING;
+    board[4] = p;
+
+    p.type = PAWN;
+    for(int i = 0; i < 8; i++)
+        board[8 + i] = p;
+
+    p.color = WHITE;
+    p.type = ROOK;
+    board[56] = p;
+    board[63] = p;
+
+    p.type = KNIGHT;
+    board[57] = p;
+    board[62] = p;
+
+    p.type = BISHOP;
+    board[58] = p;
+    board[61] = p;
+
+    p.type = QUEEN;
+    board[59] = p;
+
+    p.type = KING;
+    board[60] = p;
+
+    p.type = PAWN;
+    for(int i = 0; i < 8; i++)
+        board[48 + i] = p;
 }
