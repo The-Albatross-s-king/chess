@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <err.h>
-#include "input.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include "board.h"
+#include "input.h"
 
 int verif_input_letter(char c){
 	if (c >= 'a' && c <= 'h')
@@ -16,6 +17,36 @@ int verif_input_number(char c){
 	if (c >= '1' && c <= '8')
 		return c - '1';
 	return -1;
+}
+
+
+// Call input again if the piece does not exist at the targeted position.
+// If the piece called is valid, must generate the possibles moves.
+void is_piece(int *x, int *y, Game *game, enum color side)
+{
+    int pos = get_pos(*x, *y);
+    if(game->board[pos] == NULL || game->board[pos]->color != side)
+    {
+        printf("Not valid piece at selected coordinates.\nTry again...\n");
+        input(x, y);
+    }
+    /*
+     * else
+     * {
+     *  generate_moves(board[pos]);
+     * }
+     */
+}
+
+// Call intput to set the coordinates of the destination's position.
+// When called; pass different coordinates than starting x y.
+void target_pos(int *new_x, int *new_y /*Maybe add a list of move*/)
+{
+    printf("Enter targeted postition:\n");
+    input(new_x, new_y);
+
+    // Iterate over list of moves to check if the move is possible.
+    // If move is possible call move.
 }
 
 // Blocking function, wait for input user. 

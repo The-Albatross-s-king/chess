@@ -23,9 +23,9 @@ typedef struct piece
 
 typedef struct Game
 {
-piece* board[64];
-piece* blacks[16]; //every black pieces
-piece* whites[16];
+    piece* board[64];
+    piece* blacks[16]; //every black pieces
+    piece* whites[16];
 }Game;
 
 int get_pos(int x, int y);
