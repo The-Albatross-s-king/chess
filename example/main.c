@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include "display.h"
+#include "input.h"
 
 int main(){
     Game g;
@@ -18,6 +19,10 @@ int main(){
     display(&g);
 
     display_board(*g.board);
+
+	int x = -1;
+	int y = -1;
+	input(&x,&y); 
 
     free_game(&g);
     return 0;
