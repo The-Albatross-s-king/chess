@@ -31,11 +31,11 @@ void is_piece(int *x, int *y, Game *game, enum color side)
         input(x, y);
     }
     /*
-     * else
-     * {
-     *  generate_moves(board[pos]);
-     * }
-     */
+    ** else
+    ** {
+    **  generate_moves(board[pos]);
+    ** }
+    */
 }
 
 // Call intput to set the coordinates of the destination's position.
