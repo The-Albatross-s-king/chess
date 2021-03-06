@@ -3,7 +3,7 @@
 CC = gcc
 CC_DEB = gcc -g3 -fsanitize=address
 CPPFLAGS = -Iinclude
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O0 
+CFLAGS = -Wall -Wextra -Werror -std=c99 -O2
 LDFLAGS =
 LDLIBS =
 
