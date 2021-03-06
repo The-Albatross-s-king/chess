@@ -1,24 +1,27 @@
 #include <stdlib.h>
 #include <stdio.h>
-
+#include "list.h"
 #include "board.h"
 #include "display.h"
 
-int main(){
+int main()
+{
     Game g;
     for(int i = 0; i < 64; i++)
         g.board[i] = NULL; //init a 0 toutes les pieces
+
     set_game(&g); //remplit le plateau de pieces
+    display_board(g.board);
+    Move_list* l;
+    l=get_moves(&g, 1, 4);
+    display_list(l);
+    free_list(l);
 
-    printf("value : %d\n",move(&g,0,4,6,4));
-    display(&g); //fonction temporaire pour debugger
-    printf("\n");
+    int applied=move(&g, 1, 4, 4, 4);
+    printf("moved :%d\n",applied);
+    l=get_moves(&g,3,3);
+    display_list(l);
+    free_list(l);
 
-    printf("value : %d\n",move(&g,6,4,4,4));
-    display(&g);
-
-    display_board(*g.board);
-
-    free_game(&g);
     return 0;
 }
