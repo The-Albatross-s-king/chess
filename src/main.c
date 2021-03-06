@@ -3,13 +3,14 @@
 
 #include "board.h"
 
-int main(){
+int main()
+{
     Game g;
     for(int i = 0; i < 64; i++)
         g.board[i] = NULL; //init a 0 toutes les pieces
+
     set_game(&g); //remplit le plateau de pieces
 
-    
     Move_list* l;
     display(&g);
     l=get_moves(&g, 1, 4);
@@ -24,8 +25,5 @@ int main(){
     display_list(l);
     free_list(l);
 
-
-
-    free_game(&g);
     return 0;
 }

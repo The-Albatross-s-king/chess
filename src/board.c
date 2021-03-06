@@ -382,13 +382,12 @@ void set_game(Game* g)
         for(int j=0;j<8;j++)
         {
             int x=get_pos(i,j);
-            g->board[x]=malloc(sizeof(Piece));
-            g->board[x]->color=BLACK;
-            g->board[x]->x=i;
-            g->board[x]->y=j;
-            g->board[x]->alive=1;
-            g->board[x]->moved=0;
-            g->blacks[x]=g->board[x];
+            g->blacks[x].color=BLACK;
+            g->blacks[x].x=i;
+            g->blacks[x].y=j;
+            g->blacks[x].alive=1;
+            g->blacks[x].moved=0;
+            g->board[x]=&(g->blacks[x]);
         }
     }
     //set whites (down)s
@@ -397,13 +396,12 @@ void set_game(Game* g)
         for(int j=0;j<8;j++)
         {
             int x=get_pos(i,j);
-            g->board[x]=malloc(sizeof(Piece));
-            g->board[x]->color=WHITE;
-            g->board[x]->x=i;
-            g->board[x]->y=j;
-            g->board[x]->alive=1;
-            g->board[x]->moved=0;
-            g->whites[(x+8)%16]=g->board[x];//+8 to keep same order of white 
+            g->whites[x].color=WHITE;
+            g->whites[x].x=i;
+            g->whites[x].y=j;
+            g->whites[x].alive=1;
+            g->whites[x].moved=0;
+            g->board[x]=&(g->whites[(x+8)%16]);//+8 to keep same order of white 
         }
     }
 
@@ -425,17 +423,14 @@ void set_game(Game* g)
     {
         g->board[get_pos(7,j)]->type=types[7-j];
     }
-
-
 }
-
 
 void free_game(Game* g)
 {
     for(int i = 0; i < 16 ; i++)
     { 
-        free(g->blacks[i]);
-        free(g->whites[i]);
+        free(&(g->blacks[i]));
+        free(&(g->whites[i]));
     }
 }
 

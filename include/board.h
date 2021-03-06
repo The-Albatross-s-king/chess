@@ -1,16 +1,22 @@
 #pragma once
 
 
-enum pieces_colors {BLACK=0, WHITE=1};
+enum pieces_colors 
+{
+    BLACK=0,
+    WHITE=1
+};
 
 // used in min-max pieces_values[6]={100,500,300,300,900,0};
-enum pieces_types {
-PAWN=0,
-ROOK=1,
-KNIGHT=2,
-BISHOP=3, //bishop -> fou
-QUEEN=4,
-KING=5};
+enum pieces_types
+{
+    PAWN,
+    ROOK,
+    KNIGHT,
+    BISHOP, //bishop -> fou
+    QUEEN,
+    KING
+};
 typedef struct Piece
 {
     enum pieces_types type;
@@ -23,17 +29,16 @@ typedef struct Piece
 
 typedef struct Game
 {
-Piece* board[64];
-Piece* blacks[16]; //every black pieces
-Piece* whites[16];
+    Piece *board[64];
+    Piece blacks[16]; //every black pieces
+    Piece whites[16];
 }Game;
 
 typedef struct Move_list
 {
-    struct Move_list* next;
+    struct Move_list *next;
     int x;
     int y;
-
 }Move_list;
 
 
