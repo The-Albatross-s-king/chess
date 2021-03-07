@@ -1,9 +1,32 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <display.h>
 #include "board.h"
 #include "list.h"
 #include <err.h>
+
+char* get_name(int type)
+{
+    switch(type)
+    {
+        case 0:
+            return "PAWN";
+        case 1:
+            return "ROOK";
+        case 2:
+            return "KNIGHT";
+        case 3:
+            return "BISHOP";
+        case 4:
+            return "QUEEN";
+        case 5:
+            return "KING";
+        default:
+            return "NONE";
+    }
+}
+
 
 int get_pos(int x, int y)
 {
@@ -258,12 +281,14 @@ int move(Game* g, Piece* p, int x2, int y2)
     free_list(l);
     return 0;
 }
-int apply_move(Game* g,int x, int y, int x2, int y2)
+Piece* apply_move(Game* g,int x, int y, int x2, int y2)
 {
-
     Piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
+    {
+        display_board(g->board);
         errx(3, "Error, case vide\n");
+    }
     p->moved=1;
     int pos=get_pos(x2,y2);
     Piece* target=g->board[pos];
@@ -273,15 +298,15 @@ int apply_move(Game* g,int x, int y, int x2, int y2)
         g->board[get_pos(x,y)]=NULL; //old place empty
         p->x=x2;
         p->y=y2;
-        return -1;
+        return NULL;
     }
     target->alive=0;
+    g->board[pos]=p;
     g->board[get_pos(x,y)]=NULL; //old place empty
     p->x=x2;
     p->y=y2;
 
-    g->board[pos]=p;
-    return target->type;
+    return target;
 }
 
 
@@ -321,7 +346,7 @@ void set_game(Game* g)
     int types[8]={ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK};
     for(int j=0;j<8;j++)
     {
-        g->board[get_pos(0,j)]->type=types[j];
+        g->board[get_pos(0,j)]->type=types[7-j];
 
     }
     for(int j=0;j<8;j++)
@@ -334,6 +359,6 @@ void set_game(Game* g)
     }
     for(int j=0;j<8;j++)
     {
-        g->board[get_pos(7,j)]->type=types[7-j];
+        g->board[get_pos(7,j)]->type=types[j];
     }
 }

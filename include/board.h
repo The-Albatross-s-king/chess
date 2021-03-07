@@ -35,7 +35,8 @@ typedef struct Game
 }Game;
 
 
-
+//usefull to describe the pieces through print
+char* get_name(int type);
 //returns in p the piece at x,y. return 0  if out of bound
 int get_piece(Game* g, int x, int y, Piece** p);
 
@@ -47,7 +48,7 @@ int get_pos(int x, int y);
 //check if valid and return 1 if move applied, use apply_move for no condition
 int move(Game* g,Piece* p, int x2, int y2);
 //return type of eaten piece, -1 if None.
-int apply_move(Game* g,int x, int y, int x2, int y2);
+Piece* apply_move(Game* g,int x, int y, int x2, int y2);
 
 
 void get_knight_moves(Game* g, Piece* p, Move_list* l);
