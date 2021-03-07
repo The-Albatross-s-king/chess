@@ -1,0 +1,6 @@
+bin/
+dep/
+main
+debug
+*.o
+*.d

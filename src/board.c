@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "board.h"
 #include "list.h"
@@ -217,14 +218,9 @@ void get_king_moves(Game* g, Piece* p,Move_list* l)
     }
 }
 
-void get_moves(Game* g, int x, int y, Move_list* l)
+void get_moves(Game* g,Piece* p, Move_list* l)
 {
     
-    Piece* p=g->board[get_pos(x,y)];
-    if(p==NULL)
-    {
-        return;
-    }
     switch(p->type)
     {
         case PAWN:
@@ -250,13 +246,13 @@ void get_moves(Game* g, int x, int y, Move_list* l)
 
 }
 //return 1 if move applied
-int move(Game* g, int x, int y, int x2, int y2)
+int move(Game* g, Piece* p, int x2, int y2)
 {
     Move_list* l=init_list();
-    get_moves(g, x, y, l);
+    get_moves(g, p, l);
     if(in_list(l, x2, y2)){
         free_list(l);
-        apply_move(g, x, y, x2, y2);
+        apply_move(g, p->x, p->y, x2, y2);
         return 1;
     }
     free_list(l);
@@ -313,11 +309,11 @@ void set_game(Game* g)
         for(int j=0;j<8;j++)
         {
             int x=get_pos(i,j);
-            g->whites[x].color=WHITE;
-            g->whites[x].x=i;
-            g->whites[x].y=j;
-            g->whites[x].alive=1;
-            g->whites[x].moved=0;
+            g->whites[(x+8)%16].color=WHITE;
+            g->whites[(x+8)%16].x=i;
+            g->whites[(x+8)%16].y=j;
+            g->whites[(x+8)%16].alive=1;
+            g->whites[(x+8)%16].moved=0;
             g->board[x]=&(g->whites[(x+8)%16]);//+8 to keep same order of white 
         }
     }

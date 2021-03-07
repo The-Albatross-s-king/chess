@@ -1,5 +1,4 @@
 #pragma once
-
 #include "list.h"
 
 enum pieces_colors 
@@ -21,9 +20,9 @@ enum pieces_types
 typedef struct Piece
 {
     enum pieces_types type;
+    enum pieces_colors color;
     int alive;
     int moved;
-    int color;
     int x;
     int y;
 }Piece;
@@ -46,7 +45,7 @@ int can_move_to(Game* g, int x, int y, Piece* p);
 int get_pos(int x, int y);
 
 //check if valid and return 1 if move applied, use apply_move for no condition
-int move(Game* g, int x, int y, int x2, int y2);
+int move(Game* g,Piece* p, int x2, int y2);
 //return type of eaten piece, -1 if None.
 int apply_move(Game* g,int x, int y, int x2, int y2);
 
@@ -57,12 +56,6 @@ void get_rook_moves(Game* g, Piece* p, Move_list* l);
 void get_king_moves(Game* g, Piece* p, Move_list* l);
 void get_bishop_moves(Game* g, Piece* p, Move_list* l);
 void get_queen_moves(Game* g,Piece* p, Move_list* l);
-void get_moves(Game* g, int x, int y, Move_list* l);
+void get_moves(Game* g, Piece* p, Move_list* l);
 //malloc pieces and init board
 void set_game(Game* g);
-
-//debugging fonction
-void display(Game* g);
-
-//free board
-void free_game(Game* g);
