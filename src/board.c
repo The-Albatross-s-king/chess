@@ -341,36 +341,3 @@ void set_game(Game* g)
         g->board[get_pos(7,j)]->type=types[7-j];
     }
 }
-
-void free_game(Game* g)
-{
-    for(int i = 0; i < 16 ; i++)
-    { 
-        free(&(g->blacks[i]));
-        free(&(g->whites[i]));
-    }
-}
-
-
-void display(Game* g)
-{
-    for(int i=0;i<8;i++)
-    {
-        for(int j=0; j<8;j++)
-        {
-            int x=get_pos(i,j);
-            if(g->board[x]==NULL)
-                printf("x ");
-            else{
-                printf("%d ",g->board[x]->type);
-            }
-        }
-
-        printf("\n");
-    }
-}
-
-
-
-
-
