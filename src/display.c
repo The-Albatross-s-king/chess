@@ -1,9 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <err.h>
 #include "display.h"
 #include "board.h"
+    
+int clear_display()
+{
+    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+    if (write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 11) == -1)
+        errx(1, "Can't clear the termial");
+    return 0;
+}
 
-void display_board(Piece **board){
+void display_board(Piece **board)
+{
+    clear_display();
     int offset = 0;
     int line = 1;
 
