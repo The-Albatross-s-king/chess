@@ -1,35 +1,46 @@
 # Makefile
 
+# Setting the compiler and the default linker program
 CC = gcc
+# Compiler for debug target
 CC_DEB = gcc -g3 -fsanitize=address
+# Options for pre-processor (-I, -include, -D ... )
 CPPFLAGS = -Iinclude
+# Main compilation options
 CFLAGS = -Wall -Wextra -Werror -std=c99 -O2
+# Linker options (probably always empty)
 LDFLAGS =
+# Libs and path for linker
 LDLIBS =
 
-SRC_DIR = src/
-BIN_DIR = bin/
-DIR = ${BIN_DIR}${SRC_DIR}
-build_dir = ${shell mkdir -p ${DIR}}
+# Executables names
 BIN = main
 DEBUG = debug
+
+# Directory for object files
+BIN_DIR = bin/
+SRC_DIR = src/
+DEBUG_DIR = debug/
+
+# DO NOT EDIT BELOW, unless you know exactly what you are doing
+
+BUILD_DIR = ${BIN_DIR}${SRC_DIR}
+build_dir = ${shell mkdir -p ${BUILD_DIR}}
+
 SRC = ${wildcard src/*.c}
-OBJ = ${patsubst ${SRC_DIR}%.c,${DIR}%.o,${SRC}}
+OBJ = ${patsubst ${SRC_DIR}%.c,${BUILD_DIR}%.o,${SRC}}
 
 all: ${BIN}
 
 ${BIN}: ${build_dir} ${OBJ}
-	${CC} ${CPPFLAGS} ${CFLAGS} ${OBJ} -o $@ ${LDLIBS} ${LDFLAGS}
+	${CC} ${OBJ} -o $@ ${LDLIBS} ${LDFLAGS}
 
-${BIN_DIR}${SRC_DIR}%.o: ${SRC_DIR}%.c
-	${CC} ${CPPFLAGS} ${CFLAGS} -o $@ -c $^ ${LDLIBS} ${LDFLAGS}
+${BUILD_DIR}%.o: ${SRC_DIR}%.c
+	${CC} ${CPPFLAGS} ${CFLAGS} -o $@ -c $^
 
 clean:
-	rm -rf ${BIN_DIR} ${BIN} ${DEBUG}
-
-${DEBUG}: ${build_dir} ${OBJ}
-	${CC_DEB} ${CPPFLAGS} ${CFLAGS} ${OBJ} -o $@ ${LDLIBS} ${LDFLAGS}
-
+	${RM} -r ${BIN_DIR}		# Remove object files
+	${RM} ${BIN} ${DEBUG}	# Remove executable files
 
 .PHONY: all clean ${DEBUG}
 # END
