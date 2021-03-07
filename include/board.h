@@ -50,6 +50,7 @@ int move(Game* g,Piece* p, int x2, int y2);
 //return type of eaten piece, -1 if None.
 Piece* apply_move(Game* g,int x, int y, int x2, int y2);
 
+int is_checkmate(Game* g, Piece *king);
 
 void get_knight_moves(Game* g, Piece* p, Move_list* l);
 void get_pawn_moves(Game* g, Piece* p, Move_list* l);

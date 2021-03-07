@@ -30,9 +30,9 @@ char* get_name(int type)
 
 int get_pos(int x, int y)
 {
-    if(x>=8 || y>=8 || x<0 || y<0)
+    if(x >= 8 || y >= 8 || x < 0 || y < 0)
         errx(3, "Error, out of bound\n");
-    return x*8+y;
+    return x * 8 + y;
 }
 
 //returns in p the piece at x,y. return 0  if out of bound
@@ -243,7 +243,13 @@ void get_king_moves(Game* g, Piece* p,Move_list* l)
 
 void get_moves(Game* g,Piece* p, Move_list* l)
 {
-    
+    Move_list* l;
+    Piece* p=g->board[get_pos(x,y)];
+    if(p==NULL)
+    {
+        l=init_list();
+        return l;
+    }
     switch(p->type)
     {
         case PAWN:
@@ -309,6 +315,28 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2)
     return target;
 }
 
+// Is_checkmate checks if the given king is in checkmate state.
+int is_checkmate(Game* g, Piece *king)
+{
+    // Means opponent list, its the list of opponent's pieces.
+    Piece *opp_list; 
+    if(king->color == WHITE)
+        opp_list = g->blacks;
+    else
+        opp_list = g->whites;
+
+    Move_list *opp_li_moves;
+    for(int i = 0; i < 16; i ++)
+    {
+        int x_opp = opp_list[i].x;
+        int y_opp = opp_list[i].y;
+        opp_li_moves = get_moves(g, x_opp, y_opp);
+        if(in_list(opp_li_moves, king->x, king->y))
+            return 1;
+    }
+
+    return 0;
+}
 
 void set_game(Game* g)
 {
