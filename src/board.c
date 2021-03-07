@@ -148,9 +148,8 @@ void get_diagonal_moves(Game* g, Piece* p, Move_list* l)
 
 }
 
-Move_list* get_pawn_moves(Game* g, Piece* p)
+void get_pawn_moves(Game* g, Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
     int s=1;//sens
     if(p->color==WHITE) //bottom of the board
         s=-1;
@@ -171,13 +170,11 @@ Move_list* get_pawn_moves(Game* g, Piece* p)
     {       
         add_list(l,p->x+2*s,p->y);
     }
-    return l;
 }
 
 
-Move_list* get_knight_moves(Game* g, Piece* p)
+void get_knight_moves(Game* g, Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
 
     int moves_x[8]={+2,+2,-2,-2,+1,+1,-1,-1};
     int moves_y[8]={+1,-1,+1,-1,+2,-2,+2,-2};
@@ -188,35 +185,28 @@ Move_list* get_knight_moves(Game* g, Piece* p)
             add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
         }
     }
-    return l;
 }
 
-Move_list* get_bishop_moves(Game* g, Piece* p)
+void get_bishop_moves(Game* g, Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
     get_diagonal_moves(g,p,l);
-    return l;
 
 } 
-Move_list* get_rook_moves(Game* g, Piece* p)
+void get_rook_moves(Game* g, Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
     get_cross_moves(g,p,l);
-    return l;
 
 } 
 
-Move_list* get_queen_moves(Game* g,Piece* p)
+void get_queen_moves(Game* g,Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
     get_cross_moves(g,p,l);
     get_diagonal_moves(g,p,l);
-    return l;
 
 }
-Move_list* get_king_moves(Game* g, Piece* p)
+void get_king_moves(Game* g, Piece* p,Move_list* l)
 {
-    Move_list* l=init_list();
+    
     int moves_x[8]={1,1,1,-1,-1,-1,0,0};
     int moves_y[8]={1,-1,0,1,-1,0,1, -1};
     for(int i=0; i<8; i++){
@@ -225,50 +215,45 @@ Move_list* get_king_moves(Game* g, Piece* p)
             add_list(l,p->x+moves_x[i],p->y+moves_y[i]);
         }
     }
-    return l;
 }
 
-Move_list* get_moves(Game* g, int x, int y)
+void get_moves(Game* g, int x, int y, Move_list* l)
 {
     
-    Move_list* l;
     Piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
     {
-        l=init_list();
-        return l;
+        return;
     }
     switch(p->type)
     {
         case PAWN:
-            l=get_pawn_moves(g,p);
+            get_pawn_moves(g,p,l);
             break;
         case ROOK:
-            l=get_rook_moves(g,p);
+            get_rook_moves(g,p,l);
             break;
         case BISHOP:
-            l=get_bishop_moves(g,p);
+            get_bishop_moves(g,p,l);
             break;
         case KNIGHT:
-            l=get_knight_moves(g,p);
+            get_knight_moves(g,p,l);
             break;
          case QUEEN:
-            l=get_queen_moves(g,p);
+            get_queen_moves(g,p,l);
             break;
         case KING:
-            l=get_king_moves(g,p);
+            get_king_moves(g,p,l);
             break;
-        default:
-            errx(3, "invalid type\n");
     }
-    return l;
 
 
 }
 //return 1 if move applied
 int move(Game* g, int x, int y, int x2, int y2)
 {
-    Move_list* l=get_moves(g, x, y);
+    Move_list* l=init_list();
+    get_moves(g, x, y, l);
     if(in_list(l, x2, y2)){
         free_list(l);
         apply_move(g, x, y, x2, y2);
