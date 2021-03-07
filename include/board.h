@@ -1,47 +1,61 @@
 #pragma once
+#include "list.h"
+
+enum pieces_colors 
+{
+    BLACK=0,
+    WHITE=1
+};
 
 // used in min-max pieces_values[6]={100,500,300,300,900,0};
-enum pieces
+enum pieces_types
 {
-    null, PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING
+    PAWN,
+    ROOK,
+    KNIGHT,
+    BISHOP, //bishop -> fou
+    QUEEN,
+    KING
 };
-
-enum color
+typedef struct Piece
 {
-    WHITE, BLACK
-};
-
-typedef struct piece
-{
-    enum pieces type;
+    enum pieces_types type;
+    enum pieces_colors color;
     int alive;
     int moved;
-    enum color color;
     int x;
     int y;
-}piece;
+}Piece;
 
 typedef struct Game
 {
-    piece* board[64];
-    piece* blacks[16]; //every black pieces
-    piece* whites[16];
+    Piece *board[64];
+    Piece blacks[16]; //every black pieces
+    Piece whites[16];
 }Game;
+
+
+
+//returns in p the piece at x,y. return 0  if out of bound
+int get_piece(Game* g, int x, int y, Piece** p);
+
+//return 1 if pos occupied by opposite color or empty
+int can_move_to(Game* g, int x, int y, Piece* p);
 
 int get_pos(int x, int y);
 
+//check if valid and return 1 if move applied, use apply_move for no condition
+int move(Game* g, int x, int y, int x2, int y2);
 //return type of eaten piece, -1 if None.
-int move(Game* g,int x, int y, int x2, int y2);
+int apply_move(Game* g,int x, int y, int x2, int y2);
 
+
+Move_list* get_knight_moves(Game* g, Piece* p);
+Move_list* get_pawn_moves(Game* g, Piece* p);
+Move_list* get_rook_moves(Game* g, Piece* p);
+Move_list* get_king_moves(Game* g, Piece* p);
+Move_list* get_bishop_moves(Game* g, Piece* p);
+Move_list* get_queen_moves(Game* g,Piece* p);
+Move_list* get_moves(Game* g, int x, int y);
 //malloc pieces and init board
 void set_game(Game* g);
-
-
-//debugging fonction
-void display(Game* g);
-
-//free board
-void free_game(Game* g);
-
-void set_board(piece *board);
-

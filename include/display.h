@@ -3,6 +3,6 @@
 
 #include "board.h"
 
-void display_board(piece *board);
+void display_board(Piece **board);
 
 #endif
