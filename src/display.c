@@ -5,14 +5,14 @@
 
 void display_board(Piece **board){
     int offset = 0;
-    int line = 'A';
+    int line = 1;
 
     //printf("%d %d", board->type, (board + 1)->type);
 
-    printf("_|01234567");
+    printf("_|ABCDEFGH");
     for(unsigned int i = 0; i < 64; i++){
         if (i % 8 == 0){
-            printf("|\n%c|", line);
+            printf("|\n%d|", line);
             line++;
             offset = offset == 0 ? 1 : 0;
         }
