@@ -80,7 +80,7 @@ void display_list(Move_list* l)
     l=l->next;
     while(l!=NULL)
     {
-        printf("%c %d -> ",(char)(l->x+'A'),l->y);
+        printf("%d %c -> ",l->x+1,(char)(l->y+'A'));
         l=l->next;
     }
     printf("NULL\n");

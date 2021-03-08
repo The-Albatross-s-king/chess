@@ -5,9 +5,20 @@
 #include "board.h"
 #include "list.h"
 #include <unistd.h>
-#define DEPTH_MAX 1
+#define DEPTH_MAX 4
 
 int SCORES[6]={100,500,300,300,900,10000};
+
+int evaluate(Game* g, Piece* p, int cur_color)
+{
+    g->board[0]=g->board[0]; //REMOVE THAT LATER
+    if(cur_color==WHITE)
+    {
+        return 7-p->x;
+    }
+    return p->x;
+}
+
 int rec_minmax(Game* g, int cur_color, int depth, int max)
 {
     Piece* b;
@@ -43,6 +54,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
                 score_cur_move=SCORES[piece_eat->type]*(-1+2*max);
             else
                 score_cur_move=0;
+            score_cur_move+=evaluate(g, p, cur_color);
             //continue recurcion
             if(depth<DEPTH_MAX)
                 score_cur_move+=rec_minmax(g, !cur_color, depth+1, !max );
@@ -79,7 +91,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
     Move_list* moves= init_list();
     Move_list cur_move;
     int score_cur_move=0;
-    int best_score=-1;
+    int best_score=0;
     Piece* p;
     Piece* piece_eat;
     int old_x, old_y, old_moved;
@@ -105,11 +117,12 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
                 score_cur_move=SCORES[piece_eat->type];
             else
                 score_cur_move=0;
+            score_cur_move+=evaluate(g, p, cur_color);
             //continue recurcion
             if(depth<DEPTH_MAX)
                 score_cur_move+=rec_minmax(g, !cur_color, depth+1, 0 );
             //choose best move
-            if(score_cur_move>best_score)
+            if(*best_piece==NULL || score_cur_move>best_score)
             {
                 best_score=score_cur_move;
                 *best_piece=p;
@@ -118,24 +131,22 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             }
             //undo the move
             apply_move(g, p->x, p->y, old_x, old_y);
+            p->moved=old_moved;
             if(piece_eat!=NULL)
             {
                 piece_eat->alive=1;
             }
-            p->moved=old_moved;
             g->board[get_pos(cur_move.x, cur_move.y)]=piece_eat;
         }
     }
     free_list(moves);  
-
-
 }
 
 void auto_move(Game* g, int cur_color)
 {
 int x=0;
 int y=0;
-Piece* p;
+Piece* p=NULL;
 minmax(g,&x, &y, &p, cur_color); 
 printf("moved a %s from %c/%d to %c/%d\n",\
         get_name(p->type), p->x+'A', p->y, x+'A',y);
