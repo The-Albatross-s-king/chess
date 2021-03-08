@@ -243,13 +243,6 @@ void get_king_moves(Game* g, Piece* p,Move_list* l)
 
 void get_moves(Game* g,Piece* p, Move_list* l)
 {
-    Move_list* l;
-    Piece* p=g->board[get_pos(x,y)];
-    if(p==NULL)
-    {
-        l=init_list();
-        return l;
-    }
     switch(p->type)
     {
         case PAWN:
@@ -292,7 +285,6 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2)
     Piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
     {
-        display_board(g->board);
         errx(3, "Error, case vide\n");
     }
     p->moved=1;
@@ -325,12 +317,12 @@ int is_checkmate(Game* g, Piece *king)
     else
         opp_list = g->whites;
 
-    Move_list *opp_li_moves;
+    Move_list *opp_li_moves=init_list();
     for(int i = 0; i < 16; i ++)
     {
         int x_opp = opp_list[i].x;
         int y_opp = opp_list[i].y;
-        opp_li_moves = get_moves(g, x_opp, y_opp);
+        get_moves(g, g->board[get_pos(x_opp,y_opp)], opp_li_moves);
         if(in_list(opp_li_moves, king->x, king->y))
             return 1;
     }
@@ -343,6 +335,8 @@ void set_game(Game* g)
     // 1 : malloc pieces and init basic data
     // 2 : set type 
     //set blacks (up)
+    for(int i=0; i<64; i++)
+        g->board[i]=NULL;
     for(int i=0; i<2; i++)
     {
         for(int j=0;j<8;j++)

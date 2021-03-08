@@ -5,7 +5,7 @@
 #include "board.h"
 #include "list.h"
 #include <unistd.h>
-#define DEPTH_MAX 3
+#define DEPTH_MAX 1
 
 int SCORES[6]={100,500,300,300,900,10000};
 int rec_minmax(Game* g, int cur_color, int depth, int max)
@@ -22,19 +22,22 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
     int best_score=0;
     Piece* p;
     Piece* piece_eat;
-    int old_x, old_y;
+    int old_x, old_y,old_moved;
     for(int i=0; i<16; i++)
     {
         p=&b[i]; //get the piece
+        if(!p->alive)
+            continue;
         old_x=p->x;
         old_y=p->y;
+        old_moved=p->moved;
         get_moves(g,p,moves); //get the moves
+        //display_board(g->board, moves, cur_color);
+        // sleep(2);
         while(!is_empty(moves))
         {
             pop_list(moves,&cur_move.x, &cur_move.y); //get one move
             piece_eat=apply_move(g, p->x, p->y,cur_move.x, cur_move.y);
-            display_board(g->board);
-            sleep(1);
             //evaluate the last move
             if(piece_eat!=NULL)
                 score_cur_move=SCORES[piece_eat->type]*(-1+2*max);
@@ -54,6 +57,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
             {
                 piece_eat->alive=1;
             }
+            p->moved=old_moved;
             g->board[get_pos(cur_move.x, cur_move.y)]=piece_eat;
         }
     }
@@ -78,13 +82,18 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
     int best_score=-1;
     Piece* p;
     Piece* piece_eat;
-    int old_x, old_y;
+    int old_x, old_y, old_moved;
     for(int i=0; i<16; i++)
     {
         p=&b[i]; //get the piece
+        if(!p->alive)
+            continue;
         old_x=p->x;
         old_y=p->y;
+        old_moved=p->moved;
         get_moves(g,p,moves); //get the moves
+        //display_board(g->board, moves, cur_color);
+        //sleep(2);
         //printf("%lu move of %d at pos %d %d\n", get_size_list(moves), p->type, p->x, p->y); 
         while(!is_empty(moves))
         {
@@ -113,6 +122,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             {
                 piece_eat->alive=1;
             }
+            p->moved=old_moved;
             g->board[get_pos(cur_move.x, cur_move.y)]=piece_eat;
         }
     }

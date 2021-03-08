@@ -34,7 +34,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
     }
     else
     {
-        li = get_moves(game, *x, *y);
+        get_moves(game, game->board[get_pos(*x, *y)], li);
         return;
     }
     can_i_go(game, y, x, li, c);
@@ -48,7 +48,7 @@ int go_to(Game *game, int *x, int *y, int *new_x, int *new_y)
     input(new_x, new_y);
     //TODO Check if the move is possible ? 
     // Check if a piece is in the way.
-    if(move(game, *x, *y, *new_x, *new_y))
+    if(move(game, game->board[get_pos(*x, *y)], *new_x, *new_y))
         return 1;
 
     *x = *new_x;
@@ -76,7 +76,7 @@ void input(int *y, int *x){
         return;
     }
 
-    if (buf[0] == 'h' && buf[1] == 'e' && buf[2] == 'l' && buf[3] == 'p' && buf[4] == '\n'){
+    if(buf[0] == 'h' && buf[1] == 'e' && buf[2] == 'l' && buf[3] == 'p' && buf[4] == '\n'){
         printf("aide de l'IA\n");
         *x = -1;
         *y = -1;

@@ -51,12 +51,13 @@ int main()
     int color=BLACK;
 
 
-    apply_move(&g, 1, 3, 3, 2);
+    apply_move(&g, 1, 4, 4, 5);
     for(int i=0; i<10; i++)
     {
         auto_move(&g, color);
         color=!color;
-        display_board(g.board);
+        display_board((Piece**)&g.board, NULL, BLACK);
+        sleep(1);
     }
     //Piece* to_move;
     //apply_move(&g, 0, 3, 4, 4);
