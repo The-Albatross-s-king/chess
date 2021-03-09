@@ -231,7 +231,6 @@ Move_list* get_king_moves(Game* g, Piece* p)
 
 Move_list* get_moves(Game* g, int x, int y)
 {
-    
     Move_list* l;
     Piece* p=g->board[get_pos(x,y)];
     if(p==NULL)
@@ -278,6 +277,7 @@ int move(Game* g, int x, int y, int x2, int y2)
     free_list(l);
     return 0;
 }
+
 int apply_move(Game* g,int x, int y, int x2, int y2)
 {
 
@@ -304,6 +304,28 @@ int apply_move(Game* g,int x, int y, int x2, int y2)
     return target->type;
 }
 
+// Is_checkmate checks if the given king is in checkmate state.
+int is_checkmate(Game* g, Piece *king)
+{
+    // Means opponent list, its the list of opponent's pieces.
+    Piece *opp_list; 
+    if(king->color == WHITE)
+        opp_list = g->blacks;
+    else
+        opp_list = g->whites;
+
+    Move_list *opp_li_moves;
+    for(int i = 0; i < 16; i ++)
+    {
+        int x_opp = opp_list[i].x;
+        int y_opp = opp_list[i].y;
+        opp_li_moves = get_moves(g, x_opp, y_opp);
+        if(in_list(opp_li_moves, king->x, king->y))
+            return 1;
+    }
+
+    return 0;
+}
 
 void set_game(Game* g)
 {
