@@ -40,7 +40,8 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
     int step = 1;
     int begin = 0;
     int line = 2;
-    if (side == WHITE)
+    clear_display();
+    if (side == BLACK)
     {
         line = 7;
         printf("_|HGFEDCBA|\n8|");
@@ -49,7 +50,6 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
     }
     else
         printf("_|ABCDEFGH|\n1|");
-    // clear_display();
     int offset = 0;
     unsigned long bitboard = create_bitboard(list);
     int white_bg = 100;
