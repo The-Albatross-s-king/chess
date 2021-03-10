@@ -22,14 +22,13 @@ int verif_input_number(char c){
 
 // Call input again if the piece does not exist at the targeted position.
 // If the piece called is valid, must generate the possibles moves.
-void is_piece(Game *game, int *x, int *y, Move_list *li)
+void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
 {
     input(x, y);
-    int pos = get_pos(*x, *y);
     Piece *target = NULL;
     if(!get_piece(game, *x, *y, &target))
         errx(1, "Out of bound in chessboard");
-    if(game->board[pos] == NULL || game->board[pos]->color != target->color)
+    if(target == NULL || target->color != c)
     {
         printf("Not valid piece at selected coordinates.\nTry again...\n");
     }
@@ -38,12 +37,12 @@ void is_piece(Game *game, int *x, int *y, Move_list *li)
         li = get_moves(game, *x, *y);
         return;
     }
-    is_piece(game, y, x, li);
+    can_i_go(game, y, x, li, c);
 }
 
 // Call intput to set the coordinates of the destination's position.
 // When called; please pass different coordinates than starting x y.
-int target_pos(Game *game, int *x, int *y, int *new_x, int *new_y)
+int go_to(Game *game, int *x, int *y, int *new_x, int *new_y)
 {
     printf("Enter targeted postition:\n");
     input(new_x, new_y);
@@ -61,7 +60,7 @@ int target_pos(Game *game, int *x, int *y, int *new_x, int *new_y)
 // If the input is not valid, recall the function.
 // Set x on abscissa (letter) and y on ordinate (number).
 // If the input is "help", set x and y on -1.
-void input(int *x, int *y){
+void input(int *y, int *x){
     printf("Wait for coordinates...\n");
     char buf[16];
     ssize_t r = 16;

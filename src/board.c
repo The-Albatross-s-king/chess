@@ -7,9 +7,9 @@
 
 int get_pos(int x, int y)
 {
-    if(x>=8 || y>=8 || x<0 || y<0)
+    if(x >= 8 || y >= 8 || x < 0 || y < 0)
         errx(3, "Error, out of bound\n");
-    return x*8+y;
+    return x * 8 + y;
 }
 
 //returns in p the piece at x,y. return 0  if out of bound
