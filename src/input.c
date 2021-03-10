@@ -24,6 +24,7 @@ int verif_input_number(char c){
 // If the piece called is valid, must generate the possibles moves.
 void is_piece(Game *game, int *x, int *y, Move_list *li)
 {
+    input(x, y);
     int pos = get_pos(*x, *y);
     Piece *target = NULL;
     if(!get_piece(game, *x, *y, &target))
@@ -31,7 +32,6 @@ void is_piece(Game *game, int *x, int *y, Move_list *li)
     if(game->board[pos] == NULL || game->board[pos]->color != target->color)
     {
         printf("Not valid piece at selected coordinates.\nTry again...\n");
-        input(x, y);
     }
     else
     {
@@ -49,7 +49,12 @@ int target_pos(Game *game, int *x, int *y, int *new_x, int *new_y)
     input(new_x, new_y);
     //TODO Check if the move is possible ? 
     // Check if a piece is in the way.
-    return move(game, *x, *y, *new_x, *new_y) ? 1 : 0;
+    if(move(game, *x, *y, *new_x, *new_y))
+        return 1;
+
+    *x = *new_x;
+    *y = *new_y;
+    return 0;
 }
 
 // Blocking function, wait for input user. 

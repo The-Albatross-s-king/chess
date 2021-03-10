@@ -6,45 +6,44 @@
 #include "input.h"
 
 // In work
-int run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
+void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
 {
     int black_checkmate = 0;
     int white_checkmate = 0;
-    size_t round = 1;
-    enum pieces_color player = WHITE;
-    Move_list *piece_moves;
+    size_t round = 0;
+    //enum pieces_colors player = WHITE;
+    Move_list *piece_moves = NULL;
 
     while(!black_checkmate && !white_checkmate)
     {
+        round++;
         display_board(g->board);
-        is_piece(g, x_input, y_input, );
-        target_pos(g, *x_input, *y_input, new_x, new_y);
-        black_checkmate = is_checkmate(g, g->blacks[4]);
-        white_checkmate = is_checkmate(g, g->whites[3]);
+        is_piece(g, x_input, y_input, piece_moves);
+        target_pos(g, x_input, y_input, new_x, new_y);
+        black_checkmate = is_checkmate(g, &g->blacks[4]);
+        white_checkmate = is_checkmate(g, &g->whites[3]);
     }
+
+    if(black_checkmate)
+        printf("Black is checkmate\nWHITE WON !");
+    else
+        printf("White is checkmate\nBLACK WON !");
+
+    return;
 }
 
 int main()
 {
     Game g;
     for(int i = 0; i < 64; i++)
-        g.board[i] = NULL; //init a 0 toutes les pieces
+        g.board[i] = NULL; // Use memset instead
 
-    set_game(&g); //remplit le plateau de pieces
-    Move_list* l;
-    l=get_moves(&g, 1, 4);
-    display_list(l);
-    free_list(l);
-
-    int applied=move(&g, 1, 4, 4, 4);
-    printf("moved :%d\n",applied);
-    l=get_moves(&g,3,3);
-    display_list(l);
-    free_list(l);
-
+    set_game(&g); //Initial state of a the checkerboard
     int x = -1;
     int y = -1;
-    input(&x,&y); 
+    int new_x = -1;
+    int new_y = -1;
+    run_game(&g, &x, &y, &new_x, &new_y);
 
     return 0;
 }
