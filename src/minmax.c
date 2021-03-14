@@ -3,6 +3,7 @@
 #include "minmax.h"
 #include "display.h"
 #include "board.h"
+#include "evaluate.h"
 #include "list.h"
 #include <unistd.h>
 #define DEPTH_MAX 4
@@ -33,7 +34,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
     int best_score=0;
     Piece* p;
     Piece* piece_eat;
-    int old_x, old_y,old_moved;
+    int old_x, old_y, old_moved;
     for(int i=0; i<16; i++)
     {
         p=&b[i]; //get the piece
@@ -42,7 +43,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
         old_x=p->x;
         old_y=p->y;
         old_moved=p->moved;
-        get_moves(g,p,moves); //get the moves
+        get_moves(g,p,moves, NULL); //get the moves
         //display_board(g->board, moves, cur_color);
         // sleep(2);
         while(!is_empty(moves))
@@ -103,7 +104,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
         old_x=p->x;
         old_y=p->y;
         old_moved=p->moved;
-        get_moves(g,p,moves); //get the moves
+        get_moves(g,p,moves, NULL); //get the moves
         //display_board(g->board, moves, cur_color);
         //sleep(2);
         //printf("%lu move of %d at pos %d %d\n", get_size_list(moves), p->type, p->x, p->y); 

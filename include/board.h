@@ -25,6 +25,7 @@ typedef struct Piece
     int moved;
     int x;
     int y;
+    int id;
 }Piece;
 
 typedef struct Game
@@ -52,12 +53,12 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2);
 
 int is_checkmate(Game* g, Piece *king);
 
-void get_knight_moves(Game* g, Piece* p, Move_list* l);
-void get_pawn_moves(Game* g, Piece* p, Move_list* l);
-void get_rook_moves(Game* g, Piece* p, Move_list* l);
-void get_king_moves(Game* g, Piece* p, Move_list* l);
-void get_bishop_moves(Game* g, Piece* p, Move_list* l);
-void get_queen_moves(Game* g,Piece* p, Move_list* l);
-void get_moves(Game* g, Piece* p, Move_list* l);
+void get_knight_moves(Game* g, Piece* p, Move_list* atk, Move_list* def);
+void get_pawn_moves(Game* g, Piece* p, Move_list* atk, Move_list* def);
+void get_rook_moves(Game* g, Piece* p, Move_list* atk, Move_list* def);
+void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def);
+void get_bishop_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def);
+void get_queen_moves(Game* g,Piece* p,  Move_list* atk, Move_list* def);
+void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def);
 //malloc pieces and init board
 void set_game(Game* g);

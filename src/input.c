@@ -34,7 +34,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
     }
     else
     {
-        get_moves(game, game->board[get_pos(*x, *y)], li);
+        get_moves(game, game->board[get_pos(*x, *y)], li, NULL);
         return;
     }
     can_i_go(game, y, x, li, c);

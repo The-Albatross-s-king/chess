@@ -10,8 +10,17 @@ Move_list* init_list()
     sentinel->x=-1;
     return sentinel;
 }
+
+void secure_add_list(Move_list* list, int x, int y)
+{
+    if(list==NULL)
+        return;
+    add_list(list,x,y);
+}
 void add_list(Move_list* list, int x, int y)
 {
+    if(list==NULL)
+        errx(3, "add_list : list not init");
     Move_list* new=malloc(sizeof(Move_list));
     new->x=x;
     new->y=y;
@@ -19,17 +28,6 @@ void add_list(Move_list* list, int x, int y)
     list->next=new;
 }
 
-size_t get_size_list(Move_list* list)
-{
-    size_t len=0;
-    list=list->next;
-    while(list!=NULL)
-    {
-        len++;
-        list=list->next;
-    }
-    return len;
-}
 // reads list and free the pop, returns 1 if valide 0 otherwise
 int pop_list(Move_list* list, int* x, int* y)
 {
