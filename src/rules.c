@@ -97,6 +97,8 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 	Move_list *enemy_moves;
 	for (int i = 0; i < 16; i++)
 	{
+		if ((enemy+i)->alive == 0)
+			continue;
 		enemy_moves = get_moves(g, (enemy+i)->x, (enemy+i)->y);
 		int x;
 		int y;
