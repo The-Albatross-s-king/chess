@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "board.h"
 #include "input.h"
+#include "rules.h"
 
 int verif_input_letter(char c){
     if (c >= 'a' && c <= 'h')
@@ -22,20 +23,30 @@ int verif_input_number(char c){
 
 // Call input again if the piece does not exist at the targeted position.
 // If the piece called is valid, must generate the possibles moves.
-void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
+void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
 {
     input(x, y);
     Piece *target = NULL;
     if(!get_piece(game, *x, *y, &target))
         errx(1, "Out of bound in chessboard");
+
     if(target == NULL || target->color != c)
     {
         printf("Not valid piece at selected coordinates.\nTry again...\n");
     }
     else
     {
-        li = get_moves(game, *x, *y);
-        return;
+		if (!is_treason(game, target))
+        {
+			*li = get_moves(game, *x, *y);
+			if (li == NULL)
+				printf("gros gros pb\n");
+			if (target->type == KING)
+				king_suicide(game, target, *li);
+        	return;
+		}
+		printf("This piece protect your King from being in check, you can not move it.\n"
+			"Try again...\n");
     }
     can_i_go(game, y, x, li, c);
 }

@@ -20,8 +20,9 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
         player = round % 2;
         display_board(g->board, NULL, player);
         printf("It's %s's turn !\n", player ? "WHITE" : "BLACK");
-        can_i_go(g, x_input, y_input, piece_moves, player);
-        if(go_to(g, x_input, y_input, new_x, new_y))
+        can_i_go(g, x_input, y_input, &piece_moves, player);
+        display_list(piece_moves);
+		if(go_to(g, x_input, y_input, new_x, new_y))
         {
             round++;
         }
