@@ -14,7 +14,7 @@ LDFLAGS =
 LDLIBS =
 
 # Executables names
-BIN = main
+BIN = main demo
 DEBUG = debug
 
 # Directory for object files
@@ -32,8 +32,16 @@ OBJ = ${patsubst ${SRC_DIR}%.c,${BUILD_DIR}%.o,${SRC}}
 
 all: ${BIN}
 
-${BIN}: ${build_dir} ${OBJ}
-	${CC} ${OBJ} -o $@ ${LDLIBS} ${LDFLAGS}
+main: ${build_dir} ${OBJ} bin/src/main.o
+	${CC} ${OBJ} bin/src/main.o -o $@ ${LDLIBS} ${LDFLAGS}
+
+demo: ${build_dir} ${OBJ} bin/src/demo.o
+	${CC} ${OBJ} bin/src/demo.o -o $@ ${LDLIBS} ${LDFLAGS}
+
+bin/src/main.o: main.c
+	${CC} ${CPPFLAGS} ${CGLAGS} -o $@ -c $^
+bin/src/demo.o: demo.c
+	${CC} ${CPPFLAGS} ${CGLAGS} -o $@ -c $^
 
 ${BUILD_DIR}%.o: ${SRC_DIR}%.c
 	${CC} ${CPPFLAGS} ${CFLAGS} -o $@ -c $^
