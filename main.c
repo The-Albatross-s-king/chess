@@ -33,7 +33,7 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
             sleep(2);
         }
         black_checkmate = is_checkmate(g, &g->blacks[3]);
-        white_checkmate = is_checkmate(g, &g->whites[4]);
+        white_checkmate = is_checkmate(g, &g->whites[3]);
         free_list(piece_moves);
     }
 

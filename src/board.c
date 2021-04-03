@@ -41,7 +41,7 @@ int get_pos(int x, int y)
 {
     if(!valid_pos(x,y))
         errx(3, "Error, out of bound\n");
-    return x * 8 + y;
+    return 8 * x + y;
 }
 
 //returns in p the piece at x,y. return 0  if out of bound

@@ -106,21 +106,26 @@ int save(Game* g, char* path)
     char* white="2";
     char* black="1";
     char* null="00";
-    for(int i=0; i<64; i++)
+    int err;
+	for(int i=0; i<64; i++)
     {
         p=g->board[i];
         if(p==NULL)
         {
-            write(fd, null, 2);
+            err = write(fd, null, 2);
             continue;
         }
         if(p->color==WHITE)
-            write(fd,white, 1);
+            err = write(fd,white, 1);
         else
-            write(fd,black,1);
+            err = write(fd,black,1);
         char x=(char)(p->type+'0');
-        write(fd, &x,1);
+        err = write(fd, &x,1);
     }
+	
+	if (err == -1)
+		printf("Can't write at this path\n");
+		
     close(fd);
     return 1;
 }
