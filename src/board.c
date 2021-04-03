@@ -316,6 +316,8 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 //def : returns if not null all defended pieces
 void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
+    if(p->alive==0)
+        return;
     switch(p->type)
     {
         case PAWN:
@@ -414,13 +416,13 @@ void set_game(Game* g)
     {
         for(int j=0;j<8;j++)
         {
-            int x=get_pos(i,j);
+            int x=i*8+j;
             g->blacks[x].color=BLACK;
             g->blacks[x].x=i;
             g->blacks[x].y=j;
             g->blacks[x].alive=1;
             g->blacks[x].moved=0;
-            g->board[x]=&(g->blacks[x]);
+            g->board[get_pos(i,j)]=&(g->blacks[x]);
         }
     }
     //set whites (down)s
@@ -428,13 +430,13 @@ void set_game(Game* g)
     {
         for(int j=0;j<8;j++)
         {
-            int x=get_pos(i,j);
-            g->whites[(x+8)%16].color=WHITE;
-            g->whites[(x+8)%16].x=i;
-            g->whites[(x+8)%16].y=j;
-            g->whites[(x+8)%16].alive=1;
-            g->whites[(x+8)%16].moved=0;
-            g->board[x]=&(g->whites[(x+8)%16]);//+8 to keep same order of white 
+            int x=(7-i)*8+j;
+            g->whites[x].color=WHITE;
+            g->whites[x].x=i;
+            g->whites[x].y=j;
+            g->whites[x].alive=1;
+            g->whites[x].moved=0;
+            g->board[get_pos(i,j)]=&(g->whites[x]);//+8 to keep same order of white 
         }
     }
 
@@ -460,4 +462,15 @@ void set_game(Game* g)
         g->board[get_pos(7,j)]->id=24+j;
         g->board[get_pos(7,j)]->type=types[j];
     }
+}
+
+
+void show_moves(Game* g, Piece* p)
+{
+    Move_list* atk=init_list();
+    Move_list* def=init_list();
+    get_moves(g, p, atk, def);
+    display_board((Piece**)&g->board, atk, WHITE);
+    display_board((Piece**)&g->board, def, WHITE);
+
 }

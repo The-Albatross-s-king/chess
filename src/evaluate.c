@@ -1,41 +1,60 @@
 #include <err.h>
 #include "evaluate.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include "board.h"
 #include "list.h"
 
-
-int get_atk_def(Game *game, int pos, int* scores)
+int get_position_score(Game* game, int cur_color)
 {
-    
+    int sum=0;
+    Piece p;
+    for(int i=0;i<16; i++)
+    {
+        if(cur_color==WHITE)
+        {
+            p=game->whites[i];
+            sum+=7-p.x;
+        }
+        else
+        {
+            p=game->blacks[i];
+            sum+=p.x;
+        }
+    }
+    return sum;
+}
+
+
+int get_atk_def(Game *game, int cur_color, int* scores)
+{
+
     Move_list *atk = init_list(); 
     Move_list *def = init_list();
-
-    get_moves(game, game->board[pos], atk, def);
-
-    if (atk == NULL)
-        err(3, "atk list is null");
-
-    if (def == NULL)
-        err(3, "def list is null");
-    
     int sum = 0;
-
-    def = def->next;
-    int x=0;
-    int y=0;
-    while (!is_empty(def))
+    for(int i=0;i<16; i++)
     {
-        pop_list(def, &x, &y);
-        sum += scores[game->board[x * 8 + y]->type] / 2;
-    }
+        if(cur_color==WHITE)
+            get_moves(game, &game->whites[i], atk, def);
+        else
+            get_moves(game, &game->blacks[i], atk, def);
 
-    atk = atk->next;
-    while (!is_empty(atk))
-    {
-        pop_list(def, &x, &y);
-        if (game->board[x * 8 + y] != NULL)
-            sum += scores[game->board[x * 8 + y]->type] / 2;
+        int x=0;
+        int y=0;
+        
+        while (!is_empty(def))
+        {
+            pop_list(def, &x, &y);
+            if(scores[game->board[x * 8 + y]->type!=KING])
+                sum += scores[game->board[x * 8 + y]->type] / 5;
+        }
+
+        while (!is_empty(atk))
+        {
+            pop_list(atk, &x, &y);
+            if (game->board[x * 8 + y] != NULL)
+                sum += scores[game->board[x * 8 + y]->type] / 5;
+        }
     }
     free_list(atk);
     free_list(def);

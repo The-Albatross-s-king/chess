@@ -6,6 +6,8 @@
 #include "display.h"
 #include "minmax.h"
 #include "input.h"
+#include "save_load.h"
+#include <err.h>
 
 // In work
 void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
@@ -44,39 +46,46 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
     return;
 }
 
-int main()
+int main(int argc, char** argv)
 {
     Game g;
     set_game(&g); //remplit le plateau de pieces
+    int want_load= argc==2;
+    if(argc>=3)
+        err(3, "Need filename to load");
+    //char* file="save/situation3.txt";
+    //load(&g, "save/basic.txt");
+    if(want_load)
+    {
+        load(&g, argv[1]);
+    }
+    else
+    {
+        /*clear_board(&g);
+        char black='1';
+        char white='2';
+        put_piece(&g, 0, 7, black, KING);
+        put_piece(&g, 2, 6, white, PAWN);
+        put_piece(&g, 3, 4, white, BISHOP);
+        put_piece(&g, 1, 6, black, ROOK);
+        */
+        /*show_moves(&g, p);
+          auto_move(&g, BLACK);
+          show_moves(&g, p);*/
+        //save(&g,file) ;
+    }
     int color=BLACK;
 
-
-    apply_move(&g, 1, 4, 4, 5);
-    for(int i=0; i<10; i++)
+    display_board((Piece**)&g.board, NULL, WHITE);
+    
+    //apply_move(&g, 1, 4, 4, 5);
+    for(int i=0; i<1; i++)
     {
         auto_move(&g, color);
         color=!color;
-        display_board((Piece**)&g.board, NULL, BLACK);
         sleep(1);
+        display_board((Piece**)&g.board, NULL, WHITE);
     }
-    //Piece* to_move;
-    //apply_move(&g, 0, 3, 4, 4);
-    
-    //printf("%d %d\n", to_move->x, to_move->y);
-    /*Move_list* l=init_list();
-    get_moves(&g, &g.blacks[3], l);
-    printf("size : %ld\n", get_size_list(l));
-    display_list(l);
-    while(!is_empty(l))
-        pop_list(l,&x,&y);
-    get_moves(&g, &g.blacks[3], l);
-    printf("size : %ld\n", get_size_list(l));
-    display_list(l);
-    
-    int applied=move(&g, 1, 4, 4, 4);
-    printf("moved :%d\n",applied);
-    get_moves(&g,3,3,l);
-    display_list(l);
-    free_list(l);*/
+
    return 0;
 }

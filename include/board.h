@@ -62,3 +62,5 @@ void get_queen_moves(Game* g,Piece* p,  Move_list* atk, Move_list* def);
 void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def);
 //malloc pieces and init board
 void set_game(Game* g);
+
+void show_moves(Game* g, Piece* p);
