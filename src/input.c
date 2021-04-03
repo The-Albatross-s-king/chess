@@ -20,10 +20,9 @@ int verif_input_number(char c){
     return -1;
 }
 
-
 // Call input again if the piece does not exist at the targeted position.
 // If the piece called is valid, must generate the possibles moves.
-void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
+void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
 {
     input(x, y);
     Piece *target = NULL;
@@ -36,8 +35,17 @@ void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
     }
     else
     {
-        get_moves(game, game->board[get_pos(*x, *y)], li, NULL);
-        return;
+        if (!is_treason(game, target))
+        {
+            get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
+            if (li == NULL)
+                printf("gros gros pb\n");
+            if (target->type == KING)
+                king_suicide(game, target, *li);
+            return;
+        }
+        printf("This piece protect your King from being in check, you can not move it.\n"
+                "Try again...\n");
     }
     can_i_go(game, y, x, li, c);
 }
@@ -50,6 +58,13 @@ int go_to(Game *game, int *x, int *y, int *new_x, int *new_y)
     input(new_x, new_y);
     //TODO Check if the move is possible ? 
     // Check if a piece is in the way.
+    if(!valid_pos(*new_x, *new_y))
+    {
+        printf("Invalid target\n");
+        go_to(game, x, y, new_x, new_y);
+        return 0;
+    }
+
     if(move(game, game->board[get_pos(*x, *y)], *new_x, *new_y))
         return 1;
 

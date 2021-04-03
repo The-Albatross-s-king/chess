@@ -227,7 +227,7 @@ void get_pawn_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
         s=-1;
     
     Piece* target=NULL;
-    if(get_piece(g, p->x, p->y, &target) && target==NULL)
+    if(get_piece(g, p->x+s, p->y, &target) && target==NULL)
     {
         add_list(atk, p->x+s, p->y);
     }
