@@ -75,7 +75,7 @@ while(list!=NULL)
 void display_list(Move_list* l)
 {
     printf("coups possibles :\n");
-    l=l->next;
+	l=l->next;
     while(l!=NULL)
     {
         printf("%d %c -> ",l->x+1,(char)(l->y+'A'));

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "board.h"
 #include "input.h"
+#include "rules.h"
 
 int verif_input_letter(char c){
     if (c >= 'a' && c <= 'h')
@@ -28,6 +29,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list *li, enum pieces_colors c)
     Piece *target = NULL;
     if(!get_piece(game, *x, *y, &target))
         errx(1, "Out of bound in chessboard");
+
     if(target == NULL || target->color != c)
     {
         printf("Not valid piece at selected coordinates.\nTry again...\n");
