@@ -39,9 +39,9 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
 
     display_board(g->board, NULL, player);
     if(black_checkmate)
-        printf("Black is checkmate\nWHITE WON !");
+        printf("Black is checkmate\nWHITE WON !\n");
     else
-        printf("White is checkmate\nBLACK WON !");
+        printf("White is checkmate\nBLACK WON !\n");
 
     return;
 }
