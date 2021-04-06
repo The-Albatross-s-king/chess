@@ -1,6 +1,7 @@
 bin/
 dep/
 main
+demo
 debug
 *.o
 *.d
