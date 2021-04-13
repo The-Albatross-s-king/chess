@@ -58,6 +58,7 @@ int main()
     int new_x = -1;
     int new_y = -1;
     run_game(&g, &x, &y, &new_x, &new_y);
+    // display_board(g.board, NULL, 0);
 
     return 0;
 }
