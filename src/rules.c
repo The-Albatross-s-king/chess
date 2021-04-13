@@ -90,16 +90,16 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 
     Piece *enemy;
     if (p->color == WHITE)
-        enemy = &(g->blacks[0]);
+        enemy = g->blacks;
     else
-        enemy = &(g->whites[0]);
+        enemy = g->whites;
 
     Move_list *enemy_moves=init_list();
     for (int i = 0; i < 16; i++)
     {
-        if ((enemy+i)->alive == 0)
+        if (enemy[i].alive == 0)
             continue;
-        get_moves(g, g->board[(enemy+i)->x+ 8*(enemy+i)->y], enemy_moves, NULL);
+        get_moves(g, enemy+i, enemy_moves, NULL);
         int x;
         int y;
         while (pop_list(enemy_moves, &x, &y))

@@ -309,11 +309,13 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
     }
 }
 
-//atk can't be null but def yes. 
+//atk can't be null but def yes.
 //atk : returns a list of eatable pieces and null cases
 //def : returns if not null all defended pieces
 void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
+    if (p == NULL)
+        errx(1, "The piece can't be null");
     if(p->alive==0)
         return;
     switch(p->type)
