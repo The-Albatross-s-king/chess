@@ -6,7 +6,7 @@
 #include "board.h"
 #include "list.h"
 
-/* 
+/*
    call this function before get_move() when a piece
    (different of the king) is selected.
    This is to avoid the case where the movement of a piece
@@ -16,7 +16,7 @@ int is_treason(Game *g, Piece *p)
 {
     Piece *k;
     if (p->color == WHITE)
-        k = &(g->whites[4]);
+        k = &(g->whites[3]);
     else
         k = &(g->blacks[3]);
 
@@ -80,11 +80,11 @@ int is_treason(Game *g, Piece *p)
 
 // need to add a new parameter to get_moves()
 // the king can eat a piece, but this piece could be protected by another piece.
-void king_suicide(Game *g, Piece *p, Move_list *king_moves) 
+void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 {
     if (p->type != KING)
     {
-        errx(EXIT_FAILURE, "you have give a piece to the king_suicide" 
+        errx(EXIT_FAILURE, "you have give a piece to the king_suicide"
                 "function which is not a king.");
     }
 
