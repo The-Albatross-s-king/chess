@@ -99,6 +99,7 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
     {
         if (enemy[i].alive == 0)
             continue;
+        printf("%s\n", enemy+i == NULL ? "pas bon" : "c'est bon");
         get_moves(g, enemy+i, enemy_moves, NULL);
         int x;
         int y;
@@ -122,4 +123,5 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
             }
         }
     }
+    free_list(enemy_moves);
 }

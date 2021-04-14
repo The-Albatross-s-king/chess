@@ -315,7 +315,7 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
     if (p == NULL)
-        errx(1, "The piece can't be null");
+        errx(1, "Get_moves: The piece can't be null");
     if(p->alive==0)
         return;
     switch(p->type)

@@ -16,12 +16,15 @@ int is_check(Game* g, Piece *king)
     Move_list *opp_li_moves = init_list();
     for(int i = 0; i < 16; i ++)
     {
+        if (opp_list[i].alive == 0)
+            continue;
         int x_opp = opp_list[i].x;
         int y_opp = opp_list[i].y;
-        get_moves(g, g->board[get_pos(x_opp,y_opp)], opp_li_moves, NULL);
+        get_moves(g, g->board[get_pos(x_opp, y_opp)], opp_li_moves, NULL);
         if(in_list(opp_li_moves, king->x, king->y))
             return 1;
     }
+    free_list(opp_li_moves);
 
     return 0;
 }
@@ -53,14 +56,13 @@ int check_after_move(Game *g, Piece *p, int new_x, int new_y)
 // Is_checkmate checks if the game is win.
 int is_checkmate(Game* g, Piece *king)
 {
-    printf("pas en échec\n");
     char check = 1;
     if(!is_check(g, king))
     {
         return 0;
     }
 
-    Piece *p_list; 
+    Piece *p_list;
     if(king->color == WHITE)
         p_list = g->whites;
     else
@@ -79,12 +81,18 @@ int is_checkmate(Game* g, Piece *king)
         {
             p = &p_list[i];
         }
-        if (p->alive)
+        if (p->alive == 0)
+        {
+            i++;
+            continue;
+        }
+        if(g->board[get_pos(p->x,p->y)] == NULL)
         {
             i++;
             continue;
         }
         Move_list *p_li_moves=init_list();
+        printf("dans is_checkmate\n");
         get_moves(g, g->board[get_pos(p->x,p->y)], p_li_moves, NULL);
         p_li_moves = p_li_moves->next;
         for (; p_li_moves != NULL; p_li_moves = p_li_moves->next)
@@ -92,7 +100,6 @@ int is_checkmate(Game* g, Piece *king)
             check = check_after_move(g, p, p_li_moves->x, p_li_moves->y);
             if(!check)
             {
-                printf("pas en échec\n");
                 return check;
             }
         }
