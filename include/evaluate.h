@@ -2,11 +2,11 @@
 #include "board.h"
 
 // return the sum of attack and defense
-int get_position_score(Game* game, int cur_color);
+double get_position_score(Game* game, int cur_color);
 
 
-int get_atk_def(Game *game, int pos, int* scores);
+double get_atk_def(Game *game, int pos, int* scores);
 
-int in_danger(Game *game, int pos);
+double in_danger(Game *game, int pos);
 
-int is_protected(Game *game, int pos);
+double is_protected(Game *game, int pos);
