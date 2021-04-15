@@ -5,6 +5,7 @@
 #include "rules.h"
 #include "board.h"
 #include "list.h"
+#include "checkmate.h"
 
 /*
    call this function before get_move() when a piece
@@ -14,14 +15,16 @@
    */
 int is_treason(Game *g, Piece *p)
 {
+    if (p->alive == 0)
+        errx(1, "The piece is dead");
     Piece *k;
     if (p->color == WHITE)
         k = &(g->whites[3]);
     else
         k = &(g->blacks[3]);
 
-    int x = k->x - p->x;
-    int y = k->y - p->y;;
+    int x = p->x - k->x;
+    int y = p->y - k->y;
 
     if (x == y || -x == y || x == 0 || y == 0)
     {
@@ -40,36 +43,40 @@ int is_treason(Game *g, Piece *p)
         int a = 1;
         int i_max = p->x + i*a;
         int j_max = p->y + j*a;
-        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 && 
+        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
                 g->board[(i_max)*8 + j_max] == NULL)
         {
             a++;
             i_max = p->x + i*a;
             j_max = p->y + j*a;
         }
-        if (i_max < 0 && i_max >= 8 && j_max < 0 && j_max >= 8 && 
-                g->board[(p->x + i*a)*8 + p->y + y*a]->type != KING)
+        if (i_max < 0 && i_max >= 8 && j_max < 0 && j_max >= 8 &&
+                g->board[get_pos(i_max, j_max)]->type != KING)
+        {
             return 0;
-
+        }
         a = -1;
 
-        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 && 
-                g->board[(i_max)*8 + j_max] == NULL)
+        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
+                g->board[get_pos(i_max, j_max)] == NULL)
         {
             a++;
             i_max = p->x + i*a;
             j_max = p->y + j*a;
         }
 
-        if (i_max < 0 && i_max >= 8 && j_max < 0 && j_max >= 8)
+        if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8)
+        {
             return 0;
-        Piece *enemy = g->board[i_max*8 + j_max];
-
-        if (enemy->color != p->color && (x == 0 || y == 0) && 
+        }
+        Piece *enemy = g->board[get_pos(i_max, j_max)];
+        if (enemy == NULL)
+            errx(1, "The enemy is NULL");
+        if (enemy->color != p->color && (x == 0 || y == 0) &&
                 (enemy->type == ROOK || enemy->type == QUEEN))
             return 1;
 
-        if (enemy->color != p->color && 
+        if (enemy->color != p->color &&
                 (enemy->type == BISHOP || enemy->type == QUEEN))
             return 1;
     }
@@ -99,7 +106,6 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
     {
         if (enemy[i].alive == 0)
             continue;
-        printf("%s\n", enemy+i == NULL ? "pas bon" : "c'est bon");
         get_moves(g, enemy+i, enemy_moves, NULL);
         int x;
         int y;

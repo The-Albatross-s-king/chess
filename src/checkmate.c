@@ -7,24 +7,30 @@
 int is_check(Game* g, Piece *king)
 {
     // Means opponent list, its the list of opponent's pieces.
-    Piece *opp_list; 
+    Piece *opp_list;
     if(king->color == WHITE)
         opp_list = g->blacks;
     else
         opp_list = g->whites;
 
-    Move_list *opp_li_moves = init_list();
     for(int i = 0; i < 16; i ++)
     {
+        Move_list *opp_li_moves = init_list();
         if (opp_list[i].alive == 0)
+        {
+            free_list(opp_li_moves);
             continue;
+        }
         int x_opp = opp_list[i].x;
         int y_opp = opp_list[i].y;
         get_moves(g, g->board[get_pos(x_opp, y_opp)], opp_li_moves, NULL);
         if(in_list(opp_li_moves, king->x, king->y))
+        {
+            free_list(opp_li_moves);
             return 1;
+        }
+        free_list(opp_li_moves);
     }
-    free_list(opp_li_moves);
 
     return 0;
 }
@@ -42,12 +48,12 @@ int check_after_move(Game *g, Piece *p, int new_x, int new_y)
 
     char check = is_check(g, king);
 
+    apply_move(g, new_x, new_y, old_x, old_y);
     if (victim != NULL)
     {
         victim->alive = 1;
         g->board[get_pos(victim->x, victim->y)] = victim;
     }
-    apply_move(g, new_x, new_y, old_x, old_y);
 
     return check;
 
@@ -81,33 +87,27 @@ int is_checkmate(Game* g, Piece *king)
         {
             p = &p_list[i];
         }
-        if (p->alive == 0)
-        {
-            i++;
-            continue;
-        }
-        if(g->board[get_pos(p->x,p->y)] == NULL)
+        if (p->alive == 0 || g->board[get_pos(p->x,p->y)] == NULL)
         {
             i++;
             continue;
         }
         Move_list *p_li_moves=init_list();
-        printf("dans is_checkmate\n");
         get_moves(g, g->board[get_pos(p->x,p->y)], p_li_moves, NULL);
+        Move_list *begin = p_li_moves;
         p_li_moves = p_li_moves->next;
         for (; p_li_moves != NULL; p_li_moves = p_li_moves->next)
         {
             check = check_after_move(g, p, p_li_moves->x, p_li_moves->y);
             if(!check)
             {
+                free_list(begin);
                 return check;
             }
         }
-        free_list(p_li_moves);
+        free_list(begin);
         i++;
     }
 
     return check;
 }
-
-

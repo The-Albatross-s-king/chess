@@ -4,6 +4,7 @@
 #include <display.h>
 #include <err.h>
 #include "board.h"
+#include "checkmate.h"
 #include "list.h"
 
 char* get_name(int type)
@@ -61,7 +62,7 @@ int can_move_to(Game* g, int x, int y, Piece* p)
 {
     Piece* target=NULL;
     if(get_piece(g, x, y, &target) && (target==NULL \
-                || (target!=NULL && target->color != p->color)))
+            || (target!=NULL && target->color != p->color)))
         return 1;
     return 0;
 }
@@ -426,12 +427,12 @@ void set_game(Game* g)
     for(int j=0;j<8;j++)
     {
         g->board[get_pos(1,j)]->type=PAWN;
-        g->board[get_pos(0,j)]->id=8+j;
+        g->board[get_pos(1,j)]->id=8+j;
     }
     for(int j=0;j<8;j++)
     {
         g->board[get_pos(6,j)]->type=PAWN;
-        g->board[get_pos(0,j)]->id=16+j;
+        g->board[get_pos(6,j)]->id=16+j;
     }
     for(int j=0;j<8;j++)
     {
