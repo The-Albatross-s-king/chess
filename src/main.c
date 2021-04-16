@@ -24,11 +24,6 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
     {
         piece_moves = init_list();
         player = round % 2;
-        tie = is_tie(g, player);
-        if(tie)
-        {
-            break;
-        }
         display_board(g->board, piece_moves, player);
         printf("It's %s's turn !\n", player ? "WHITE" : "BLACK");
         can_i_go(g, x_input, y_input, &piece_moves, player);
@@ -44,6 +39,8 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
         }
         black_checkmate = is_checkmate(g, &g->blacks[3]);
         white_checkmate = is_checkmate(g, &g->whites[3]);
+        tie = is_tie(g, player);
+        printf("%d, %d, %d\n", black_checkmate, white_checkmate, tie);
         free_list(piece_moves);
     }
 
@@ -52,10 +49,13 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
         printf("Black is checkmate\nWHITE WON !\n");
     else
     {
-        if(black_checkmate)
-           printf("White is checkmate\nBLACK WON !\n");
+        if(white_checkmate)
+        {
+            printf("White is checkmate\nBLACK WON !\n");
+            return;
+        }
         else
-           printf("Tie\nNo one won !\n");
+            printf("Tie\nNo one won !\n");
     }
     return;
 }

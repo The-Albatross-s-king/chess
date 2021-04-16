@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <err.h>
 #include "board.h"
+#include "rules.h"
 #include "list.h"
 
 // Is_check checks if the given king is in check state.
@@ -96,8 +97,11 @@ int is_checkmate(Game* g, Piece *king)
             i++;
             continue;
         }
+
         Move_list *p_li_moves=init_list();
-        get_moves(g, g->board[get_pos(p->x,p->y)], p_li_moves, NULL);
+        get_moves(g, p, p_li_moves, NULL);
+        if(p->type != KING)
+            is_treason(g, p, p_li_moves);
         Move_list *begin = p_li_moves;
         p_li_moves = p_li_moves->next;
         for (; p_li_moves != NULL; p_li_moves = p_li_moves->next)

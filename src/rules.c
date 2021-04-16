@@ -12,7 +12,7 @@ void impossible_diag_move(Piece *p, Move_list *l, int x, int y);
 void impossible_cross_move(Piece *p, Move_list *l, int x, int y);
 
 /*
-   call this function before get_move() when a piece
+   call this function after get_move() when a piece
    (different of the king) is selected.
    This is to avoid the case where the movement of a piece
    make check your king.
