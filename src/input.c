@@ -39,43 +39,52 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
         }
         else
         {
-            if (!is_treason(game, target))
-            {
-                get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
-                if (li == NULL)
-                    errx(EXIT_FAILURE, "Move_list is egal to NULL");
-                if (target->type == KING)
-                    king_suicide(game, target, *li);
-                return;
-            }
-            printf("This piece protect your King from being in check, you can not move it.\n"
-                    "Try again...\n");
-            not_valid = 1;
+        	get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
+            if (li == NULL)
+                errx(EXIT_FAILURE, "Move_list is egal to NULL");
+			if ((*li)->next == NULL)
+			{
+				printf("This piece can not move.\n");
+				not_valid = 1;
+			}
+            else if (target->type == KING)
+                king_suicide(game, target, *li);
+			else
+			{
+            	is_treason(game, target, *li);
+				if ((*li)->next == NULL)
+				{
+					printf("This piece protect your King from being in check, you can not move it.\n"
+                    	"Try again...\n");
+            		not_valid = 1;
+				}
+			}
         }
     }
 }
 
 // Call intput to set the coordinates of the destination's position.
 // When called; please pass different coordinates than starting x y.
-int go_to(Game *game, int *x, int *y, int *new_x, int *new_y)
+int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
 {
     printf("Enter targeted postition:\n");
     input(new_x, new_y);
     //TODO Check if the move is possible ? 
     // Check if a piece is in the way.
-    if(!valid_pos(*new_x, *new_y))
+    while(!valid_pos(*new_x, *new_y))
     {
         printf("Invalid target\n");
-        go_to(game, x, y, new_x, new_y);
-        return 0;
+        input(new_x, new_y);
     }
 
-    if(move(game, game->board[get_pos(*x, *y)], *new_x, *new_y))
-        return 1;
-
-    *x = *new_x;
-    *y = *new_y;
-    return 0;
+	if(in_list(l, *new_x, *new_y))
+	{
+		apply_move(game, *x, *y, *new_x, *new_y);
+		return 1;
+	}
+	
+	return 0;
+	
 }
 
 // Blocking function, wait for input user. 

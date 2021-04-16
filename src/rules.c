@@ -7,13 +7,17 @@
 #include "list.h"
 #include "checkmate.h"
 
+
+void impossible_diag_move(Piece *p, Move_list *l, int x, int y);
+void impossible_cross_move(Piece *p, Move_list *l, int x, int y);
+
 /*
    call this function before get_move() when a piece
    (different of the king) is selected.
    This is to avoid the case where the movement of a piece
    make check your king.
    */
-int is_treason(Game *g, Piece *p)
+void is_treason(Game *g, Piece *p, Move_list *l)
 {
     if (p->alive == 0)
         errx(1, "The piece is dead");
@@ -29,59 +33,114 @@ int is_treason(Game *g, Piece *p)
     if (x == y || -x == y || x == 0 || y == 0)
     {
         int i = 0;
-        if (x < 0)
+        
+		if (x < 0)
             i = -1;
-        else if (x > 0)
-            i = 1;
-
-        int j = 0;
-        if (y < 0)
+		else if (x > 0)
+			i = 1;
+        
+		int j = 0;
+        
+		if (y < 0)
             j = -1;
         else if (y > 0)
             j = 1;
 
-        int a = 1;
+		int a = -1; // a = step, depend of the position of the piece with the king.
+		int step = a;
+		
         int i_max = p->x + i*a;
         int j_max = p->y + j*a;
-        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
-                g->board[(i_max)*8 + j_max] == NULL)
+        
+		while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
+                g->board[get_pos(i_max, j_max)] == NULL)
         {
-            a++;
+            a += step;
             i_max = p->x + i*a;
             j_max = p->y + j*a;
         }
-        if (i_max < 0 && i_max >= 8 && j_max < 0 && j_max >= 8 &&
+        
+		if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8 ||
                 g->board[get_pos(i_max, j_max)]->type != KING)
-        {
-            return 0;
-        }
-        a = -1;
+			return;
+		
+		a = -step;
+		step = a;
+
+		i_max = p->x + i*a;
+        j_max = p->y + j*a;
 
         while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
                 g->board[get_pos(i_max, j_max)] == NULL)
         {
-            a++;
+            a += step;
             i_max = p->x + i*a;
             j_max = p->y + j*a;
         }
 
         if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8)
-        {
-            return 0;
-        }
-        Piece *enemy = g->board[get_pos(i_max, j_max)];
-        if (enemy == NULL)
+			return;
+        
+		Piece *enemy = g->board[get_pos(i_max, j_max)];
+       
+		if (enemy == NULL)
             errx(1, "The enemy is NULL");
-        if (enemy->color != p->color && (x == 0 || y == 0) &&
+        
+		if (enemy->color != p->color && (x == 0 || y == 0) &&
                 (enemy->type == ROOK || enemy->type == QUEEN))
-            return 1;
+            impossible_cross_move(p, l, x, y);
 
-        if (enemy->color != p->color &&
+        else if (enemy->color != p->color &&
                 (enemy->type == BISHOP || enemy->type == QUEEN))
-            return 1;
+			impossible_diag_move(p, l, x, y);
     }
+}
 
-    return 0;
+// remove all diagonal move in Move_list that the piece can not do.
+void impossible_diag_move(Piece *p, Move_list *l, int x, int y)
+{
+	Move_list *prev = l;
+	l = l->next;
+	for (; l != NULL; l = l->next)
+	{
+		int rx = p->x - l->x; // relative x
+		int ry = p->y - l->y; // relative y
+		
+		if ((x == y && rx == ry) || (x == -y && rx == -ry))
+		{
+			prev = l;
+			continue;
+		}
+		
+		Move_list *tmp = l;
+		prev->next = l->next;
+		free(tmp);
+		l = prev;
+	}
+}
+
+// remove all diaonal move in Move_list that the piece can not do.
+void impossible_cross_move(Piece *p, Move_list *l, int x, int y)
+{
+	Move_list *prev = l;
+	l = l->next;
+
+	for (; l != NULL; l = l->next)
+	{
+		int rx = p->x - l->x; // relative x
+		int ry = p->y - l->y; // relative y
+		
+		if ((x == 0 && rx == 0) || (y == 0 && ry == 0))
+		{
+			prev = l;
+			continue;
+		}
+		
+		Move_list *tmp = l;
+		prev->next = l->next;
+		free(tmp);
+		l = prev;
+	}
 
 }
 
