@@ -33,41 +33,41 @@ void is_treason(Game *g, Piece *p, Move_list *l)
     if (x == y || -x == y || x == 0 || y == 0)
     {
         int i = 0;
-        
-		if (x < 0)
+
+        if (x < 0)
             i = -1;
-		else if (x > 0)
-			i = 1;
-        
-		int j = 0;
-        
-		if (y < 0)
+        else if (x > 0)
+            i = 1;
+
+        int j = 0;
+
+        if (y < 0)
             j = -1;
         else if (y > 0)
             j = 1;
 
-		int a = -1; // a = step, depend of the position of the piece with the king.
-		int step = a;
-		
+        int a = -1; // a = step, depend of the position of the piece with the king.
+        int step = a;
+
         int i_max = p->x + i*a;
         int j_max = p->y + j*a;
-        
-		while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
+
+        while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
                 g->board[get_pos(i_max, j_max)] == NULL)
         {
             a += step;
             i_max = p->x + i*a;
             j_max = p->y + j*a;
         }
-        
-		if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8 ||
-                g->board[get_pos(i_max, j_max)]->type != KING)
-			return;
-		
-		a = -step;
-		step = a;
 
-		i_max = p->x + i*a;
+        if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8 ||
+                g->board[get_pos(i_max, j_max)]->type != KING)
+            return;
+
+        a = -step;
+        step = a;
+
+        i_max = p->x + i*a;
         j_max = p->y + j*a;
 
         while (i_max >= 0 && i_max < 8 && j_max >= 0 && j_max < 8 &&
@@ -79,68 +79,68 @@ void is_treason(Game *g, Piece *p, Move_list *l)
         }
 
         if (i_max < 0 || i_max >= 8 || j_max < 0 || j_max >= 8)
-			return;
-        
-		Piece *enemy = g->board[get_pos(i_max, j_max)];
-       
-		if (enemy == NULL)
+            return;
+
+        Piece *enemy = g->board[get_pos(i_max, j_max)];
+
+        if (enemy == NULL)
             errx(1, "The enemy is NULL");
-        
-		if (enemy->color != p->color && (x == 0 || y == 0) &&
+
+        if (enemy->color != p->color && (x == 0 || y == 0) &&
                 (enemy->type == ROOK || enemy->type == QUEEN))
             impossible_cross_move(p, l, x, y);
 
         else if (enemy->color != p->color &&
                 (enemy->type == BISHOP || enemy->type == QUEEN))
-			impossible_diag_move(p, l, x, y);
+            impossible_diag_move(p, l, x, y);
     }
 }
 
 // remove all diagonal move in Move_list that the piece can not do.
 void impossible_diag_move(Piece *p, Move_list *l, int x, int y)
 {
-	Move_list *prev = l;
-	l = l->next;
-	for (; l != NULL; l = l->next)
-	{
-		int rx = p->x - l->x; // relative x
-		int ry = p->y - l->y; // relative y
-		
-		if ((x == y && rx == ry) || (x == -y && rx == -ry))
-		{
-			prev = l;
-			continue;
-		}
-		
-		Move_list *tmp = l;
-		prev->next = l->next;
-		free(tmp);
-		l = prev;
-	}
+    Move_list *prev = l;
+    l = l->next;
+    for (; l != NULL; l = l->next)
+    {
+        int rx = p->x - l->x; // relative x
+        int ry = p->y - l->y; // relative y
+
+        if ((x == y && rx == ry) || (x == -y && rx == -ry))
+        {
+            prev = l;
+            continue;
+        }
+
+        Move_list *tmp = l;
+        prev->next = l->next;
+        free(tmp);
+        l = prev;
+    }
 }
 
 // remove all diaonal move in Move_list that the piece can not do.
 void impossible_cross_move(Piece *p, Move_list *l, int x, int y)
 {
-	Move_list *prev = l;
-	l = l->next;
+    Move_list *prev = l;
+    l = l->next;
 
-	for (; l != NULL; l = l->next)
-	{
-		int rx = p->x - l->x; // relative x
-		int ry = p->y - l->y; // relative y
-		
-		if ((x == 0 && rx == 0) || (y == 0 && ry == 0))
-		{
-			prev = l;
-			continue;
-		}
-		
-		Move_list *tmp = l;
-		prev->next = l->next;
-		free(tmp);
-		l = prev;
-	}
+    for (; l != NULL; l = l->next)
+    {
+        int rx = p->x - l->x; // relative x
+        int ry = p->y - l->y; // relative y
+
+        if ((x == 0 && rx == 0) || (y == 0 && ry == 0))
+        {
+            prev = l;
+            continue;
+        }
+
+        Move_list *tmp = l;
+        prev->next = l->next;
+        free(tmp);
+        l = prev;
+    }
 
 }
 

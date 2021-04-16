@@ -8,20 +8,27 @@
 #include "checkmate.h"
 #include "input.h"
 #include "save_load.h"
+#include "tie.h"
 
 // In work
 void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
 {
     int black_checkmate = 0;
     int white_checkmate = 0;
+    int tie = 0;
     size_t round = 1;
     enum pieces_colors player = WHITE;
     Move_list *piece_moves = NULL;
 
-    while(!black_checkmate && !white_checkmate)
+    while(!black_checkmate && !white_checkmate && !tie)
     {
         piece_moves = init_list();
         player = round % 2;
+        tie = is_tie(g, player);
+        if(tie)
+        {
+            break;
+        }
         display_board(g->board, piece_moves, player);
         printf("It's %s's turn !\n", player ? "WHITE" : "BLACK");
         can_i_go(g, x_input, y_input, &piece_moves, player);
@@ -44,8 +51,12 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
     if(black_checkmate)
         printf("Black is checkmate\nWHITE WON !\n");
     else
-        printf("White is checkmate\nBLACK WON !\n");
-
+    {
+        if(black_checkmate)
+           printf("White is checkmate\nBLACK WON !\n");
+        else
+           printf("Tie\nNo one won !\n");
+    }
     return;
 }
 
