@@ -40,9 +40,11 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
     int step = 1;
     int begin = 0;
     int line = 2;
+    int offset = 0;
     //clear_display();
     if (side == BLACK)
     {
+        offset = 1;
         line = 7;
         printf("_|HGFEDCBA|\n8|");
         step = -1;
@@ -50,7 +52,6 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
     }
     else
         printf("_|ABCDEFGH|\n1|");
-    int offset = 0;
     unsigned long bitboard = create_bitboard(list);
     int white_bg = 100;
     int white_p = 96;
@@ -110,6 +111,7 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
                     case 2:
                         if (is_move)
                             printf("\033[1;%d;%dm♘\033[0m", possible, white_p);
+                        else
                         {
                             if ((i + offset) % 2 == 0)
                                 printf("\033[1;%dm♘\033[0m", white_p);

@@ -62,6 +62,10 @@ int check_after_move(Game *g, Piece *p, int new_x, int new_y)
 // Is_checkmate checks if the game is win.
 int is_checkmate(Game* g, Piece *king)
 {
+    if (king == NULL)
+        errx(1, "The king can't be NULL");
+    if (king->alive == 0)
+        return 0;
     char check = 1;
     if(!is_check(g, king))
     {
