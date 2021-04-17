@@ -148,45 +148,128 @@ void impossible_cross_move(Piece *p, Move_list *l, int x, int y)
 // the king can eat a piece, but this piece could be protected by another piece.
 void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 {
-    if (p->type != KING)
+    
+	if (p->type != KING)
     {
         errx(EXIT_FAILURE, "you have give a piece to the king_suicide"
                 "function which is not a king.");
     }
 
     Piece *enemy;
+	int direction; // to know if pawns move up or down.
     if (p->color == WHITE)
-        enemy = g->blacks;
+    {
+		direction = 1;
+		enemy = g->blacks;
+	}
     else
-        enemy = g->whites;
-
+    {    
+		direction = -1;
+		enemy = g->whites;
+	}
     Move_list *enemy_moves=init_list();
     for (int i = 0; i < 16; i++)
     {
         if (enemy[i].alive == 0)
             continue;
-        get_moves(g, enemy+i, enemy_moves, NULL);
-        int x;
+        
+		int x;
         int y;
-        while (pop_list(enemy_moves, &x, &y))
-        {
-            Move_list *tmp = king_moves->next;
-            Move_list *last = king_moves;
-            while (tmp != NULL)
-            {
-                if (tmp->x == x && tmp->y == y)
-                {
-                    last->next = tmp->next;
-                    free(tmp);
-                    tmp = last->next;
-                }
-                else
-                {
-                    last = last->next;
-                    tmp = tmp->next;
-                }
-            }
-        }
+		
+		if ((enemy+i)->type == PAWN)
+		{
+			x = (enemy+i)->x;
+			if (x > 0 && x < 7)
+			{
+				y = (enemy+i)->y;
+				int n = 0;
+	
+				if (y != 0)
+					n += 1;
+
+				if (y != 7)
+					n += 1;
+					
+
+				Move_list *tmp = king_moves->next;
+				Move_list *last = king_moves;
+				while (tmp != NULL)
+				{
+					if (tmp->x == x + direction && tmp->y == y + 1)
+					{
+						last->next = tmp->next;
+						free(tmp);
+						tmp = last->next;
+						n--;
+					}
+					else if (tmp->x == x + direction && tmp->y == y - 1)
+					{
+						last->next = tmp->next;
+						free(tmp);
+						tmp = last->next;
+						n--;
+					}
+					else
+					{
+						last = last->next;
+						tmp = tmp->next;
+					}
+				}
+			}
+		}
+		
+		else
+		{
+			get_moves(g, enemy+i, enemy_moves, NULL);
+			
+			int rx = p->x - (enemy+i)->x;
+			int ry = p->y - (enemy+i)->y;
+			int in_axe = 0;
+
+			if ((rx == ry || rx == -ry) && ((enemy+i)->type == BISHOP || (enemy+i)->type == QUEEN))
+				in_axe = 1;
+
+			if ((rx == 0 || ry == 0) && ((enemy+i)->type == ROOK || (enemy+i)->type == QUEEN))
+				in_axe = 1;
+			
+			int n = 2;
+
+			while (king_moves->next != NULL && pop_list(enemy_moves, &x, &y) && n)
+			{
+				Move_list *tmp = king_moves->next;
+				Move_list *last = king_moves;
+				while (tmp != NULL)
+				{
+					if (tmp->x == x && tmp->y == y)
+					{
+						last->next = tmp->next;
+						free(tmp);
+						tmp = last->next;
+						if (in_axe)
+							n--;
+					}
+					
+					else if (in_axe && tmp->x == p->x + (p->x - x) && 
+						tmp->y == p->y + (p->y - y))
+					{
+						last->next = tmp->next;
+						free(tmp);
+						tmp = last->next;
+						n--;
+					}
+					
+					else
+					{
+						last = last->next;
+						tmp = tmp->next;
+					}
+				}
+			}
+		}
+
+		if (king_moves->next == NULL)
+			break;
     }
     free_list(enemy_moves);
+
 }
