@@ -39,7 +39,7 @@ void run_game(Game *g, int *x_input, int *y_input, int *new_x, int *new_y)
         }
         black_checkmate = is_checkmate(g, &g->blacks[3]);
         white_checkmate = is_checkmate(g, &g->whites[3]);
-        tie = is_tie(g, player);
+        tie = is_tie(g, player + 1 % 2);
         printf("%d, %d, %d\n", black_checkmate, white_checkmate, tie);
         free_list(piece_moves);
     }
