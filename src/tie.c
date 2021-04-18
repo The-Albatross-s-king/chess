@@ -4,6 +4,9 @@
 #include "list.h"
 #include "rules.h"
 
+// Verify if a move is possible for each piece
+//      if there is a possible move, there is no tie
+//      else there is a tie
 int is_tie(Game *g, enum pieces_colors player)
 {
     Move_list *mv_list = init_list();

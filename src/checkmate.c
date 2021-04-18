@@ -36,6 +36,7 @@ int is_check(Game* g, Piece *king)
     return 0;
 }
 
+// Test if there is a check after a move given in argument.
 int check_after_move(Game *g, Piece *p, int new_x, int new_y)
 {
     if (p == NULL)
@@ -61,8 +62,10 @@ int check_after_move(Game *g, Piece *p, int new_x, int new_y)
 }
 
 // Is_checkmate checks if the game is win.
+// Test for each piece if after a move the king is again in check.
 int is_checkmate(Game* g, Piece *king)
 {
+    // Test if the checkmate is possible
     if (king == NULL)
         errx(1, "The king can't be NULL");
     if (king->alive == 0)
@@ -79,6 +82,9 @@ int is_checkmate(Game* g, Piece *king)
     else
         p_list = g->blacks;
 
+    // Run through the piece array of the player's color and test if
+    // the king is again in check after each moves of a piece.
+    // if a move save the king from check the function is stopped.
     int order[] = {3, 4, 2, 5, 0, 7, 1, 6};
     int i = 0;
     while(check && i < 16)
