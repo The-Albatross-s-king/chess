@@ -5,6 +5,7 @@
 #include "board.h"
 #include "input.h"
 #include "rules.h"
+#include "spe_rules.h"
 
 int verif_input_letter(char c){
     if (c >= 'a' && c <= 'h')
@@ -39,26 +40,26 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
         }
         else
         {
-        	get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
+            get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
             if (li == NULL)
                 errx(EXIT_FAILURE, "Move_list is egal to NULL");
-			if ((*li)->next == NULL)
-			{
-				printf("This piece can not move.\n");
-				not_valid = 1;
-			}
+            if ((*li)->next == NULL)
+            {
+                printf("This piece can not move.\n");
+                not_valid = 1;
+            }
             else if (target->type == KING)
                 king_suicide(game, target, *li);
-			else
-			{
-            	is_treason(game, target, *li);
-				if ((*li)->next == NULL)
-				{
-					printf("This piece protect your King from being in check, you can not move it.\n"
-                    	"Try again...\n");
-            		not_valid = 1;
-				}
-			}
+            else
+            {
+                is_treason(game, target, *li);
+                if ((*li)->next == NULL)
+                {
+                    printf("This piece protect your King from being in check, you can not move it.\n"
+                            "Try again...\n");
+                    not_valid = 1;
+                }
+            }
         }
     }
 }
@@ -77,14 +78,18 @@ int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
         input(new_x, new_y);
     }
 
-	if(in_list(l, *new_x, *new_y))
-	{
-		apply_move(game, *x, *y, *new_x, *new_y);
-		return 1;
-	}
-	
-	return 0;
-	
+    if(in_list(l, *new_x, *new_y))
+    {
+        apply_move(game, *x, *y, *new_x, *new_y);
+        Piece p = *game->board[get_pos(*new_x, *new_y)];
+        if (p.type == PAWN)
+            pawn_transformation(game, &p);
+
+        return 1;
+    }
+
+    return 0;
+
 }
 
 // Blocking function, wait for input user. 
@@ -118,7 +123,7 @@ void input(int *y, int *x){
         else{
             int tmp = 0;
 
-            tmp = verif_input_letter(buf[0]);	
+            tmp = verif_input_letter(buf[0]);
             if (buf[0] == '\n' || tmp == -1){
                 printf("Unknow command. Try again\n");
                 not_valid = 1;
