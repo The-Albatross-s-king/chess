@@ -84,15 +84,38 @@ int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
         Piece p = *game->board[get_pos(*new_x, *new_y)];
         if (p.type == PAWN)
             pawn_transformation(game, &p);
+        if (p.type == KING)
+        {
+            Piece *team = p.color == WHITE ? game->whites : game->blacks;
+            Piece rook = team[0];
+            switch(*y - *new_y)
+            {
+                case 2:
+                    rook = team[0];
+                    game->board[get_pos(rook.x, rook.y)] = NULL;
+                    game->board[get_pos(p.x, p.y + 1)] = &rook;
+                    rook.x = p.x;
+                    rook.y = p.y + 1;
+                    break;
+                case -2:
+                    rook = team[7];
+                    game->board[get_pos(rook.x, rook.y)] = NULL;
+                    game->board[get_pos(p.x, p.y - 1)] = &rook;
+                    rook.x = p.x;
+                    rook.y = p.y - 1;
+                    break;
+                default:
+                    break;
 
+            }
+
+        }
         return 1;
     }
-
     return 0;
-
 }
 
-// Blocking function, wait for input user. 
+// Blocking function, wait for input user.
 // If the input is not valid, recall the function.
 // Set x on abscissa (letter) and y on ordinate (number).
 // If the input is "help", set x and y on -1.

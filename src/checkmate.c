@@ -5,17 +5,19 @@
 #include "list.h"
 
 // Is_check checks if the given king is in check state.
-int is_check(Game* g, Piece *king)
+int is_check_coord(Game *g, int x, int y, enum pieces_colors player)
 {
     // Means opponent list, its the list of opponent's pieces.
     Piece *opp_list;
-    if(king->color == WHITE)
+    if(player == WHITE)
         opp_list = g->blacks;
     else
         opp_list = g->whites;
 
     for(int i = 0; i < 16; i ++)
     {
+        if(i == 3)
+            continue;
         Move_list *opp_li_moves = init_list();
         if (opp_list[i].alive == 0)
         {
@@ -25,7 +27,7 @@ int is_check(Game* g, Piece *king)
         int x_opp = opp_list[i].x;
         int y_opp = opp_list[i].y;
         get_moves(g, g->board[get_pos(x_opp, y_opp)], opp_li_moves, NULL);
-        if(in_list(opp_li_moves, king->x, king->y))
+        if(in_list(opp_li_moves, x, y))
         {
             free_list(opp_li_moves);
             return 1;
@@ -34,6 +36,11 @@ int is_check(Game* g, Piece *king)
     }
 
     return 0;
+}
+
+int is_check(Game* g, Piece *king)
+{
+    return is_check_coord(g, king->x, king->y, king->color);
 }
 
 // Test if there is a check after a move given in argument.

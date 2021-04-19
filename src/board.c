@@ -309,8 +309,29 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
         }
     }
     Piece *team = p->color == WHITE ? g->whites : g->blacks;
-    if (p.moved == 0)
+    if (p->moved == 0 && (p->y == 3))
     {
+        if(team[7].alive && !team[7].moved)
+        {
+            if(g->board[get_pos(p->x, p->y+1)] == NULL &&
+                    g->board[get_pos(p->x, p->y+2)] == NULL &&
+                    g->board[get_pos(p->x, p->y+3)] == NULL)
+            {
+                if(is_check(g, p) || is_check_coord(g, p->x, p->y+2, p->color))
+                    return;
+                secure_add_list(atk, p->x, p->y+2);
+            }
+        }
+        if(team[0].alive && !team[0].moved)
+        {
+            if(g->board[get_pos(p->x, p->y - 1)] == NULL &&
+                    g->board[get_pos(p->x, p->y - 2)] == NULL)
+            {
+                if(is_check(g, p) || is_check_coord(g, p->x, p->y-2, p->color))
+                    return;
+                secure_add_list(atk, p->x, p->y-2);
+            }
+        }
 
     }
 }
