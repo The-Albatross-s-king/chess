@@ -118,6 +118,7 @@ int main(int argc, char** argv)
     }
 
     Game g;
+    set_game(&g);
     //load
     printf("Do you want create a new game (0) or load a save (1) ? (q to quit) :\n");
     want_load = get_answer(buff);
