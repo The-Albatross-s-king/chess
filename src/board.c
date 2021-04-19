@@ -308,6 +308,11 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
             secure_add_list(def, p->x+moves_x[i], p->y+moves_y[i]);
         }
     }
+    Piece *team = p->color == WHITE ? g->whites : g->blacks;
+    if (p.moved == 0)
+    {
+
+    }
 }
 
 //atk can't be null but def yes.
