@@ -8,14 +8,14 @@
 #include <unistd.h>
 #define DEPTH_MAX 2
 
-int SCORES[6]={100,500,300,300,900,2000};
+int SCORES[6]={10,50,30,30,90,900};
 
-int evaluate(Game* g, int cur_color)
+double evaluate(Game* g, int cur_color)
 {
-    int score=0;
-    score+=get_atk_def(g,cur_color,  SCORES);
+    double score=0;
+    //score+=get_atk_def(g,cur_color,  SCORES);
     //score-=get_atk_def(g,!cur_color, SCORES);
-    //score+=get_position_score(g,cur_color)*5;
+    score+=get_position_score(g,cur_color);
     return score;
 }
 
@@ -29,8 +29,8 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
     
     Move_list* moves= init_list();
     Move_list cur_move;
-    int score_cur_move=0;
-    int best_score=0;
+    double score_cur_move=0;
+    double best_score=0;
     Piece* p;
     Piece* piece_eat;
     int old_x, old_y, old_moved;
@@ -93,8 +93,8 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
     int depth=1;
     Move_list* moves= init_list();
     Move_list cur_move;
-    int score_cur_move=0;
-    int best_score=0;
+    double score_cur_move=0;
+    double best_score=0;
     Piece* p;
     Piece* piece_eat;
     int old_x, old_y, old_moved;
@@ -142,20 +142,20 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             g->board[get_pos(cur_move.x, cur_move.y)]=piece_eat;
         }
     }
-    printf("best :%d\n",best_score);
+    printf("best :%lf\n",best_score);
     free_list(moves);  
 }
 
 void auto_move(Game* g, int cur_color)
 {
-int x=0;
-int y=0;
-Piece* p=NULL;
-minmax(g,&x, &y, &p, cur_color); 
-printf("moved a %s from %c/%d to %c/%d\n",\
-        get_name(p->type), p->x+'A', p->y, x+'A',y);
+	int x=0;
+	int y=0;
+	Piece* p=NULL;
+	minmax(g,&x, &y, &p, cur_color); 
+	printf("moved a %s from %c/%d to %c/%d\n",\
+	        get_name(p->type), p->x+'A', p->y, x+'A',y);
 
-apply_move(g,p->x, p->y, x, y);
+	apply_move(g,p->x, p->y, x, y);
 
 
 /*Move_list* l=init_list();
