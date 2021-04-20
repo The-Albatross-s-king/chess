@@ -38,12 +38,12 @@ int main(int argc, char** argv)
           show_moves(&g, p);*/
         //save(&g,file) ;
     }
-    int color=BLACK;
+    int color=WHITE;
 
     display_board((Piece**)&g.board, NULL, WHITE);
 
     //apply_move(&g, 1, 4, 4, 5);
-    for(int i=0; i<8; i++)
+    for(int i=0; i<20; i++)
     {
         auto_move(&g, color);
         color=!color;

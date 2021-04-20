@@ -4,6 +4,7 @@
 // return the sum of attack and defense
 double get_position_score(Game* game, int cur_color);
 
+double position_score(Piece *p);
 
 double get_atk_def(Game *game, int pos, int* scores);
 
