@@ -16,17 +16,17 @@ int is_check_coord(Game *g, int x, int y, enum pieces_colors player)
 
     for(int i = 0; i < 16; i ++)
     {
-        if(i == 3)
-            continue;
         Move_list *opp_li_moves = init_list();
-        if (opp_list[i].alive == 0)
+        if (opp_list[i].alive == 0 || i == 3)
         {
             free_list(opp_li_moves);
             continue;
         }
         int x_opp = opp_list[i].x;
         int y_opp = opp_list[i].y;
-        get_moves(g, g->board[get_pos(x_opp, y_opp)], opp_li_moves, NULL);
+        Piece *tmp = g->board[get_pos(x_opp, y_opp)];
+        if(tmp != NULL)
+            get_moves(g, tmp, opp_li_moves, NULL);
         if(in_list(opp_li_moves, x, y))
         {
             free_list(opp_li_moves);

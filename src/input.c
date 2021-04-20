@@ -29,6 +29,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
     while (not_valid){
         not_valid = 0;
         input(x, y);
+        printf("%d, %d\n", *x, *y);
         Piece *target = NULL;
         if(!get_piece(game, *x, *y, &target))
             errx(1, "Out of bound in chessboard");
@@ -92,17 +93,15 @@ int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
             {
                 case 2:
                     rook = team[0];
+                    game->board[get_pos(rook.x, rook.y + 2)] = game->board[get_pos(rook.x, rook.y)];
                     game->board[get_pos(rook.x, rook.y)] = NULL;
-                    game->board[get_pos(p.x, p.y + 1)] = &rook;
-                    rook.x = p.x;
-                    rook.y = p.y + 1;
+                    rook.y = rook.y + 2;
                     break;
                 case -2:
                     rook = team[7];
+                    game->board[get_pos(rook.x, rook.y - 3)] = game->board[get_pos(rook.x, rook.y)];
                     game->board[get_pos(rook.x, rook.y)] = NULL;
-                    game->board[get_pos(p.x, p.y - 1)] = &rook;
-                    rook.x = p.x;
-                    rook.y = p.y - 1;
+                    rook.y = rook.y - 3;
                     break;
                 default:
                     break;
