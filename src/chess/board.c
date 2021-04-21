@@ -2,9 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <display.h>
-#include "board.h"
-#include "list.h"
 #include <err.h>
+#include "board.h"
+#include "checkmate.h"
+#include "list.h"
 
 char* get_name(int type)
 {
@@ -61,17 +62,15 @@ int can_move_to(Game* g, int x, int y, Piece* p)
 {
     Piece* target=NULL;
     if(get_piece(g, x, y, &target) && (target==NULL \
-                || (target!=NULL && target->color != p->color)))
+            || (target!=NULL && target->color != p->color)))
         return 1;
     return 0;
 }
 
-
-
 void get_cross_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
     Piece* target=NULL; //usefull for the the build of def
-    
+
     int x=p->x+1;
     int y=p->y;
 
@@ -225,7 +224,7 @@ void get_pawn_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
     int s=1;//sens
     if(p->color==WHITE) //bottom of the board
         s=-1;
-    
+
     Piece* target=NULL;
     if(get_piece(g, p->x+s, p->y, &target) && target==NULL)
     {
@@ -248,7 +247,7 @@ void get_pawn_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
     if(!p->moved && valid_pos(p->x+s,p->y) && valid_pos(p->x+2*s,p->y) &&\
             g->board[get_pos(p->x+s,p->y)]==NULL && \
             g->board[get_pos(p->x+2*s,p->y)]==NULL)
-    {       
+    {
         add_list(atk,p->x+2*s,p->y);
     }
 }
@@ -260,7 +259,7 @@ void get_knight_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
     int moves_x[8]={+2,+2,-2,-2,+1,+1,-1,-1};
     int moves_y[8]={+1,-1,+1,-1,+2,-2,+2,-2};
     Piece* target=NULL;
-    //+2+1; +2-1; -2+1; -2   ;+1+2; -1+2; +1-2; -1-2; 
+    //+2+1; +2-1; -2+1; -2   ;+1+2; -1+2; +1-2; -1-2;
     for(int i=0; i<8; i++){
         if(can_move_to(g, p->x+moves_x[i], p->y+moves_y[i], p))
         {
@@ -270,7 +269,7 @@ void get_knight_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
                         && target!=NULL && target->color==p->color)
         {
             secure_add_list(def, p->x+moves_x[i], p->y+moves_y[i]);
-        }  
+        }
     }
 }
 
@@ -278,12 +277,12 @@ void get_bishop_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
     get_diagonal_moves(g,p,atk,def);
 
-} 
+}
 void get_rook_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
     get_cross_moves(g,p,atk,def);
 
-} 
+}
 
 void get_queen_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
@@ -307,15 +306,43 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
                         && target!=NULL && target->color==p->color)
         {
             secure_add_list(def, p->x+moves_x[i], p->y+moves_y[i]);
-        }  
+        }
+    }
+    Piece *team = p->color == WHITE ? g->whites : g->blacks;
+    if (p->moved == 0 && (p->y == 3))
+    {
+        if(team[7].alive && !team[7].moved)
+        {
+            if(g->board[get_pos(p->x, p->y+1)] == NULL &&
+                    g->board[get_pos(p->x, p->y+2)] == NULL &&
+                    g->board[get_pos(p->x, p->y+3)] == NULL)
+            {
+                if(is_check(g, p) || is_check_coord(g, p->x, p->y+2, p->color))
+                    return;
+                secure_add_list(atk, p->x, p->y+2);
+            }
+        }
+        if(team[0].alive && !team[0].moved)
+        {
+            if(g->board[get_pos(p->x, p->y - 1)] == NULL &&
+                    g->board[get_pos(p->x, p->y - 2)] == NULL)
+            {
+                if(is_check(g, p) || is_check_coord(g, p->x, p->y-2, p->color))
+                    return;
+                secure_add_list(atk, p->x, p->y-2);
+            }
+        }
+
     }
 }
 
-//atk can't be null but def yes. 
+//atk can't be null but def yes.
 //atk : returns a list of eatable pieces and null cases
 //def : returns if not null all defended pieces
 void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
 {
+    if (p == NULL)
+        errx(1, "Get_moves: The piece can't be null");
     if(p->alive==0)
         return;
     switch(p->type)
@@ -381,30 +408,6 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2)
 
     return target;
 }
-
-// Is_checkmate checks if the given king is in checkmate state.
-int is_checkmate(Game* g, Piece *king)
-{
-    // Means opponent list, its the list of opponent's pieces.
-    Piece *opp_list; 
-    if(king->color == WHITE)
-        opp_list = g->blacks;
-    else
-        opp_list = g->whites;
-
-    Move_list *opp_li_moves=init_list();
-    for(int i = 0; i < 16; i ++)
-    {
-        int x_opp = opp_list[i].x;
-        int y_opp = opp_list[i].y;
-        get_moves(g, g->board[get_pos(x_opp,y_opp)], opp_li_moves, NULL);
-        if(in_list(opp_li_moves, king->x, king->y))
-            return 1;
-    }
-
-    return 0;
-}
-
 void set_game(Game* g)
 {
     // 1 : malloc pieces and init basic data
@@ -450,12 +453,12 @@ void set_game(Game* g)
     for(int j=0;j<8;j++)
     {
         g->board[get_pos(1,j)]->type=PAWN;
-        g->board[get_pos(0,j)]->id=8+j;
+        g->board[get_pos(1,j)]->id=8+j;
     }
     for(int j=0;j<8;j++)
     {
         g->board[get_pos(6,j)]->type=PAWN;
-        g->board[get_pos(0,j)]->id=16+j;
+        g->board[get_pos(6,j)]->id=16+j;
     }
     for(int j=0;j<8;j++)
     {

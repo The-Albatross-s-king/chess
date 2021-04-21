@@ -63,19 +63,19 @@ int is_empty(Move_list* list)
 void free_list(Move_list* list)
 {
 
-Move_list* tmp;
-while(list!=NULL)
-{
-    tmp=list;
-    list=list->next;
-    free(tmp);
-}
+    Move_list* tmp;
+    while(list!=NULL)
+    {
+        tmp=list;
+        list=list->next;
+        free(tmp);
+    }
 }
 
 void display_list(Move_list* l)
 {
     printf("coups possibles :\n");
-	l=l->next;
+    l=l->next;
     while(l!=NULL)
     {
         printf("%d %c -> ",l->x+1,(char)(l->y+'A'));

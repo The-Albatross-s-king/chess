@@ -4,4 +4,5 @@ main
 demo
 debug
 *.o
+*.out
 *.d
