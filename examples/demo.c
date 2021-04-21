@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     //apply_move(&g, 1, 4, 4, 5);
     for(int i=0; i<20; i++)
     {
-        auto_move(&g, color);
+        auto_move_minmax(&g, color);
         color=!color;
         sleep(0.7f);
         display_board((Piece**)&g.board, NULL, WHITE);

@@ -10,21 +10,6 @@
 
 int SCORES[6]={10,50,30,30,90,900};
 
-double random_double(void)
-{
-    //srandom(NULL);
-    long int x=rand();
-    return ((double)x)/RAND_MAX;
-}
-
-double evaluate(Game* g, int cur_color)
-{
-    double score=0;
-    score+=get_atk_def_pos(g,cur_color,  SCORES);
-    return score;
-}
-
-
 void print_evaluate(int depth, double score)
 {
     for(int i=0; i<depth; i++)
@@ -101,7 +86,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
                 int init_color=cur_color;
                 if(!max)
                     init_color=!cur_color;
-                score_cur_move+=evaluate(g, init_color);
+                score_cur_move+=evaluate(g, init_color, &SCORES[0]);
                 //print_evaluate(depth, evaluate(g, init_color));
             } 
             //choose best move
@@ -117,8 +102,8 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
             }
             else if (score_cur_move == best_score)
             {
-                double rand = random_double();
-                if (rand > 0.5)
+                double r = random_double();
+                if (r > 0.5)
                     best_score = score_cur_move;
             }
             //undo the move
@@ -183,7 +168,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             }
             else
             {
-                score_cur_move+=evaluate(g, cur_color);//choose best move
+                score_cur_move+=evaluate(g, cur_color, &SCORES[0]);//choose best move
                 //print_evaluate(depth, evaluate(g, cur_color));
             }
             if(*best_piece==NULL || score_cur_move>best_score)
@@ -207,7 +192,8 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
     free_list(moves);  
 }
 
-void auto_move(Game* g, int cur_color)
+
+void auto_move_minmax(Game* g, int cur_color)
 {
 	int x=0;
 	int y=0;
@@ -215,7 +201,6 @@ void auto_move(Game* g, int cur_color)
 	minmax(g,&x, &y, &p, cur_color); 
 	//printf("moved a %s from %c/%d to %c/%d\n",
 	 //       get_name(p->type), p->x+'A', p->y, x+'A',y);
-    
     
     //double pos1=position_score(p);
 	apply_move(g,p->x, p->y, x, y);

@@ -81,6 +81,22 @@ double pawn_positions[]=
 
 double* pieces_positions[]={&pawn_positions[0], &rook_positions[0], &knight_positions[0], &bishop_positions[0], &queen_positions[0], &king_positions[0]};
 
+
+double random_double(void)
+{
+    //srandom(NULL);
+    long int x=rand();
+    return ((double)x)/RAND_MAX;
+}
+
+
+double evaluate(Game* g, int cur_color, int *SCORES)
+{
+    double score=0;
+    score+=get_atk_def_pos(g,cur_color,  SCORES);
+    return score;
+}
+
 double position_score(Piece* p)
 {
     if (!p->alive)

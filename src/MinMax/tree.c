@@ -1,8 +1,9 @@
 #include "tree.h"
+#include "board.h"
 #include <stdlib.h>
 #include <err.h>
 
-Tree* select_tree(Tree *t, int x, int y)
+Tree* select_tree(Tree *t, int pos, int old_pos)
 {
     if (t == NULL)
         err(3, "Tree is NULL");
@@ -12,13 +13,19 @@ Tree* select_tree(Tree *t, int x, int y)
     t = t->child;
     free(t);
     
-    while (t != NULL && t->pos != x*8+y)
+    while (t != NULL && t->pos != pos && t->old_pos != old_pos)
     {
         tmp = t;
         t = t->sibling;
         free_tree(tmp);
     }
-    
+
+    while (tmp!=NULL)
+    {
+        t->sibling=tmp->sibling;
+        free_tree(tmp);
+        tmp = t->sibling;
+    }
     if (t == NULL)
         err(3, "pos does not exit");
     
