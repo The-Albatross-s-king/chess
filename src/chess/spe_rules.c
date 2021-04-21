@@ -64,7 +64,9 @@ void take_choice(Game *g, Piece *pawn)
     while (1)
     {
         printf("Type the number of the piece you want to revive:\n");
-        scanf("%i", &choice);
+        int e = scanf("%i", &choice);
+		if (e != 0)
+			errx(EXIT_FAILURE, "erreur while scaning input");
         if(choice >= 0 && choice <= 7 && choice != 3 && team[choice].alive == 0)
         {
             break;

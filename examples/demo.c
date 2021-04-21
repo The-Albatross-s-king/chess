@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     {
         auto_move(&g, color);
         color=!color;
-        sleep(1);
+        sleep(0.7f);
         display_board((Piece**)&g.board, NULL, WHITE);
     }
 

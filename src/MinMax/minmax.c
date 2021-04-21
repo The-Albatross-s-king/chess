@@ -10,11 +10,17 @@
 
 int SCORES[6]={10,50,30,30,90,900};
 
+double random_double(void)
+{
+    //srandom(NULL);
+    long int x=rand();
+    return ((double)x)/RAND_MAX;
+}
+
 double evaluate(Game* g, int cur_color)
 {
     double score=0;
-    score+=get_atk_def(g,cur_color,  SCORES);
-    score+=get_position_score(g,cur_color);
+    score+=get_atk_def_pos(g,cur_color,  SCORES);
     return score;
 }
 
@@ -108,6 +114,12 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
             {
                 first_move=0;
                 best_score=score_cur_move;
+            }
+            else if (score_cur_move == best_score)
+            {
+                double rand = random_double();
+                if (rand > 0.5)
+                    best_score = score_cur_move;
             }
             //undo the move
             apply_move(g, cur_move.x, cur_move.y, old_x, old_y);

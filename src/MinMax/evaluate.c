@@ -85,9 +85,9 @@ double position_score(Piece* p)
 {
     if (!p->alive)
         return 0;
-    int x = p->x;
+    int x = 7-p->x;
     if(p->color==BLACK)
-        x=7-p->x;
+        x=p->x;
     
     return pieces_positions[p->type][get_pos(x, p->y)];
 }
@@ -113,57 +113,57 @@ int get_circle_position(Piece* p)
 	return 3;
 }
 
-double get_position_score(Game* game, int cur_color)
-{
-    double sum=0;
-    for(int i=0;i<16; i++)
-    {
-        if(cur_color==BLACK)
-        {
-            sum+=position_score(&(game->blacks[i]));
-            sum-=position_score(&(game->whites[i]));
-        }
-        else
-        {
-            sum+=position_score(&(game->whites[i]));
-            sum-=position_score(&(game->blacks[i]));
-        }
-    }
-    return sum;
-}
-
-
-double get_atk_def(Game *game, int cur_color, int* scores)
+double get_atk_def_pos(Game *game, int cur_color, int* scores)
 {
 
     Move_list *atk = init_list(); 
     Move_list *def = init_list();
     double sum = 0;
+    Piece* cur_pieces=&game->blacks[0];
+    Piece* opp_pieces=&game->whites[0];
+    if(cur_color==WHITE)
+    {
+        cur_pieces=&game->whites[0];
+        opp_pieces=&game->blacks[0];
+    }
     for(int i=0;i<16; i++)
     {
-        if(cur_color==WHITE)
-            get_moves(game, &game->whites[i], atk, def);
-        else
-            get_moves(game, &game->blacks[i], atk, def);
-
+        //atk & def
+        get_moves(game, &cur_pieces[i], atk, def);
+        
         int x=0;
         int y=0;
+        int factor_def=100;
+        int factor_atk=20;
+        while (!is_empty(def) && !is_empty(atk))
+        {
+            pop_list(def, &x, &y);
+            if(scores[game->board[x * 8 + y]->type!=KING])
+                sum += ((double)scores[game->board[x * 8 + y]->type]) / factor_def;
+            pop_list(atk, &x, &y);
+            if (game->board[x * 8 + y] != NULL)
+                sum += ((double)scores[game->board[x * 8 + y]->type])/ factor_atk;
+        }
         
         while (!is_empty(def))
         {
             pop_list(def, &x, &y);
             if(scores[game->board[x * 8 + y]->type!=KING])
-                sum += scores[game->board[x * 8 + y]->type] / 10;
+                sum += ((double)scores[game->board[x * 8 + y]->type]) / factor_def;
         }
 
         while (!is_empty(atk))
         {
             pop_list(atk, &x, &y);
             if (game->board[x * 8 + y] != NULL)
-                sum += scores[game->board[x * 8 + y]->type] / 10;
+                sum += ((double)scores[game->board[x * 8 + y]->type])/ factor_atk;
         }
+
+        //position
+        sum+=position_score(&cur_pieces[i]);
+        sum-=position_score(&opp_pieces[i]);
     }
     free_list(atk);
     free_list(def);
-    return (double)sum;
+    return sum;
 }
