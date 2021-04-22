@@ -12,8 +12,6 @@
 #define DEPTH_MAX 4
 #define CRITICAL_SCORE -200
 
-//TODO put it in evaluate (do a function)
-int ab_SCORES[6]={10,50,30,30,90,900};
 
 void compute_minmax(int* first_move, int max, Tree* parent, Tree* T)
 {
@@ -79,7 +77,7 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
         {
             p = g->board[C->old_pos];
             old_moved = p->moved; //c bo
-            C->max = C->score + parent->score;
+            C->max = C->score + parent->max;
             piece_eat = apply_move(g, C->old_pos/8, C->old_pos%8, C->pos/8, C->pos%8);
             
             alphabeta(g, !color, depth+1, !max, C);
@@ -117,14 +115,14 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
                 piece_eat=apply_move(g, p->x, p->y,cur_move.x, cur_move.y);
                 
                 if(piece_eat!=NULL)
-                    score_cur_move = ab_SCORES[piece_eat->type]*(-1+2*max);
+                    score_cur_move = get_score_piece(piece_eat)*(-1+2*max);
                 else
                     score_cur_move=0;
                 
                 Tree *T = new_tree();
-                set_tree(T, p->x, p->y, cur_move.x, cur_move.y);
+                set_tree(T, old_x, old_y, cur_move.x, cur_move.y);
                 T->score = score_cur_move;
-                T->max = T->score + parent->score;
+                T->max = T->score + parent->max;
                 if(C==NULL)
                 {
                     parent->child = T;
@@ -145,7 +143,8 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
                     int init_color=color;
                     if(!max)
                         init_color=!color;
-                    T->max+=evaluate(g, init_color, &ab_SCORES[0]);
+                    T->max+=evaluate(g, init_color);
+                    //printf("eval :%lf\n", T->max);
                 } 
                 
                 compute_minmax(&first_move, max, parent, T);
@@ -186,5 +185,61 @@ void auto_move_alphabeta(Game* g, int cur_color, Tree** T, int oldpos_lastmove, 
     //Step forward 1 time with the last move
 }
 
+void IA_vs_IA(Game *g, int nb_turn)
+{
+    Tree *T1 = new_tree();
+    Tree *T2 = new_tree();
+    int color = 1;
+    int old_pos;
+    int pos;
+    Tree* select = NULL;
+    //display_board(&g->board[0], NULL, WHITE);
+
+    for(;nb_turn!=0;nb_turn--)
+    {
+        if(color)
+        {
+            //manipule T1
+            
+            alphabeta(g, color, 1, 1, T1);
+            get_max_tree(T1, &pos, &old_pos);
+            //play T1
+            select=select_tree(T1, pos, old_pos);
+            display_board(&g->board[0], NULL, WHITE);
+            apply_move(g, old_pos/8, old_pos%8, pos/8, pos%8);
+            T1->child=select->child;
+            free(select);
+            //clean T2
+            if(T2->child!=NULL)
+            {
+                select=select_tree(T2, pos, old_pos);
+                T2->child=select->child;
+                free(select);
+            }
+        }
+        else
+        {
+            //manipule T2
+            alphabeta(g, color, 1, 1, T2);
+            get_max_tree(T2, &pos, &old_pos);
+            //play T2
+            select=select_tree(T2, pos, old_pos);
+            apply_move(g, old_pos/8, old_pos%8, pos/8, pos%8);
+            T2->child = select->child;
+            free(select);
+            //clean T1
+            if (T1->child != NULL)
+            {   
+                select=select_tree(T1, pos, old_pos);
+                T1->child = select->child;
+                free(select);
+            }
+        }
+        display_board(&g->board[0], NULL, WHITE);
+        color = !color;
+    }
+    free_tree(T1);
+    free_tree(T2);
+}
 
 

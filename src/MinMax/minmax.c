@@ -8,7 +8,6 @@
 #include <unistd.h>
 #define DEPTH_MAX 4
 
-int SCORES[6]={10,50,30,30,90,900};
 
 void print_evaluate(int depth, double score)
 {
@@ -74,7 +73,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
             piece_eat=apply_move(g, p->x, p->y,cur_move.x, cur_move.y);
             //evaluate the last move
             if(piece_eat!=NULL)
-                score_cur_move=SCORES[piece_eat->type]*(-1+2*max);
+                score_cur_move=get_score_piece(piece_eat)*(-1+2*max);
             else
                 score_cur_move=0;
             //continue recurcion
@@ -86,7 +85,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
                 int init_color=cur_color;
                 if(!max)
                     init_color=!cur_color;
-                score_cur_move+=evaluate(g, init_color, &SCORES[0]);
+                score_cur_move+=evaluate(g, init_color);
                 //print_evaluate(depth, evaluate(g, init_color));
             } 
             //choose best move
@@ -157,7 +156,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             
             //evaluate the last move
             if(piece_eat!=NULL)
-                score_cur_move=SCORES[piece_eat->type];
+                score_cur_move=get_score_piece(piece_eat);
             else
                 score_cur_move=0;
             //continue recurcion
@@ -168,7 +167,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             }
             else
             {
-                score_cur_move+=evaluate(g, cur_color, &SCORES[0]);//choose best move
+                score_cur_move+=evaluate(g, cur_color);//choose best move
                 //print_evaluate(depth, evaluate(g, cur_color));
             }
             if(*best_piece==NULL || score_cur_move>best_score)

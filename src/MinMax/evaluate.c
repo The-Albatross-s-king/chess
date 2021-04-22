@@ -81,6 +81,12 @@ double pawn_positions[]=
 
 double* pieces_positions[]={&pawn_positions[0], &rook_positions[0], &knight_positions[0], &bishop_positions[0], &queen_positions[0], &king_positions[0]};
 
+int SCORES[6]={10,50,30,30,90,900};
+
+int get_score_piece(Piece *p)
+{
+    return SCORES[p->type];
+}
 
 double random_double(void)
 {
@@ -90,10 +96,10 @@ double random_double(void)
 }
 
 
-double evaluate(Game* g, int cur_color, int *SCORES)
+double evaluate(Game* g, int cur_color)
 {
     double score=0;
-    score+=get_atk_def_pos(g,cur_color,  SCORES);
+    score+=get_atk_def_pos(g,cur_color);
     return score;
 }
 
@@ -129,7 +135,7 @@ int get_circle_position(Piece* p)
 	return 3;
 }
 
-double get_atk_def_pos(Game *game, int cur_color, int* scores)
+double get_atk_def_pos(Game *game, int cur_color)
 {
 
     Move_list *atk = init_list(); 
@@ -154,25 +160,25 @@ double get_atk_def_pos(Game *game, int cur_color, int* scores)
         while (!is_empty(def) && !is_empty(atk))
         {
             pop_list(def, &x, &y);
-            if(scores[game->board[x * 8 + y]->type!=KING])
-                sum += ((double)scores[game->board[x * 8 + y]->type]) / factor_def;
+            if(game->board[x * 8 + y]->type!=KING)
+                sum += ((double)get_score_piece(game->board[x * 8 + y])) / factor_def;
             pop_list(atk, &x, &y);
             if (game->board[x * 8 + y] != NULL)
-                sum += ((double)scores[game->board[x * 8 + y]->type])/ factor_atk;
+                sum += ((double)get_score_piece(game->board[x * 8 + y]))/ factor_atk;
         }
         
         while (!is_empty(def))
         {
             pop_list(def, &x, &y);
-            if(scores[game->board[x * 8 + y]->type!=KING])
-                sum += ((double)scores[game->board[x * 8 + y]->type]) / factor_def;
+            if(game->board[x * 8 + y]->type!=KING)
+                sum += ((double)get_score_piece(game->board[x * 8 + y])) / factor_def;
         }
 
         while (!is_empty(atk))
         {
             pop_list(atk, &x, &y);
             if (game->board[x * 8 + y] != NULL)
-                sum += ((double)scores[game->board[x * 8 + y]->type])/ factor_atk;
+                sum += ((double)get_score_piece(game->board[x * 8 + y]))/ factor_atk;
         }
 
         //position
