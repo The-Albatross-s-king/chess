@@ -15,7 +15,7 @@ CFLAGS = -Wall -Wextra -Werror -std=c99 -O2
 # Linker options (probably always empty)
 LDFLAGS =
 # Libs and path for linker
-LDLIBS =
+LDLIBS = -lm
 
 # Executables names
 EXAMPLES_DIR = examples/
