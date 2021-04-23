@@ -3,11 +3,14 @@
 #include <unistd.h>
 #include <err.h>
 #include "display.h"
+#include "save_load.h"
 #include "evaluate.h"
 #include "list.h"
 #include "tree.h"
+#include "input.h"
 #include "board.h"
 #include "checkmate.h"
+#include "tie.h"
 
 //ALWAYS SUPERIOR TO 2
 #define DEPTH_MAX 4
@@ -251,9 +254,9 @@ void IA_vs_IA(Game *g, int nb_turn)
         if (is_checkmate(g, k))
         {
             if(color)
-                printf("the black king is checkmate, whites WIN\n");
+                printf("The black king is checkmate, whites WIN\n");
             else
-                printf("the white king is checkmate, blacks WIN\n");
+                printf("The white king is checkmate, blacks WIN\n");
             break;
         }
 
@@ -263,4 +266,83 @@ void IA_vs_IA(Game *g, int nb_turn)
     free_tree(T2);
 }
 
+void human_vs_IA(Game *g, int color_human)
+{
+    int x_input;
+    int y_input;
+    int new_x;
+    int new_y;
+    int color = 1;
+    int checkmate = 0;
+    int tie = 0;
+    Tree *T = new_tree();
+    int old_pos;
+    int pos;
+    Tree* select = NULL;
+    Piece *king = &g->blacks[3];
+    Move_list *piece_moves = init_list();
 
+
+    display_board(g->board, piece_moves, color_human);
+
+    while(!checkmate && !tie)
+    {
+        if (color==color_human) //sans Tree
+        {
+            printf("It's your turn !\n");
+            can_i_go(g, &x_input, &y_input, &piece_moves, color_human);
+            display_board(g->board, piece_moves, color_human);
+            if (!go_to(g, piece_moves ,&x_input, &y_input, &new_x, &new_y))
+            {
+                printf("Wrong move, try again.\n");
+                free_list(piece_moves->next);
+                piece_moves->next = NULL;
+                display_board(g->board, NULL, color_human);
+                continue;
+            }
+            free_list(piece_moves->next);
+            piece_moves->next = NULL;
+            old_pos = x_input*8 + y_input;
+            pos = new_x*8 + new_y;
+        }
+        else
+        {
+            if(T->child!=NULL)
+            {
+                select=select_tree(T, pos, old_pos); //got from the human input
+                T->child=select->child;
+                free(select);
+            }
+            alphabeta(g, color, 1, 1, T);
+            get_max_tree(T, &pos, &old_pos);
+            //play T1
+            select=select_tree(T, pos, old_pos);
+                       
+            //display_board(&g->board[0], NULL, WHITE);
+            apply_move(g, old_pos/8, old_pos%8, pos/8, pos%8);
+            T->child=select->child;
+            free(select);
+        }
+
+        display_board(g->board, NULL, color_human);
+
+        if(color)
+            king = &g->blacks[3];
+        else
+            king = &g->whites[3];
+        
+        checkmate = is_checkmate(g, king);
+        tie = is_tie(g, (color + 1) % 2);
+
+        color = !color;
+    }
+    if (tie)
+        printf("Tie ! The game wins !\n");
+    else if(color)
+        printf("The black king is checkmate, whites WIN\n");
+    else
+        printf("The white king is checkmate, blacks WIN\n");
+
+    free_tree(T);
+    free_list(piece_moves);
+}

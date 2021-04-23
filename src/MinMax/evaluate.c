@@ -155,7 +155,7 @@ double get_atk_def_pos(Game *game, int cur_color)
         
         int x=0;
         int y=0;
-        int factor_def=100;
+        int factor_def=50;
         int factor_atk=20;
         while (!is_empty(def) && !is_empty(atk))
         {

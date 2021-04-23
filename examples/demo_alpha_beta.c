@@ -15,9 +15,9 @@ int main(int argc, char** argv)
 {
     Game g;
     set_game(&g); //remplit le plateau de pieces
-    int want_load= argc==2;
-    if(argc>=3)
-        err(3, "Need filename to load");
+    int want_load = argc==2;
+    if(argc>2)
+        err(3, "Too much arguments");
     //char* file="save/situation3.txt";
     //load(&g, "save/basic.txt");
     if(want_load)
@@ -35,9 +35,9 @@ int main(int argc, char** argv)
     }
     int color=WHITE;
 
-    display_board(&g.board[0], NULL, WHITE);
+    display_board(&g.board[0], NULL, color);
 
     //apply_move(&g, 1, 4, 4, 5);
-    IA_vs_IA(&g, 20);
+    human_vs_IA(&g, color);
     return 0;
 }

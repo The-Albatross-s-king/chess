@@ -29,7 +29,6 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
     while (not_valid){
         not_valid = 0;
         input(x, y);
-        printf("%d, %d\n", *x, *y);
         Piece *target = NULL;
         if(!get_piece(game, *x, *y, &target))
             errx(1, "Out of bound in chessboard");
