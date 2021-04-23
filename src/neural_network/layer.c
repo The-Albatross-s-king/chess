@@ -87,3 +87,16 @@ void mutate_layer(layer *l)
     for(size_t i = 0; i < l->size; ++i)
         mutate(l->neurones + i);
 }
+
+void save_layer(layer *l, FILE *file)
+{
+    if(file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+    char str[10];
+    sprintf(str, "%lu\n", l->size);
+    fputs(str, file);
+    for(size_t i = 0; i < l->size; i++)
+    {
+        save_neurone(l->neurones + i, file);
+    }
+}

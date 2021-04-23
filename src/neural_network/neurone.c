@@ -13,7 +13,7 @@ void print_neurone(neurone *n)
     {
         printf("%lf, ", *(n->weights + i));
     }
-    printf("}\n%lf\n", n->bias);
+    printf("} -> %lf\n%lf\n", n->value, n->bias);
 }
 
 neurone *build_neurone(size_t size)
@@ -155,4 +155,45 @@ void front_prop(neurone *n, layer *prev_l, char is_last)
     if(!is_last)
         sum = activation(sum);
     n->value = sum;
+}
+
+void save_neurone(neurone *n, FILE *file)
+{
+    if (file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+    char str[10];
+    sprintf(str, "%lu,", n->size);
+    fputs(str, file);
+    fputs("[", file);
+
+    for (unsigned int i = 0; i < n->size - i; i++) {
+        snprintf(str, 10, "%f", n->weights[i]);
+        fputs(str, file);
+        fputs(",", file);
+    }
+    snprintf(str, 10, "%f", n->weights[n->size - 1]);
+    fputs(str, file);
+    fputs("],", file);
+    snprintf(str, 10, "%f", n->bias);
+    fputs(str, file);
+    fputs("\n", file);
+
+}
+
+void load_neurones(FILE *file)
+{
+    if (file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+
+    size_t size = 0;
+    if (fscanf(file, "%lu,[", &size) == 0)
+        errx(EXIT_FAILURE, "Can't read the file");
+    neurone *n = build_neurone(size);
+    for(size_t i = 0; i < size - 1; i++)
+    {
+        if (fscanf(file, "%f,", n->weights + i) == 0)
+            errx(EXIT_FAILURE, "Can't read the file");
+    }
+    if (fscanf(file, "%f],%f\n", n->weights + size - 1, &n->bias) == 0)
+        errx(EXIT_FAILURE, "Can't read the file");
 }

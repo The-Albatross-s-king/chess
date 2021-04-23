@@ -16,3 +16,9 @@ typedef struct layer
     size_t size;
 }layer;
 
+typedef struct network
+{
+    layer *layers;
+    size_t *sizes;
+    size_t nb_layer;
+}network;

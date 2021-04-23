@@ -19,3 +19,5 @@ void soft_max_layer(layer *l);
 void mix_layer(layer *l, layer *partner);
 
 void mutate_layer(layer *l);
+
+void save_layer(layer *l, FILE *file);
