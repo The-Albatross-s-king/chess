@@ -7,10 +7,11 @@
 #include "list.h"
 #include "tree.h"
 #include "board.h"
+#include "checkmate.h"
 
 //ALWAYS SUPERIOR TO 2
 #define DEPTH_MAX 4
-#define CRITICAL_SCORE -200
+#define CRITICAL_SCORE -100
 
 
 void compute_minmax(int* first_move, int max, Tree* parent, Tree* T)
@@ -28,7 +29,7 @@ void compute_minmax(int* first_move, int max, Tree* parent, Tree* T)
     else if (T->max == parent->max)
     {
         double r = random_double();
-        if (r > 0.5)
+        if (r > 0.5f)
             parent->max=T->max;
     }
 }
@@ -70,18 +71,17 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
 
     //IF ALREADY COMPUTED
 
-    if(depth < DEPTH_MAX-2 && parent->child != NULL)
+    if(depth <= DEPTH_MAX-2 && parent->child != NULL)
     {
         C=parent->child;
         while(C!=NULL)
         {
             p = g->board[C->old_pos];
             old_moved = p->moved; //c bo
-            C->max = C->score + parent->max;
+            C->sum = C->score + parent->sum;
             piece_eat = apply_move(g, C->old_pos/8, C->old_pos%8, C->pos/8, C->pos%8);
             
             alphabeta(g, !color, depth+1, !max, C);
-            
             apply_move(g, C->pos/8, C->pos%8, C->old_pos/8, C->old_pos%8);
             
             if(piece_eat!=NULL)
@@ -106,6 +106,8 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
                 continue;
             old_x=p->x;
             old_y=p->y;
+            int old_pos=p->x*8+p->y;
+            old_pos=old_pos+1-1;
             old_moved=p->moved;
             get_moves(g, p, moves, NULL);
             
@@ -122,7 +124,7 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
                 Tree *T = new_tree();
                 set_tree(T, old_x, old_y, cur_move.x, cur_move.y);
                 T->score = score_cur_move;
-                T->max = T->score + parent->max;
+                T->sum = T->score + parent->sum;
                 if(C==NULL)
                 {
                     parent->child = T;
@@ -134,18 +136,20 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
                     C=C->sibling;
                 }
 
-                if(depth<DEPTH_MAX && T->max > CRITICAL_SCORE) //AND LIMITE
+                if(depth<DEPTH_MAX && T->sum > CRITICAL_SCORE) //AND LIMITE
                 {
                         alphabeta(g, !color, depth+1, !max, T);
                 }
-                else if (T->max > CRITICAL_SCORE)
+                else if (T->sum > CRITICAL_SCORE)
                 {
                     int init_color=color;
                     if(!max)
                         init_color=!color;
-                    T->max+=evaluate(g, init_color);
+                    T->max = evaluate(g, init_color) + T->sum;
                     //printf("eval :%lf\n", T->max);
-                } 
+                }
+                else
+                    T->max = T->sum;
                 
                 compute_minmax(&first_move, max, parent, T);
 
@@ -205,7 +209,8 @@ void IA_vs_IA(Game *g, int nb_turn)
             get_max_tree(T1, &pos, &old_pos);
             //play T1
             select=select_tree(T1, pos, old_pos);
-            display_board(&g->board[0], NULL, WHITE);
+                       
+            //display_board(&g->board[0], NULL, WHITE);
             apply_move(g, old_pos/8, old_pos%8, pos/8, pos%8);
             T1->child=select->child;
             free(select);
@@ -236,6 +241,22 @@ void IA_vs_IA(Game *g, int nb_turn)
             }
         }
         display_board(&g->board[0], NULL, WHITE);
+        
+        Piece *k;
+        if (color)
+            k = &g->blacks[3];
+        else
+            k = &g->whites[3];
+       
+        if (is_checkmate(g, k))
+        {
+            if(color)
+                printf("the black king is checkmate, whites WIN\n");
+            else
+                printf("the white king is checkmate, blacks WIN\n");
+            break;
+        }
+
         color = !color;
     }
     free_tree(T1);

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <err.h>
 
+
+
+
 Tree* select_tree(Tree *t, int pos, int old_pos)
 {
     if (t == NULL)
@@ -13,7 +16,7 @@ Tree* select_tree(Tree *t, int pos, int old_pos)
     Tree *tmp = t;
     t = t->child;
     
-    while (t != NULL && t->pos != pos && t->old_pos != old_pos)
+    while (t != NULL && (t->pos != pos || t->old_pos != old_pos))
     {
         tmp = t;
         t = t->sibling;
@@ -21,16 +24,17 @@ Tree* select_tree(Tree *t, int pos, int old_pos)
     }
 
     tmp = t->sibling;
+    Tree *tmp2;
 
     while (tmp!=NULL)
     {
-        t->sibling=tmp->sibling;
+        tmp2=tmp->sibling;
         free_tree(tmp);
-        tmp = t->sibling;
+        tmp = tmp2;
     }
     if (t == NULL)
         err(3, "the move (old_pos->pos) does not exit");
-    
+
     return t;
 }
 
@@ -40,6 +44,7 @@ Tree* new_tree(void)
     if(t==NULL)
         errx(3,"Can't free a new tree");
     t->score=0;
+    t->sum=0;
     t->max=0;
     t->child=NULL;
     t->sibling=NULL;

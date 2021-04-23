@@ -6,6 +6,7 @@ typedef struct Tree
     struct Tree* child;
     struct Tree* sibling;
     int score;
+    int sum;
     double max;
     int pos;
     int old_pos;
