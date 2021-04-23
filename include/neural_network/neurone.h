@@ -1,20 +1,7 @@
 #include <stddef.h>
+#include "neural_struct.h"
 
 #pragma once
-
-#define INPUT_COUNT 4
-#define INPUT_SIZE 2
-#define INPUT_LAYER 2
-#define HIDDEN_LAYER 2
-#define OUTPUT_LAYER 1
-
-typedef struct neurone
-{
-    float *weights;
-    float bias;
-    float value;
-    size_t size;
-}neurone;
 
 neurone *build_neurone(size_t size);
 
@@ -31,3 +18,7 @@ float activation(float f);
 float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b);
 
 float soft_max(neurone *n, float f);
+
+void mutate(neurone *n);
+
+void front_prop(neurone *n, layer *prev_l, char is_last);

@@ -1,4 +1,5 @@
 #include "neurone.h"
+#include "layer.h"
 #include <stdlib.h>
 
 int main()
@@ -11,19 +12,14 @@ int main()
     // float *output_weights = build_rand_f_arr(HIDDEN_LAYER * OUTPUT_LAYER);
     // float *output_bias = build_rand_f_arr(OUTPUT_LAYER);
 
-    neurone *n = build_neurone(10);
-    neurone *copy = build_neurone(10);
-    neurone *m = build_neurone(10);
-    init_neurone(n);
-    init_neurone(m);
-    copy_neurone(n, copy, 1);
-    print_neurone(n);
-    print_neurone(m);
-    mix(n, m);
-    print_neurone(n);
+    layer *l1 = build_layer(3);
+    init_layer(l1, 3, 10);
 
-    free(n);
-    free(m);
-    free(copy);
+    print_layer(l1);
+    layer *l2 = copy_layer(l1, 1);
+    print_layer(l2);
+
+    free_layer(l1);
+    free_layer(l2);
     // printf("%lf\n", sigmoid(hidden_weights, hidden_bias, 4, 2));
 }

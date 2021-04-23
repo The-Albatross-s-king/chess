@@ -141,3 +141,18 @@ float soft_max(neurone *n, float f)
     n->value = expf(n->value) / f;
     return n->value;
 }
+
+void front_prop(neurone *n, layer *prev_l, char is_last)
+{
+    if(n->size != prev_l->size)
+        errx(EXIT_FAILURE, "Try to front propagate with wrong sizes");
+
+    float sum = 0;
+    for(size_t i = 0; i < n->size; ++i)
+        sum += prev_l->neurones[i].value * n->weights[i];
+
+    sum += n->bias;
+    if(!is_last)
+        sum = activation(sum);
+    n->value = sum;
+}
