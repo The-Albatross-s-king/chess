@@ -28,3 +28,10 @@ typedef struct bot
     network *net;
     size_t score;
 }bot;
+
+typedef struct generation
+{
+    bot *bots;
+    size_t size;
+}generation;
+
