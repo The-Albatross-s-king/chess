@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "neural_struct.h"
 
 #pragma once
@@ -7,6 +8,8 @@ void print_network(network *net);
 network *build_network(size_t *size, size_t nb_layer);
 
 void free_network(network *net);
+
+network *copy_network(network *net, char mutated);
 
 void init_network(network *net);
 

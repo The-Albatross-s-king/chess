@@ -42,6 +42,16 @@ void free_network(network *net)
     free(net);
 }
 
+network *copy_network(network *net, char mutated)
+{
+    network *copy = build_network(net->sizes, net->nb_layer);
+    for(size_t i = 0; i < net->nb_layer; i++)
+    {
+        copy->layers[i] = *copy_layer(net->layers + i, mutated);
+    }
+    return copy;
+}
+
 void init_network(network *net)
 {
     for (size_t i = 0; i < net->nb_layer; i++)

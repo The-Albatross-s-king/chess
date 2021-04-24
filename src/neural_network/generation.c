@@ -1,4 +1,5 @@
 #include "neural_struct.h"
+#include "bot_xor.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@ generation *build_generation(size_t size)
     g->size = size;
     for(size_t i = 0; i < size; ++i)
     {
-        g->bots[i] = *build_bot(8, 8);
+        g->bots[i] = *build_bot();
     }
 
     return g;
@@ -104,8 +105,8 @@ void duplicate(generation *g, generation *gen)
     gen->bots[0] = g->bots[0];
     for(size_t i = 1; i < g->size; ++i)
     {
-        gen->bots[i] = crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum));
-        mutate_bot(gen->bots[i]);
+        gen->bots[i] = *crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum));
+        mutate_bot(gen->bots + i);
     }
 
     *g = *gen;
@@ -117,7 +118,7 @@ void new_gen(generation *g, char display_best)
     if(display_best)
     {
         // Play Function
-        // play(g->bots, 1);
+        play_bot(g->bots);
     }
 
     generation *gen = build_generation(g->size);
@@ -128,15 +129,14 @@ void new_gen(generation *g, char display_best)
 void play(generation *g)
 {
     for(size_t i = 0; i < g->size; ++i)
-        //play_bot(g->bots[i]);
-        continue;
+        play_bot(g->bots + i);
 }
 
 void train(generation *g, size_t nb_gen)
 {
     for(size_t i = 0; i < nb_gen; ++i)
     {
-        //play(g, 0);
+        play(g);
         if(i % 100 == 0)
         {
             new_gen(g, 1);
@@ -146,16 +146,16 @@ void train(generation *g, size_t nb_gen)
             new_gen(g, 0);
         }
 
-        printf("%zu", i);
+        // printf("%zu", i);
     }
 }
 
 generation *build_generation_from_file(size_t size, char *path)
 {
     generation *g = build_generation(size);
-    bot saved = build_bot_from_file(path);
+    bot *saved = load_bot(path);
     for(size_t i = 0; i < size; ++i)
-        g->bots[i] = build_bot(saved, 0);
+        g->bots[i] = *copy_bot(saved, 0);
 
     return g;
 }
