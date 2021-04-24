@@ -22,3 +22,10 @@ typedef struct network
     size_t *sizes;
     size_t nb_layer;
 }network;
+
+typedef struct generation
+{
+    bot *bots;
+    size_t size;
+}generation;
+
