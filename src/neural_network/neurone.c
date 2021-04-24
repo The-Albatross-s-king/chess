@@ -166,7 +166,7 @@ void save_neurone(neurone *n, FILE *file)
     fputs(str, file);
     fputs("[", file);
 
-    for (unsigned int i = 0; i < n->size - i; i++) {
+    for (unsigned int i = 0; i < n->size - 1; i++) {
         snprintf(str, 10, "%f", n->weights[i]);
         fputs(str, file);
         fputs(",", file);
@@ -180,7 +180,7 @@ void save_neurone(neurone *n, FILE *file)
 
 }
 
-void load_neurones(FILE *file)
+neurone *load_neurones(FILE *file)
 {
     if (file == NULL)
         errx(EXIT_FAILURE, "The file can't be null");
@@ -196,4 +196,5 @@ void load_neurones(FILE *file)
     }
     if (fscanf(file, "%f],%f\n", n->weights + size - 1, &n->bias) == 0)
         errx(EXIT_FAILURE, "Can't read the file");
+    return n;
 }

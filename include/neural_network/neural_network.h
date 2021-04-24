@@ -19,3 +19,7 @@ float *get_output(network *net);
 void mix_network(network *net, network *partner);
 
 void mutate_network(network *net);
+
+void save_network(network *net, FILE *file);
+
+network *load_network(FILE *file);

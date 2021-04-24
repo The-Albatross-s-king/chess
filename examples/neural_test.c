@@ -26,6 +26,9 @@ int main()
     front_prop_network(net);
     float *res = get_output(net);
     print_network(net);
+    FILE *file = fopen("save/network.nn", "w");
+    save_network(net, file);
+    fclose(file);
     print_arr(res, sizes[nb - 1]);
     free(res);
     free_network(net);

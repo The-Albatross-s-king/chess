@@ -100,3 +100,20 @@ void save_layer(layer *l, FILE *file)
         save_neurone(l->neurones + i, file);
     }
 }
+
+layer *load_layer(FILE *file)
+{
+    if (file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+
+    size_t size = 0;
+    if (fscanf(file, "%lu\n", &size) <= 0)
+        errx(EXIT_FAILURE, "Can't read the file");
+    layer *l = build_layer(size);
+
+    for(size_t i = 0; i < size; i++)
+    {
+        l->neurones[i] = *load_neurones(file);
+    }
+    return l;
+}

@@ -26,4 +26,4 @@ void front_prop(neurone *n, layer *prev_l, char is_last);
 
 void save_neurone(neurone *n, FILE *file);
 
-void load_neurones(FILE *file);
+neurone *load_neurones(FILE *file);

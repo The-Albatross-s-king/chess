@@ -98,3 +98,39 @@ void mutate_network(network *net)
     }
 }
 
+void save_network(network *net, FILE *file)
+{
+    if(file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+    char str[10];
+    sprintf(str, "%lu\n", net->nb_layer);
+    fputs(str, file);
+    for(size_t i = 0; i < net->nb_layer; i++)
+    {
+        save_layer(net->layers + i, file);
+    }
+}
+
+network *load_network(FILE *file)
+{
+    if (file == NULL)
+        errx(EXIT_FAILURE, "The file can't be null");
+
+    size_t nb_layer = 0;
+    if (fscanf(file, "%lu\n", &nb_layer) <= 0)
+        errx(EXIT_FAILURE, "Can't read the file");
+    layer l[nb_layer];
+    size_t sizes[nb_layer];
+    for(size_t i = 0; i < nb_layer; i++)
+    {
+        l[i] = *load_layer(file);
+        sizes[i] = l[i].size;
+    }
+    network *net = build_network(sizes, nb_layer);
+    for (size_t i = 0; i < nb_layer; i++)
+    {
+        net->layers[i] = l[i];
+        net->sizes[i] = sizes[i];
+    }
+    return net;
+}

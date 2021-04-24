@@ -21,3 +21,5 @@ void mix_layer(layer *l, layer *partner);
 void mutate_layer(layer *l);
 
 void save_layer(layer *l, FILE *file);
+
+layer *load_layer(FILE *file);
