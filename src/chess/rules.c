@@ -151,7 +151,7 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 
     if (p->type != KING)
     {
-        errx(EXIT_FAILURE, "you have give a piece to the king_suicide"
+        errx(EXIT_FAILURE, "you have give a piece to the king_suicide "
                 "function which is not a king.");
     }
 
@@ -167,7 +167,8 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
         direction = -1;
         enemy = g->whites;
     }
-    Move_list *enemy_moves=init_list();
+    Move_list *enemy_moves = init_list();
+	Move_list *enemy_protect = init_list();
     for (int i = 0; i < 16; i++)
     {
         if (enemy[i].alive == 0)
@@ -220,7 +221,7 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 
         else
         {
-            get_moves(g, enemy+i, enemy_moves, NULL);
+            get_moves(g, enemy+i, enemy_moves, enemy_protect);
 
             int rx = p->x - (enemy+i)->x;
             int ry = p->y - (enemy+i)->y;
@@ -229,12 +230,14 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
             if ((rx == ry || rx == -ry) && ((enemy+i)->type == BISHOP || (enemy+i)->type == QUEEN))
                 in_axe = 1;
 
-            if ((rx == 0 || ry == 0) && ((enemy+i)->type == ROOK || (enemy+i)->type == QUEEN))
+            else if ((rx == 0 || ry == 0) && ((enemy+i)->type == ROOK || (enemy+i)->type == QUEEN))
                 in_axe = 1;
 
             int n = 2;
+			int x2;
+			int y2;
 
-            while (king_moves->next != NULL && pop_list(enemy_moves, &x, &y) && n)
+            while (king_moves->next != NULL && (pop_list(enemy_moves, &x, &y) || pop_list(enemy_protect, &x2, &y2)) && n)
             {
                 Move_list *tmp = king_moves->next;
                 Move_list *last = king_moves;
@@ -246,18 +249,27 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
                         free(tmp);
                         tmp = last->next;
                         if (in_axe)
-                            n--;
+                        {
+							if ((enemy+i)->type != QUEEN)
+								n--;
+						}
                     }
 
-                    else if (in_axe && tmp->x == p->x + (p->x - x) && 
+					else if (in_axe && tmp->x == p->x + (p->x - x) && 
                             tmp->y == p->y + (p->y - y))
+                    {	
+                    	last->next = tmp->next;
+                        free(tmp);
+                        tmp = last->next;
+                        if ((enemy+i)->type != QUEEN)
+							n--;
+                    }
+                    else if (tmp->x == x2 && tmp->y == y2)
                     {
                         last->next = tmp->next;
                         free(tmp);
                         tmp = last->next;
-                        n--;
                     }
-
                     else
                     {
                         last = last->next;
@@ -265,11 +277,16 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
                     }
                 }
             }
+			free_list(enemy_moves->next);
+            enemy_moves->next = NULL;
+            free_list(enemy_protect->next);
+            enemy_protect->next = NULL;
         }
 
         if (king_moves->next == NULL)
             break;
     }
     free_list(enemy_moves);
+    free_list(enemy_protect);
 
 }

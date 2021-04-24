@@ -58,23 +58,34 @@ void take_choice(Game *g, Piece *pawn)
         }
     }
     printf("|\n");
-    int choice = 0;
+    
+    char buff[32];
+    int e;
+    int choice;
 
     // while the choice is not correct, re-ask for a piece.
     while (1)
     {
         printf("Type the number of the piece you want to revive:\n");
-        int e = scanf("%i", &choice);
-		if (e != 0)
-			errx(EXIT_FAILURE, "erreur while scaning input");
-        if(choice >= 0 && choice <= 7 && choice != 3 && team[choice].alive == 0)
+        e = read(STDOUT_FILENO, buff, 32);
+		if (e == -1)
+			errx(EXIT_FAILURE, "erreur while reading input");
+        if (buff[1] == '\n')
         {
-            break;
+            choice = buff[0] - '0';
+            if(choice >= 0 && choice <= 7 && choice != 3 && team[choice].alive == 0)
+            {
+                break;
+            }    
         }
-        else
+        while (e == 32)
         {
-            printf("It is not a good input.\n");
+            e = read(STDOUT_FILENO, buff, 32);
+            if (e == -1)
+                errx(EXIT_FAILURE, "erreur while reading input");
         }
+        
+        printf("It is not a good input.\n");
     }
     // call the replace function
     replace(g, pawn, &team[choice]);
