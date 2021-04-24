@@ -166,13 +166,16 @@ void save_neurone(neurone *n, FILE *file)
     fputs(str, file);
     fputs("[", file);
 
-    for (unsigned int i = 0; i < n->size - 1; i++) {
-        snprintf(str, 10, "%f", n->weights[i]);
+    if(n->size != 0)
+    {
+        for (unsigned int i = 0; i < n->size - 1; i++) {
+            snprintf(str, 10, "%f", n->weights[i]);
+            fputs(str, file);
+            fputs(",", file);
+        }
+        snprintf(str, 10, "%f", n->weights[n->size - 1]);
         fputs(str, file);
-        fputs(",", file);
     }
-    snprintf(str, 10, "%f", n->weights[n->size - 1]);
-    fputs(str, file);
     fputs("],", file);
     snprintf(str, 10, "%f", n->bias);
     fputs(str, file);
@@ -187,14 +190,20 @@ neurone *load_neurones(FILE *file)
 
     size_t size = 0;
     if (fscanf(file, "%lu,[", &size) == 0)
-        errx(EXIT_FAILURE, "Can't read the file");
+        errx(EXIT_FAILURE, "Can't read the file 1");
     neurone *n = build_neurone(size);
-    for(size_t i = 0; i < size - 1; i++)
+    if (size != 0)
     {
-        if (fscanf(file, "%f,", n->weights + i) == 0)
-            errx(EXIT_FAILURE, "Can't read the file");
+        for(size_t i = 0; i < size - 1; i++)
+        {
+            if (fscanf(file, "%f,", n->weights + i) == 0)
+                errx(EXIT_FAILURE, "Can't read the file 2");
+        }
+        if (fscanf(file, "%f", n->weights + size - 1) == 0)
+            errx(EXIT_FAILURE, "Can't read the file 3");
+
     }
-    if (fscanf(file, "%f],%f\n", n->weights + size - 1, &n->bias) == 0)
-        errx(EXIT_FAILURE, "Can't read the file");
+    if (fscanf(file, "],%f\n", &n->bias) == 0)
+        errx(EXIT_FAILURE, "Can't read the file 4");
     return n;
 }

@@ -118,7 +118,7 @@ network *load_network(FILE *file)
 
     size_t nb_layer = 0;
     if (fscanf(file, "%lu\n", &nb_layer) <= 0)
-        errx(EXIT_FAILURE, "Can't read the file");
+        errx(EXIT_FAILURE, "Can't read the file in load_network");
     layer l[nb_layer];
     size_t sizes[nb_layer];
     for(size_t i = 0; i < nb_layer; i++)

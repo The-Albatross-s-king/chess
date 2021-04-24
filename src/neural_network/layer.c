@@ -108,7 +108,7 @@ layer *load_layer(FILE *file)
 
     size_t size = 0;
     if (fscanf(file, "%lu\n", &size) <= 0)
-        errx(EXIT_FAILURE, "Can't read the file");
+        errx(EXIT_FAILURE, "Can't read the file in load_layer");
     layer *l = build_layer(size);
 
     for(size_t i = 0; i < size; i++)
