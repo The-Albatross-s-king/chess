@@ -22,3 +22,9 @@ typedef struct network
     size_t *sizes;
     size_t nb_layer;
 }network;
+
+typedef struct bot
+{
+    network *net;
+    size_t score;
+}bot;
