@@ -8,9 +8,6 @@
 #include "checkmate.h"
 
 
-void impossible_diag_move(Piece *p, Move_list *l, int x, int y);
-void impossible_cross_move(Piece *p, Move_list *l, int x, int y);
-
 /*
    call this function after get_move() when a piece
    (different of the king) is selected.
@@ -21,11 +18,26 @@ void is_treason(Game *g, Piece *p, Move_list *l)
 {
     if (p->alive == 0)
         errx(1, "The piece is dead");
+
     Piece *k;
     if (p->color == WHITE)
         k = &(g->whites[3]);
     else
         k = &(g->blacks[3]);
+    
+    Piece *e;
+    int check = is_one_check(g, k, &e);
+    if (check > 1)
+    {
+        free_list(l->next);
+        l->next = NULL;
+        return;
+    }
+    else if (check == 1)
+    {
+        need_protect(g, p, l, e);
+        return;
+    }
 
     int x = p->x - k->x;
     int y = p->y - k->y;
@@ -90,7 +102,7 @@ void is_treason(Game *g, Piece *p, Move_list *l)
                 (enemy->type == ROOK || enemy->type == QUEEN))
             impossible_cross_move(p, l, x, y);
 
-        else if (enemy->color != p->color &&
+        else if (enemy->color != p->color && (x == y || x == -y) &&
                 (enemy->type == BISHOP || enemy->type == QUEEN))
             impossible_diag_move(p, l, x, y);
     }
@@ -223,15 +235,53 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
         {
             get_moves(g, enemy+i, enemy_moves, enemy_protect);
 
-            int rx = p->x - (enemy+i)->x;
-            int ry = p->y - (enemy+i)->y;
+            int rx = (enemy+i)->x - p->x;
+            int ry = (enemy+i)->y - p->y;
             int in_axe = 0;
 
             if ((rx == ry || rx == -ry) && ((enemy+i)->type == BISHOP || (enemy+i)->type == QUEEN))
-                in_axe = 1;
+            {   
+                int i = 1;
+                int j = 1;
+                if (rx < 0)
+                    i = -1;
+                if (ry < 0)
+                    j = -1;
+                rx = p->x + i;
+                ry = p->y + j;
+                while (g->board[get_pos(rx,ry)] == NULL)
+                {
+                    rx += i;
+                    ry += j;
+                }
+                if (g->board[get_pos(rx,ry)] == enemy+i)
+                    in_axe = 1;
+            }
 
-            else if ((rx == 0 || ry == 0) && ((enemy+i)->type == ROOK || (enemy+i)->type == QUEEN))
-                in_axe = 1;
+            else if ((rx == 0 || ry == 0) && (rx>1 || rx<-1 || ry>1 || ry<-1) && 
+                ((enemy+i)->type == ROOK || (enemy+i)->type == QUEEN))
+            {   
+                int i = 0;
+                int j = 0;
+                if (rx < 0)
+                    i = -1;
+                else if (rx > 0)
+                    i = 1;
+                if (ry < 0)
+                    j = -1;
+                else if (ry > 0)
+                    j = 1;
+                rx = p->x + i;
+                ry = p->y + j;
+                while (g->board[get_pos(rx,ry)] == NULL)
+                {
+                    rx += i;
+                    ry += j;
+                }
+                if (g->board[get_pos(rx,ry)] == enemy+i)
+                    in_axe = 1;
+            }    
+            
 
             int n = 2;
 			int x2;
@@ -254,7 +304,6 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 								n--;
 						}
                     }
-
 					else if (in_axe && tmp->x == p->x + (p->x - x) && 
                             tmp->y == p->y + (p->y - y))
                     {	
@@ -265,6 +314,12 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 							n--;
                     }
                     else if (tmp->x == x2 && tmp->y == y2)
+                    {
+                        last->next = tmp->next;
+                        free(tmp);
+                        tmp = last->next;
+                    }
+                    else if (tmp->x == p->x + (p->x - (enemy+i)->x) && tmp->y == p->y + (p->y - (enemy+i)->y))
                     {
                         last->next = tmp->next;
                         free(tmp);
@@ -289,4 +344,141 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
     free_list(enemy_moves);
     free_list(enemy_protect);
 
+}
+
+
+int is_one_check(Game *g, Piece *k, Piece **p)
+{
+    int nb_check = 0;
+    Piece *enemy;
+    int direction;
+    if (k->color == WHITE)
+    {    
+        enemy = g->blacks;
+        direction = 1;
+    }
+    else
+    {
+        enemy = g->whites;
+        direction = -1;
+    }
+    Move_list *opp_list = init_list();
+    int x;
+    int y;
+    int i = 0;
+    for (; i < 8; i++)
+    {
+        if (i == 3 || !(enemy+i)->alive)
+            continue;
+        get_moves(g, enemy+i, opp_list, NULL);
+        while (pop_list(opp_list, &x, &y) && (x != k->x || y != k->y))
+        {
+            continue;
+        }
+        if (opp_list->next != NULL)
+        {
+            *p = enemy+i;
+            nb_check++;
+            free_list(opp_list->next);
+            opp_list->next = NULL;
+        }
+        
+    }
+    for (; i < 16; i++)
+    {
+        if (!(enemy+i)->alive)
+            continue;
+        x = (enemy+i)->x;
+        if (x > 0 && x < 7)
+        {
+            y = (enemy+i)->y;
+
+            if (k->x == x + direction && k->y == y + 1)
+            {
+                *p = enemy+i;
+                nb_check++;
+                continue;
+            }
+            else if (k->x == x + direction && k->y == y - 1)
+            {
+                *p = enemy+i;
+                nb_check++;
+                continue;
+            }
+        }
+    }
+     
+    return nb_check;
+}
+
+void need_protect(Game *g, Piece *p, Move_list *l, Piece *enemy)
+{
+    Piece *k;
+    if (p->color == WHITE)
+    {
+        k = &g->whites[3];
+    }
+    else
+    {
+        k = &g->blacks[3];
+    }
+
+    Move_list *tmp = l;
+    l = l->next;
+
+    if (enemy->type == QUEEN || enemy->type == ROOK || 
+        enemy->type == BISHOP)
+    {
+        int rx = enemy->x - k->x;
+        int ry = enemy->y - k->y;
+        int x = 0;
+        int y = 0;
+        if (rx < 0)
+            x = -1;
+        else if (rx > 0)
+            x = 1;
+        if (ry < 0)
+            y = -1;
+        else if (ry > 0)
+            y = 1;
+
+        while (l != NULL)
+        {
+            rx = k->x + x;
+            ry = k->y + y;
+            while ((l->x != rx || l->y != ry) && (enemy->x != rx || enemy->y != ry))
+            {
+                rx += x;
+                ry += y;
+            }
+
+            if (l->x != rx || l->y != ry)
+            {
+                tmp->next = l->next;
+                free(l);
+                l = tmp->next;
+            }
+            else
+            {
+                tmp = l;
+                l = l->next;
+            }
+
+        }
+    }
+    else
+    {
+        while (l != NULL && (l->x != enemy->x || l->y != enemy->y))
+        {
+            tmp->next = l->next;
+            free(l);
+            l = tmp->next;
+        }
+        
+        if (l != NULL && l->next != NULL)
+        {
+            free_list(l->next);
+            l->next = NULL;
+        }
+    }
 }
