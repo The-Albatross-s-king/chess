@@ -249,12 +249,8 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
                     j = -1;
                 rx = p->x + i;
                 ry = p->y + j;
-                while (g->board[get_pos(rx,ry)] == NULL)
-                {
-                    rx += i;
-                    ry += j;
-                }
-                if (g->board[get_pos(rx,ry)] == enemy+i)
+                
+                if (g->board[get_pos(rx,ry)] == NULL)
                     in_axe = 1;
             }
 
@@ -273,12 +269,8 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
                     j = 1;
                 rx = p->x + i;
                 ry = p->y + j;
-                while (g->board[get_pos(rx,ry)] == NULL)
-                {
-                    rx += i;
-                    ry += j;
-                }
-                if (g->board[get_pos(rx,ry)] == enemy+i)
+                
+                if (g->board[get_pos(rx,ry)] == NULL)
                     in_axe = 1;
             }    
             
@@ -319,7 +311,9 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
                         free(tmp);
                         tmp = last->next;
                     }
-                    else if (tmp->x == p->x + (p->x - (enemy+i)->x) && tmp->y == p->y + (p->y - (enemy+i)->y))
+                    else if ((((enemy+i)->type == ROOK && (p->x - (enemy+i)->x == 0 || p->y - (enemy+i)->y == 0))
+                        || (enemy+i)->type == QUEEN) && tmp->x == p->x + (p->x - (enemy+i)->x) && 
+                        tmp->y == p->y + (p->y - (enemy+i)->y))
                     {
                         last->next = tmp->next;
                         free(tmp);
