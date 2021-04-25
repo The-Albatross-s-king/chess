@@ -12,8 +12,8 @@ void print_bot(bot *b)
 
 bot *build_bot(void)
 {
-    size_t sizes[] = {2, 2, 2};
-    size_t nb_layer = 3;
+    size_t sizes[] = {2, 4, 4, 4, 2};
+    size_t nb_layer = 5;
     network *net = build_network(sizes, nb_layer);
     init_network(net);
     bot *b = malloc(sizeof(bot));
@@ -61,9 +61,13 @@ void mutate_bot(bot *b)
 size_t scoring(float *resultat, float *expected, size_t size)
 {
     size_t score = 0;
+    int res = resultat[0] > resultat[1] ? 0 : 1;
+    float sign = 1;
+    if (!expected[res])
+        sign = -35.0f;
     for(size_t i = 0; i < size; i++)
     {
-        score += (1 - fabs(expected[i] - resultat[i])) * 10000;
+        score += sign * (1 - fabs(expected[i] - resultat[i])) * 1000;
     }
     return score;
 }

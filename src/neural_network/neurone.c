@@ -43,7 +43,7 @@ void init_neurone(neurone *n)
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(size_t i = 0; i < n->size; ++i)
     {
-        *(n->weights + i) = (float)rand()/(float)(RAND_MAX) * 2 - 1;
+        *(n->weights + i) = ((float)rand()/(float)(RAND_MAX) * 2 - 1);
     }
     n->bias = (float)rand()/(float)(RAND_MAX) * 2 - 1;
 }
@@ -55,7 +55,7 @@ void mutate(neurone *n)
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 0.15f)
+        if((float)rand()/(float)(RAND_MAX) < 0.05f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -131,9 +131,30 @@ float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
     return 1/(1 + expf(-sum));
 }
 
-float activation(float f)
+float first_act(float f)
 {
     return logf(1 + expf(f));
+}
+
+float tanh_act(float f)
+{
+    float exp_f = expf(f);
+    float exp_min_f = expf(-f);
+    return (exp_f - exp_min_f) / (exp_f + exp_min_f);
+}
+
+float elu_act(float f)
+{
+    float exp_f = expf(f);
+    if(f <= 0)
+        return 2 * (exp_f - 1);
+    return f;
+
+}
+
+float activation(float f)
+{
+    return elu_act(f);
 }
 
 float soft_max(neurone *n, float f)
