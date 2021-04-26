@@ -55,7 +55,7 @@ void mutate(neurone *n)
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 0.05f)
+        if((float)rand()/(float)(RAND_MAX) < 1.0f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -66,7 +66,7 @@ void mutate(neurone *n)
                 *(n->weights + i) = -1.0f;
         }
     }
-    if((float)rand()/(float)(RAND_MAX) < 0.05f)
+    if((float)rand()/(float)(RAND_MAX) < 1.0f)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
         float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -154,7 +154,7 @@ float elu_act(float f)
 
 float activation(float f)
 {
-    return elu_act(f);
+    return first_act(f);
 }
 
 float soft_max(neurone *n, float f)
@@ -174,7 +174,9 @@ void front_prop(neurone *n, layer *prev_l, char is_last)
 
     sum += n->bias;
     if(!is_last)
+    {
         sum = activation(sum);
+    }
     n->value = sum;
 }
 

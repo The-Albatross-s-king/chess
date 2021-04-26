@@ -16,17 +16,9 @@ int main()
     init_layer(l1, 3, 10);
 
     print_layer(l1);
-    // layer *l2 = copy_layer(l1, 1);
-    // print_layer(l2);
-    FILE *file = fopen("save/layer.nn", "w");
-    save_layer(l1, file);
-
-    fclose(file);
-    FILE *file1 = fopen("save/layer.nn", "r");
-    layer *l3 = load_layer(file1);
-    print_layer(l3);
-    fclose(file1);
+    layer *l2 = copy_layer(l1, 1);
+    print_layer(l2);
     free_layer(l1);
-    free_layer(l3);
+    free_layer(l2);
     // printf("%lf\n", sigmoid(hidden_weights, hidden_bias, 4, 2));
 }

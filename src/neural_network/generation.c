@@ -99,16 +99,15 @@ bot *select_bot_random(generation *g)
 void duplicate(generation *g, generation *gen)
 {
     size_t sum = 0;
-    for(size_t i = 0; i < g->size; ++i)
+    for(size_t i = 0; i < g->size; i++)
         sum += g->bots[i].score;
 
     gen->bots[0] = g->bots[0];
-    for(size_t i = 1; i < g->size; ++i)
+    for(size_t i = 1; i < g->size; i++)
     {
         gen->bots[i] = *crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum));
         mutate_bot(gen->bots + i);
     }
-
     *g = *gen;
 }
 
@@ -126,11 +125,34 @@ void new_gen(generation *g, char display_best)
     free(gen);
 }
 
+void mutate_generation(generation *g)
+{
+    // bot *best = g->bots;
+    for(size_t i = 0; i < g->size; i++)
+    {
+        mutate_bot(g->bots + i);
+    }
+}
+
 void play(generation *g)
 {
     for(size_t i = 0; i < g->size; ++i)
         play_bot(g->bots + i);
 }
+
+void new_gen2(generation *g, char display_best)
+{
+    play(g);
+    sort(g);
+    if(display_best)
+    {
+        // Play Function
+        play_bot(g->bots);
+    }
+    mutate_generation(g);
+    play(g);
+}
+
 
 void train(generation *g, size_t nb_gen)
 {
@@ -139,11 +161,11 @@ void train(generation *g, size_t nb_gen)
         play(g);
         if(i % 100 == 0)
         {
-            new_gen(g, 1);
+            new_gen2(g, 1);
         }
         else
         {
-            new_gen(g, 0);
+            new_gen2(g, 0);
         }
 
         // printf("%zu", i);

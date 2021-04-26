@@ -6,14 +6,14 @@
 
 void print_bot(bot *b)
 {
-    printf("Son score est %lu\n", b->score);
+    printf("Son score est %f\n", b->score);
     print_network(b->net);
 }
 
 bot *build_bot(void)
 {
-    size_t sizes[] = {2, 4, 4, 4, 2};
-    size_t nb_layer = 5;
+    size_t sizes[] = {2, 2, 2};
+    size_t nb_layer = 3;
     network *net = build_network(sizes, nb_layer);
     init_network(net);
     bot *b = malloc(sizeof(bot));
@@ -60,23 +60,23 @@ void mutate_bot(bot *b)
 
 size_t scoring(float *resultat, float *expected, size_t size)
 {
-    size_t score = 0;
+    float score = 0;
     int res = resultat[0] > resultat[1] ? 0 : 1;
     float sign = 1;
     if (!expected[res])
-        sign = -35.0f;
+        sign = 0;
     for(size_t i = 0; i < size; i++)
     {
-        score += sign * (1 - fabs(expected[i] - resultat[i])) * 1000;
+        score += sign * (resultat[i]) * 1000;
     }
-    return score;
+    return sign;
 }
 
 void play_bot(bot *b)
 {
     float inputs[] = {0, 0};
     float expected[] = {1, 0};
-    size_t score = 0;
+    float score = 0.0f;
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     float *res = get_output(b->net);
@@ -108,7 +108,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     res = get_output(b->net);
     score += scoring(res, expected, 2);
-
+    // printf("%f\n", score);
     b->score = score;
 }
 

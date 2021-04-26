@@ -26,7 +26,7 @@ typedef struct network
 typedef struct bot
 {
     network *net;
-    size_t score;
+    float score;
 }bot;
 
 typedef struct generation
