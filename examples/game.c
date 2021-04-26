@@ -168,10 +168,10 @@ int main(int argc, char** argv)
             if((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
                 errx(EXIT_FAILURE, "critical error while reading answer");
             
-            if ( r > 1 && buff[5] == 'q' && buff[6] == '\n')
+            if ( r > 1 && path[5] == 'q' && path[6] == '\n')
                 exit(EXIT_SUCCESS);
             
-            buff[r+4] = 0;
+            path[r+4] = 0;
             fd=open(path, O_RDONLY, 0666);
         }
         close(fd);
