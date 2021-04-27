@@ -84,7 +84,6 @@ void copy_neurone(neurone *n, neurone *copy, char mutated)
     copy->bias = n->bias;
     if(mutated)
     {
-        printf("mutate\n");
         mutate(copy);
     }
 }

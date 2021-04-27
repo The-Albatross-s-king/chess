@@ -30,9 +30,9 @@ generation *build_generation(size_t size)
 void free_generation(generation *g)
 {
     for (size_t i = 0; i < g->size; i++)
-		free_bot(g->bots+i);
+        free_bot(g->bots+i);
     free(g->bots);
-	free(g);
+    free(g);
 }
 
 void sort(generation *g)
@@ -66,7 +66,7 @@ generation *get_best_bots(generation *g, size_t n)
     {
         copy_bot(g->bots+i, best->bots+i, 0);
     }
-	best->size = n;
+    best->size = n;
 
     return best;
 }
@@ -131,9 +131,14 @@ void new_gen(generation *g, char display_best)
 void mutate_generation(generation *g)
 {
     // bot *best = g->bots;
-    for(size_t i = 0; i < g->size; i++)
+    for(size_t i = 10; i < g->size / 2; i++)
     {
-        mutate_bot(g->bots + i);
+        copy_bot(g->bots, g->bots + i, 1);
+        mix_bot(g->bots + i, g->bots + i % 10);
+    }
+    for(size_t i = g->size / 2; i < g->size; i++)
+    {
+        copy_bot(g->bots, g->bots + i, 1);
     }
 }
 
@@ -152,8 +157,8 @@ void new_gen2(generation *g, char display_best)
         // Play Function
         play_bot(g->bots);
     }
+    play(g);
     mutate_generation(g);
-    //play(g);
 }
 
 

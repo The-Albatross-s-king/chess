@@ -52,8 +52,15 @@ void mutate_bot(bot *b)
 }
 
 
-size_t scoring(float *resultat, float *expected, size_t size)
+float scoring(float *resultat, float *expected, size_t size)
 {
+    int exp = expected[0] ? 0 : 1;
+    int res = resultat[0] > resultat[1] ? 0 : 1;
+    size = 2 * size;
+    if (exp != res)
+        return 0;
+    return resultat[exp] * 100;
+    /*
     float score = 0;
     int res = resultat[0] > resultat[1] ? 0 : 1;
     float sign = 1;
@@ -64,6 +71,7 @@ size_t scoring(float *resultat, float *expected, size_t size)
         score += sign * (resultat[i]) * 1000;
     }
     return sign;
+    */
 }
 
 void play_bot(bot *b)

@@ -6,7 +6,7 @@ DIRS_INCLUDE = ${patsubst %/, -I%/, ${LIB_DIRS}}
 # Setting the compiler and the default linker program
 # CC = gcc
 # Compiler for debug target
-CC = gcc -g3 -fsanitize=address
+CC = gcc -g3 #-fsanitize=address
 # Options for pre-processor (-I, -include, -D ... )
 CPPFLAGS = ${DIRS_INCLUDE}
 
