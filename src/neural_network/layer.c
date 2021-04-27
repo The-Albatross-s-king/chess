@@ -12,45 +12,41 @@ void print_layer(layer *l)
         print_neurone(l->neurones + i);
 }
 
-layer *build_layer(size_t size)
+void build_layer(layer *l, size_t size)
 {
-    layer *l = malloc(sizeof(layer));
-    if(l == NULL)
-        errx(EXIT_FAILURE, "Can not allocate memory");
-
     l->neurones = malloc(size * sizeof(neurone));
     if(l->neurones == NULL)
         errx(EXIT_FAILURE, "Can not allocate memory");
 
     l->size = size;
-    return l;
 }
 
 void free_layer(layer *l)
 {
-    free(l->neurones);
-    free(l);
+	for (size_t i = 0; i < l->size; i++)
+	{
+		free_neurone(l->neurones+i);
+	}
+	free(l->neurones);
 }
 
 void init_layer(layer *l, size_t size, size_t prev_size)
 {
     for(size_t i = 0; i < size; ++i)
     {
-        l->neurones[i] = *build_neurone(prev_size);
+       	build_neurone(l->neurones+i, prev_size);
         init_neurone(l->neurones + i);
     }
 }
 
-layer *copy_layer(layer *l, char mutated)
+void copy_layer(layer *l, layer *copy, char mutated)
 {
-    layer *copy_l = build_layer(l->size);
-    init_layer(copy_l, l->size, l->neurones->size);
+    //build_layer(dest, l->size);
+    //init_layer(dest, l->size, l->neurones->size);
     for(size_t i = 0; i < l->size; ++i)
     {
-        copy_neurone(l->neurones + i, copy_l->neurones + i, mutated);
+        copy_neurone(l->neurones + i, copy->neurones + i, mutated);
     }
-
-    return copy_l;
 }
 
 void front_prop_layer(layer *l, layer *prev_l, char is_last)
@@ -101,7 +97,7 @@ void save_layer(layer *l, FILE *file)
     }
 }
 
-layer *load_layer(FILE *file)
+void load_layer(layer *l, FILE *file)
 {
     if (file == NULL)
         errx(EXIT_FAILURE, "The file can't be null");
@@ -109,11 +105,10 @@ layer *load_layer(FILE *file)
     size_t size = 0;
     if (fscanf(file, "%lu\n", &size) <= 0)
         errx(EXIT_FAILURE, "Can't read the file in load_layer");
-    layer *l = build_layer(size);
+    build_layer(l, size);
 
     for(size_t i = 0; i < size; i++)
     {
-        l->neurones[i] = *load_neurones(file);
+        load_neurones(l->neurones+i, file);
     }
-    return l;
 }

@@ -21,7 +21,7 @@ generation *build_generation(size_t size)
     g->size = size;
     for(size_t i = 0; i < size; ++i)
     {
-        g->bots[i] = *build_bot();
+        build_bot(g->bots+i);
     }
 
     return g;
@@ -29,8 +29,10 @@ generation *build_generation(size_t size)
 
 void free_generation(generation *g)
 {
+    for (size_t i = 0; i < g->size; i++)
+		free_bot(g->bots+i);
     free(g->bots);
-    free(g);
+	free(g);
 }
 
 void sort(generation *g)
@@ -62,8 +64,9 @@ generation *get_best_bots(generation *g, size_t n)
     generation *best = build_generation(n);
     for(size_t i = 0; i < n; ++i)
     {
-        best->bots[i] = g->bots[i];
+        copy_bot(g->bots+i, best->bots+i, 0);
     }
+	best->size = n;
 
     return best;
 }
@@ -105,7 +108,7 @@ void duplicate(generation *g, generation *gen)
     gen->bots[0] = g->bots[0];
     for(size_t i = 1; i < g->size; i++)
     {
-        gen->bots[i] = *crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum));
+        crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum), gen->bots + i);
         mutate_bot(gen->bots + i);
     }
     *g = *gen;
@@ -142,7 +145,7 @@ void play(generation *g)
 
 void new_gen2(generation *g, char display_best)
 {
-    play(g);
+    //play(g);
     sort(g);
     if(display_best)
     {
@@ -150,7 +153,7 @@ void new_gen2(generation *g, char display_best)
         play_bot(g->bots);
     }
     mutate_generation(g);
-    play(g);
+    //play(g);
 }
 
 
@@ -177,7 +180,7 @@ generation *build_generation_from_file(size_t size, char *path)
     generation *g = build_generation(size);
     bot *saved = load_bot(path);
     for(size_t i = 0; i < size; ++i)
-        g->bots[i] = *copy_bot(saved, 0);
+        copy_bot(saved, g->bots+i, 0);
 
     return g;
 }

@@ -37,17 +37,23 @@ network *build_network(size_t *sizes, size_t nb_layer)
 
 void free_network(network *net)
 {
-    free(net->sizes);
-    free(net->layers);
+    for (size_t i = 0; i < net->nb_layer; i++)
+	{
+    	free_layer(net->layers+i);
+	}
+	
+	free(net->sizes);
+	free(net->layers);
     free(net);
 }
 
 network *copy_network(network *net, char mutated)
 {
-    network *copy = build_network(net->sizes, net->nb_layer);
-    for(size_t i = 0; i < net->nb_layer; i++)
+	network *copy = build_network(net->sizes, net->nb_layer);
+    init_network(copy);
+	for(size_t i = 0; i < net->nb_layer; i++)
     {
-        copy->layers[i] = *copy_layer(net->layers + i, mutated);
+        copy_layer(net->layers + i, copy->layers + i, mutated);
     }
     return copy;
 }
@@ -56,7 +62,7 @@ void init_network(network *net)
 {
     for (size_t i = 0; i < net->nb_layer; i++)
     {
-        net->layers[i] = *build_layer(net->sizes[i]);
+        build_layer(net->layers+i, net->sizes[i]);
         init_layer(net->layers + i, net->sizes[i], i == 0 ? 0 : net->sizes[i - 1]);
     }
 }
@@ -133,14 +139,15 @@ network *load_network(FILE *file)
     size_t sizes[nb_layer];
     for(size_t i = 0; i < nb_layer; i++)
     {
-        l[i] = *load_layer(file);
+        load_layer(&l[i], file);
         sizes[i] = l[i].size;
     }
     network *net = build_network(sizes, nb_layer);
     for (size_t i = 0; i < nb_layer; i++)
     {
-        net->layers[i] = l[i];
-        net->sizes[i] = sizes[i];
+        copy_layer(&l[i], net->layers+i, 0);
+		free_layer(&l[i]);
+        *(net->sizes+i) = sizes[i];
     }
     return net;
 }

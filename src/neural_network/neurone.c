@@ -16,24 +16,19 @@ void print_neurone(neurone *n)
     printf("} -> %lf\n%lf\n", n->value, n->bias);
 }
 
-neurone *build_neurone(size_t size)
+void build_neurone(neurone *n, size_t size)
 {
-    neurone *n = malloc(sizeof(neurone));
-    if(n == NULL)
-        errx(EXIT_FAILURE, "Your computer is going to die");
     n->weights = malloc(size * sizeof(float));
     if(n->weights == NULL)
         errx(EXIT_FAILURE, "Your computer is going to die");
     n->bias = 0;
     n->value = 0;
     n->size = size;
-    return n;
 }
 
 void free_neurone(neurone *n)
 {
     free(n->weights);
-    free(n);
 }
 
 void init_neurone(neurone *n)
@@ -55,7 +50,7 @@ void mutate(neurone *n)
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 1.0f)
+        if((float)rand()/(float)(RAND_MAX) < 0.05f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -66,7 +61,7 @@ void mutate(neurone *n)
                 *(n->weights + i) = -1.0f;
         }
     }
-    if((float)rand()/(float)(RAND_MAX) < 1.0f)
+    if((float)rand()/(float)(RAND_MAX) < 0.05f)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
         float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -206,7 +201,7 @@ void save_neurone(neurone *n, FILE *file)
 
 }
 
-neurone *load_neurones(FILE *file)
+void load_neurones(neurone *n, FILE *file)
 {
     if (file == NULL)
         errx(EXIT_FAILURE, "The file can't be null");
@@ -214,7 +209,7 @@ neurone *load_neurones(FILE *file)
     size_t size = 0;
     if (fscanf(file, "%lu,[", &size) == 0)
         errx(EXIT_FAILURE, "Can't read the file 1");
-    neurone *n = build_neurone(size);
+    build_neurone(n, size);
     if (size != 0)
     {
         for(size_t i = 0; i < size - 1; i++)
@@ -228,5 +223,4 @@ neurone *load_neurones(FILE *file)
     }
     if (fscanf(file, "],%f\n", &n->bias) == 0)
         errx(EXIT_FAILURE, "Can't read the file 4");
-    return n;
 }

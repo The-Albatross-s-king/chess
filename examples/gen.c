@@ -20,7 +20,10 @@ int main()
 {
     generation *gen = build_generation(500);
     train(gen, 100);
-    bot *best = get_best_bots(gen, 1)->bots;
+    generation *best_gen = get_best_bots(gen, 1);
+	bot *best = malloc(sizeof(bot));
+	build_bot(best);
+	copy_bot(best_gen->bots, best, 0);
     float inputs[] = {0, 0};
     float expected[] = {1, 0};
     int resultat = 0;
@@ -47,6 +50,7 @@ int main()
         printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
         resultat = res[0] > res[1] ? 0 : 1;
         succ += expected[resultat];
+		free(res);
 
         inputs [0] = 0;
         inputs [1] = 1;
@@ -61,6 +65,7 @@ int main()
         printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
         resultat = res[0] > res[1] ? 0 : 1;
         succ += expected[resultat];
+		free(res);
 
         inputs[0] = 1;
         inputs[1] = 0;
@@ -75,6 +80,7 @@ int main()
         printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
         resultat = res[0] > res[1] ? 0 : 1;
         succ += expected[resultat];
+		free(res);
 
         inputs[0] = 1;
         inputs[1] = 1;
@@ -89,12 +95,16 @@ int main()
         printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
         resultat = res[0] > res[1] ? 0 : 1;
         succ += expected[resultat];
-        printf("%d\n", succ);
+        free(res);
+		printf("%d\n", succ);
         train(gen, 100);
     }
 
     // save_bot(best, "save/best.nn");
     free_generation(gen);
+	free_generation(best_gen);
+	free_bot(best);
+	free(best);
 
     return 0;
 }

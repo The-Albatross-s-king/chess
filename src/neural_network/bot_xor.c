@@ -10,33 +10,28 @@ void print_bot(bot *b)
     print_network(b->net);
 }
 
-bot *build_bot(void)
+void build_bot(bot *b)
 {
     size_t sizes[] = {2, 2, 2};
     size_t nb_layer = 3;
     network *net = build_network(sizes, nb_layer);
     init_network(net);
-    bot *b = malloc(sizeof(bot));
-    if(b == NULL)
-        errx(EXIT_FAILURE, "Can't malloc");
     b->net = net;
     b->score = 0;
-    return b;
 }
 
 void free_bot(bot *b)
 {
-    free(b);
+    free_network(b->net);
 }
 
-bot *copy_bot(bot *b, char mutated)
+void copy_bot(bot *b, bot *dest, char mutated)
 {
-    bot *copy = malloc(sizeof(bot));
-    if(copy == NULL)
-        errx(EXIT_FAILURE, "Can't malloc");
-    copy->net = copy_network(b->net, mutated);
+    network *tmp = dest->net;
+    
+	dest->net = copy_network(b->net, mutated);
 
-    return copy;
+	free_network(tmp); 
 }
 
 void mix_bot(bot *b, bot *partner)
@@ -44,11 +39,10 @@ void mix_bot(bot *b, bot *partner)
     mix_network(b->net, partner->net);
 }
 
-bot *crossover(bot *b, bot *partner)
+void crossover(bot *b, bot *partner, bot *dest)
 {
-    bot *new = copy_bot(b, 0);
-    mix_bot(new, partner);
-    return new;
+    copy_bot(b, dest, 0);
+    mix_bot(dest, partner);
 }
 
 
@@ -81,6 +75,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     float *res = get_output(b->net);
     score += scoring(res, expected, 2);
+	free(res);
 
     inputs [0] = 0;
     inputs [1] = 1;
@@ -90,6 +85,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     res = get_output(b->net);
     score += scoring(res, expected, 2);
+	free(res);
 
     inputs[0] = 1;
     inputs[1] = 0;
@@ -99,6 +95,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     res = get_output(b->net);
     score += scoring(res, expected, 2);
+	free(res);
 
     inputs[0] = 1;
     inputs[1] = 1;
@@ -109,6 +106,7 @@ void play_bot(bot *b)
     res = get_output(b->net);
     score += scoring(res, expected, 2);
     // printf("%f\n", score);
+	free(res);
     b->score = score;
 }
 

@@ -4,13 +4,13 @@
 
 void print_layer(layer *l);
 
-layer *build_layer(size_t size);
+void build_layer(layer *l, size_t size);
 
 void free_layer(layer *l);
 
 void init_layer(layer *l, size_t size, size_t prev_size);
 
-layer *copy_layer(layer *l, char mutated);
+void copy_layer(layer *l, layer *copy, char mutated);
 
 void front_prop_layer(layer *l, layer *prev_l, char is_last);
 
@@ -22,4 +22,4 @@ void mutate_layer(layer *l);
 
 void save_layer(layer *l, FILE *file);
 
-layer *load_layer(FILE *file);
+void load_layer(layer *l, FILE *file);

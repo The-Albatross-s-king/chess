@@ -4,13 +4,13 @@
 
 void print_bot(bot *b);
 
-bot *build_bot(void);
+void build_bot(bot *b);
 
 void free_bot(bot *b);
 
-bot *copy_bot(bot *b, char mutated);
+void copy_bot(bot *b, bot *dest, char mutated);
 
-bot *crossover(bot *b, bot *partner);
+void crossover(bot *b, bot *partner, bot *dest);
 
 void mutate_bot(bot *b);
 
