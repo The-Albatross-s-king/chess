@@ -16,74 +16,79 @@ void print_arr(float *arr, size_t len)
 }
 
 void print_score(bot *best)
-{	
-	float inputs[] = {0, 0};
+{
+    float inputs[] = {0, 0};
     float expected[] = {1, 0};
     int resultat = 0;
-	
-	printf("Score: %f\n", best->score);
 
-	int succ = 0;
-	inputs [0] = 0;
-	inputs [1] = 0;
-	expected [0]= 1;
-	expected [1]= 0;
-	feed(best->net, inputs, 2);
-	front_prop_network(best->net);
-	printf("inputs: ");
-	print_arr(inputs, 2);
-	float *res = get_output(best->net);
-	printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-	printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-	resultat = res[0] > res[1] ? 0 : 1;
-	succ += expected[resultat];
-	free(res);
+    printf("===============================\n");
+    printf("Score: %f\n", best->score);
 
-	inputs [0] = 0;
-	inputs [1] = 1;
-	expected [0]= 0;
-	expected [1]= 1;
-	feed(best->net, inputs, 2);
-	front_prop_network(best->net);
-	printf("inputs: ");
-	print_arr(inputs, 2);
-	res = get_output(best->net);
-	printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-	printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-	resultat = res[0] > res[1] ? 0 : 1;
-	succ += expected[resultat];
-	free(res);
+    int succ = 0;
+    inputs [0] = 0;
+    inputs [1] = 0;
+    expected [0]= 1;
+    expected [1]= 0;
+    feed(best->net, inputs, 2);
+    front_prop_network(best->net);
+    printf("Inputs: ");
+    print_arr(inputs, 2);
+    float *res = get_output(best->net);
+    printf("Output: %d   (%f)", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
+    // printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
+    resultat = res[0] > res[1] ? 0 : 1;
+    printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
+    succ += expected[resultat];
+    free(res);
 
-	inputs[0] = 1;
-	inputs[1] = 0;
-	expected[0] = 0;
-	expected[1] = 1;
-	feed(best->net, inputs, 2);
-	front_prop_network(best->net);
-	printf("inputs: ");
-	print_arr(inputs, 2);
-	res = get_output(best->net);
-	printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-	printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-	resultat = res[0] > res[1] ? 0 : 1;
-	succ += expected[resultat];
-	free(res);
+    inputs [0] = 0;
+    inputs [1] = 1;
+    expected [0]= 0;
+    expected [1]= 1;
+    feed(best->net, inputs, 2);
+    front_prop_network(best->net);
+    printf("Inputs: ");
+    print_arr(inputs, 2);
+    res = get_output(best->net);
+    printf("Output: %d   (%f)", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
+    // printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
+    resultat = res[0] > res[1] ? 0 : 1;
+    printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
+    succ += expected[resultat];
+    free(res);
 
-	inputs[0] = 1;
-	inputs[1] = 1;
-	expected[0] = 1;
-	expected[1] = 0;
-	feed(best->net, inputs, 2);
-	front_prop_network(best->net);
-	printf("inputs: ");
-	print_arr(inputs, 2);
-	res = get_output(best->net);
-	printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-	printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-	resultat = res[0] > res[1] ? 0 : 1;
-	succ += expected[resultat];
-	free(res);
-	printf("%d\n", succ);
+    inputs[0] = 1;
+    inputs[1] = 0;
+    expected[0] = 0;
+    expected[1] = 1;
+    feed(best->net, inputs, 2);
+    front_prop_network(best->net);
+    printf("Inputs: ");
+    print_arr(inputs, 2);
+    res = get_output(best->net);
+    printf("Output: %d   (%f)", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
+    // printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
+    resultat = res[0] > res[1] ? 0 : 1;
+    printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
+    succ += expected[resultat];
+    free(res);
+
+    inputs[0] = 1;
+    inputs[1] = 1;
+    expected[0] = 1;
+    expected[1] = 0;
+    feed(best->net, inputs, 2);
+    front_prop_network(best->net);
+    printf("Inputs: ");
+    print_arr(inputs, 2);
+    res = get_output(best->net);
+    printf("Output: %d   (%f)", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
+    // printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
+    resultat = res[0] > res[1] ? 0 : 1;
+    printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
+    succ += expected[resultat];
+    free(res);
+    printf("Number of good answers: %d/4\n\n", succ);
 
 }
 
@@ -102,81 +107,24 @@ int main()
     int resultat = 0;
     // bot *b = gen->bots;
 
-	int i = 1;
+    int i = 1;
 
     while (best->score < 40.0f)
-	{
-		printf("itération : %d\n", i);
-		i++;
-		play(gen);
-		sort(gen);
-		printf("Score: %f\n", best->score);
-		int succ = 0;
-		inputs [0] = 0;
-		inputs [1] = 0;
-		expected [0]= 1;
-		expected [1]= 0;
-		feed(best->net, inputs, 2);
-		front_prop_network(best->net);
-		printf("inputs: ");
-		print_arr(inputs, 2);
-		float *res = get_output(best->net);
-		printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-		printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-		resultat = res[0] > res[1] ? 0 : 1;
-		succ += expected[resultat];
-		free(res);
+    {
+        printf("===============================\n");
+        printf("Iteration : %d\n", i);
+        i++;
+        play(gen);
+        sort(gen);
 
-		inputs [0] = 0;
-		inputs [1] = 1;
-		expected [0]= 0;
-		expected [1]= 1;
-		feed(best->net, inputs, 2);
-		front_prop_network(best->net);
-		printf("inputs: ");
-		print_arr(inputs, 2);
-		res = get_output(best->net);
-		printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-		printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-		resultat = res[0] > res[1] ? 0 : 1;
-		succ += expected[resultat];
-		free(res);
+        print_score(best);
 
-		inputs[0] = 1;
-		inputs[1] = 0;
-		expected[0] = 0;
-		expected[1] = 1;
-		feed(best->net, inputs, 2);
-		front_prop_network(best->net);
-		printf("inputs: ");
-		print_arr(inputs, 2);
-		res = get_output(best->net);
-		printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-		printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-		resultat = res[0] > res[1] ? 0 : 1;
-		succ += expected[resultat];
-		free(res);
-
-		inputs[0] = 1;
-		inputs[1] = 1;
-		expected[0] = 1;
-		expected[1] = 0;
-		feed(best->net, inputs, 2);
-		front_prop_network(best->net);
-		printf("inputs: ");
-		print_arr(inputs, 2);
-		res = get_output(best->net);
-		printf("resultat: %d => %f\n", res[0] < res[1] ? 1 : 0, res[0] < res[1] ? res[1] : res[0]);
-		printf("resultat: %d => %f\n", res[0] > res[1] ? 1 : 0, res[0] > res[1] ? res[1] : res[0]);
-		resultat = res[0] > res[1] ? 0 : 1;
-		succ += expected[resultat];
-		free(res);
-		printf("%d\n", succ);
-		train(gen, 100);
+        train(gen, 100);
     }
-	
-	printf("itération : %d\n", i);
-	print_score(best);
+
+    printf("===============================\n");
+    printf("Iteration : %d\n", i);
+    print_score(best);
     save_bot(best, "save/best.nn");
     free_generation(gen);
     // free_generation(best_gen);
