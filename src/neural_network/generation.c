@@ -131,15 +131,21 @@ void new_gen(generation *g, char display_best)
 void mutate_generation(generation *g)
 {
     // bot *best = g->bots;
-    for(size_t i = 10; i < g->size / 2; i++)
+    for(size_t i = 20; i < g->size-200; i++)
     {
-        copy_bot(g->bots, g->bots + i, 1);
-        mix_bot(g->bots + i, g->bots + i % 10);
+        mix_bot(g->bots + i, g->bots + i%20);
+		mutate_bot(g->bots+i);
     }
-    for(size_t i = g->size / 2; i < g->size; i++)
-    {
-        copy_bot(g->bots, g->bots + i, 1);
-    }
+	for (size_t i = g->size-200; i < g->size-100; i++)
+	{
+		copy_bot(g->bots, g->bots+i, 1);
+		mix_bot(g->bots+i, g->bots+i%20); 
+	}
+	for(size_t i = g->size-100; i < g->size; i++)
+	{
+		free_bot(g->bots+i);
+		build_bot(g->bots+i);
+	}
 }
 
 void play(generation *g)
@@ -151,13 +157,13 @@ void play(generation *g)
 void new_gen2(generation *g, char display_best)
 {
     //play(g);
-    sort(g);
     if(display_best)
     {
         // Play Function
         play_bot(g->bots);
     }
     play(g);
+    sort(g);
     mutate_generation(g);
 }
 

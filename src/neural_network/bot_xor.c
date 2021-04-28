@@ -58,8 +58,8 @@ float scoring(float *resultat, float *expected, size_t size)
     int res = resultat[0] > resultat[1] ? 0 : 1;
     size = 2 * size;
     if (exp != res)
-        return 0;
-    return resultat[exp] * 100;
+        return resultat[exp];
+    return 10 + resultat[exp];
     /*
     float score = 0;
     int res = resultat[0] > resultat[1] ? 0 : 1;

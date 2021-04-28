@@ -50,7 +50,7 @@ void mutate(neurone *n)
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 0.05f)
+        if((float)rand()/(float)(RAND_MAX) < 0.15f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -61,7 +61,7 @@ void mutate(neurone *n)
                 *(n->weights + i) = -1.0f;
         }
     }
-    if((float)rand()/(float)(RAND_MAX) < 0.05f)
+    if((float)rand()/(float)(RAND_MAX) < 0.15f)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
         float x2 = 1 - (float)rand()/(float)(RAND_MAX);
