@@ -45,12 +45,10 @@ void crossover(bot *b, bot *partner, bot *dest)
     mix_bot(dest, partner);
 }
 
-
 void mutate_bot(bot *b)
 {
     mutate_network(b->net);
 }
-
 
 float scoring(float *resultat, float *expected, size_t size)
 {
@@ -60,18 +58,6 @@ float scoring(float *resultat, float *expected, size_t size)
     if (exp != res)
         return resultat[exp];
     return 10 + resultat[exp];
-    /*
-       float score = 0;
-       int res = resultat[0] > resultat[1] ? 0 : 1;
-       float sign = 1;
-       if (!expected[res])
-       sign = 0;
-       for(size_t i = 0; i < size; i++)
-       {
-       score += sign * (resultat[i]) * 1000;
-       }
-       return sign;
-       */
 }
 
 void play_bot(bot *b)

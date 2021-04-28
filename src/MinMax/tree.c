@@ -1,8 +1,13 @@
 #include "tree.h"
+#include "board.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <err.h>
 
-Tree* select_tree(Tree *t, int x, int y)
+
+
+
+Tree* select_tree(Tree *t, int pos, int old_pos)
 {
     if (t == NULL)
         err(3, "Tree is NULL");
@@ -10,18 +15,26 @@ Tree* select_tree(Tree *t, int x, int y)
     
     Tree *tmp = t;
     t = t->child;
-    free(t);
     
-    while (t != NULL && t->pos != x*8+y)
+    while (t != NULL && (t->pos != pos || t->old_pos != old_pos))
     {
         tmp = t;
         t = t->sibling;
         free_tree(tmp);
     }
-    
+
+    tmp = t->sibling;
+    Tree *tmp2;
+
+    while (tmp!=NULL)
+    {
+        tmp2=tmp->sibling;
+        free_tree(tmp);
+        tmp = tmp2;
+    }
     if (t == NULL)
-        err(3, "pos does not exit");
-    
+        err(3, "the move (old_pos->pos) does not exit");
+
     return t;
 }
 
@@ -30,7 +43,9 @@ Tree* new_tree(void)
     Tree* t=malloc(sizeof(Tree));
     if(t==NULL)
         errx(3,"Can't free a new tree");
-    
+    t->score=0;
+    t->sum=0;
+    t->max=0;
     t->child=NULL;
     t->sibling=NULL;
     return t;
@@ -49,12 +64,21 @@ void free_tree(Tree* t)
     if(t==NULL)
         return;
 
-    for(Tree* tmp=t->child; tmp!=NULL; tmp=tmp->sibling)
+    Tree *tmp = t->child;
+    Tree *tmp2;
+
+    while (tmp != NULL)
+    {
+        tmp2 = tmp->sibling;
         free_tree(tmp);
+        tmp = tmp2;
+    }
+
     free(t);
+
 }
 
-void get_max_tree(Tree *t, int *x, int *y)
+void get_max_tree(Tree *t, int *pos, int *old_pos)
 {
     if (t == NULL)
         err(3, "Tree is NULL");
@@ -64,18 +88,21 @@ void get_max_tree(Tree *t, int *x, int *y)
 
     t = t->child;
     
-    int score = t->score;
-    *x = t->pos / 8;
-    *y = t->pos % 8;
+    double score = t->max;
+    *old_pos= t->old_pos;
+    *pos= t->pos;
     
     t = t->sibling;
     while (t != NULL)
     {
-        if (t->score > score)
+        //printf("%d ->", t->max);
+        if (t->max > score)
         {
-            *x = t->pos / 8;
-            *y = t->pos % 8;
-            score = t->score;
+            *old_pos = t->old_pos;
+            *pos = t->pos;
+            score = t->max;
         }
+        t=t->sibling;
     }
+    printf("\n");
 }

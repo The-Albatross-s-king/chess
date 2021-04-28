@@ -67,10 +67,14 @@ int load(Game* g, char* path)
 
     for(int i=0; i<64; i++)
     {
-        r=read(fd, buf, 2);
-        if(r<=0)
+        r=read(fd, buf, 2); 
+        if(r<0)
         {
-            printf("wrong format of the loading file\n");
+            errx(3, "critical error while reading file");
+        }
+        if(r==0 || r==1)
+        {
+            printf("Wrong format of the loading file\n");
             return 0;
         }
         if(buf[0]=='0')

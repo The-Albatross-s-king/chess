@@ -41,7 +41,7 @@ void display_board(Piece **board, Move_list *list, enum pieces_colors side)
     int begin = 0;
     int line = 2;
     int offset = 0;
-    //clear_display();
+    clear_display();
     if (side == BLACK)
     {
         offset = 1;

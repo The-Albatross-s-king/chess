@@ -23,18 +23,18 @@ void build_layer(layer *l, size_t size)
 
 void free_layer(layer *l)
 {
-	for (size_t i = 0; i < l->size; i++)
-	{
-		free_neurone(l->neurones+i);
-	}
-	free(l->neurones);
+    for (size_t i = 0; i < l->size; i++)
+    {
+        free_neurone(l->neurones+i);
+    }
+    free(l->neurones);
 }
 
 void init_layer(layer *l, size_t size, size_t prev_size)
 {
     for(size_t i = 0; i < size; ++i)
     {
-       	build_neurone(l->neurones+i, prev_size);
+        build_neurone(l->neurones+i, prev_size);
         init_neurone(l->neurones + i);
     }
 }

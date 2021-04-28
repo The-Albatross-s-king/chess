@@ -139,7 +139,7 @@ void mutate_generation(generation *g)
     for (size_t i = g->size-200; i < g->size-100; i++)
     {
         copy_bot(g->bots, g->bots+i, 1);
-        mix_bot(g->bots+i, g->bots+i%20); 
+        mix_bot(g->bots+i, g->bots+i%20);
     }
     for(size_t i = g->size-100; i < g->size; i++)
     {

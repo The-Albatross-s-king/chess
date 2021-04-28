@@ -58,21 +58,24 @@ void take_choice(Game *g, Piece *pawn)
         }
     }
     printf("|\n");
-    int choice = 0;
+
+    int e;
+    int choice;
 
     // while the choice is not correct, re-ask for a piece.
     while (1)
     {
         printf("Type the number of the piece you want to revive:\n");
-        int e = scanf("%i", &choice);
+        e = scanf("%i", &choice);
         if(e && choice >= 0 && choice <= 7 && choice != 3 && team[choice].alive == 0)
         {
-            break;
+            if(choice >= 0 && choice <= 7 && choice != 3 && team[choice].alive == 0)
+            {
+                break;
+            }
         }
-        else
-        {
-            printf("It is not a good input.\n");
-        }
+
+        printf("It is not a good input.\n");
     }
     // call the replace function
     replace(g, pawn, &team[choice]);

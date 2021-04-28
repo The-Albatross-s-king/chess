@@ -38,20 +38,20 @@ network *build_network(size_t *sizes, size_t nb_layer)
 void free_network(network *net)
 {
     for (size_t i = 0; i < net->nb_layer; i++)
-	{
-    	free_layer(net->layers+i);
-	}
-	
-	free(net->sizes);
-	free(net->layers);
+    {
+        free_layer(net->layers+i);
+    }
+
+    free(net->sizes);
+    free(net->layers);
     free(net);
 }
 
 network *copy_network(network *net, char mutated)
 {
-	network *copy = build_network(net->sizes, net->nb_layer);
+    network *copy = build_network(net->sizes, net->nb_layer);
     init_network(copy);
-	for(size_t i = 0; i < net->nb_layer; i++)
+    for(size_t i = 0; i < net->nb_layer; i++)
     {
         copy_layer(net->layers + i, copy->layers + i, mutated);
     }
@@ -146,7 +146,7 @@ network *load_network(FILE *file)
     for (size_t i = 0; i < nb_layer; i++)
     {
         copy_layer(&l[i], net->layers+i, 0);
-		free_layer(&l[i]);
+        free_layer(&l[i]);
         *(net->sizes+i) = sizes[i];
     }
     return net;
