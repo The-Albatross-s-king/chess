@@ -28,10 +28,10 @@ void free_bot(bot *b)
 void copy_bot(bot *b, bot *dest, char mutated)
 {
     network *tmp = dest->net;
-    
-	dest->net = copy_network(b->net, mutated);
 
-	free_network(tmp); 
+    dest->net = copy_network(b->net, mutated);
+
+    free_network(tmp); 
 }
 
 void mix_bot(bot *b, bot *partner)
@@ -61,17 +61,17 @@ float scoring(float *resultat, float *expected, size_t size)
         return resultat[exp];
     return 10 + resultat[exp];
     /*
-    float score = 0;
-    int res = resultat[0] > resultat[1] ? 0 : 1;
-    float sign = 1;
-    if (!expected[res])
-        sign = 0;
-    for(size_t i = 0; i < size; i++)
-    {
-        score += sign * (resultat[i]) * 1000;
-    }
-    return sign;
-    */
+       float score = 0;
+       int res = resultat[0] > resultat[1] ? 0 : 1;
+       float sign = 1;
+       if (!expected[res])
+       sign = 0;
+       for(size_t i = 0; i < size; i++)
+       {
+       score += sign * (resultat[i]) * 1000;
+       }
+       return sign;
+       */
 }
 
 void play_bot(bot *b)
@@ -83,7 +83,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     float *res = get_output(b->net);
     score += scoring(res, expected, 2);
-	free(res);
+    free(res);
 
     inputs [0] = 0;
     inputs [1] = 1;
@@ -93,7 +93,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     res = get_output(b->net);
     score += scoring(res, expected, 2);
-	free(res);
+    free(res);
 
     inputs[0] = 1;
     inputs[1] = 0;
@@ -103,7 +103,7 @@ void play_bot(bot *b)
     front_prop_network(b->net);
     res = get_output(b->net);
     score += scoring(res, expected, 2);
-	free(res);
+    free(res);
 
     inputs[0] = 1;
     inputs[1] = 1;
@@ -114,7 +114,7 @@ void play_bot(bot *b)
     res = get_output(b->net);
     score += scoring(res, expected, 2);
     // printf("%f\n", score);
-	free(res);
+    free(res);
     b->score = score;
 }
 
