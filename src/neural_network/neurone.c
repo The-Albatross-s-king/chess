@@ -16,8 +16,13 @@ void print_neurone(neurone *n)
     printf("} -> %lf\n%lf\n", n->value, n->bias);
 }
 
+// Builds a neurone containing weights, number of weights, a bias and a value.
 void build_neurone(neurone *n, size_t size)
 {
+    /*
+    ** n : the neurone to build
+    ** size : the weight's number
+    */
     n->weights = malloc(size * sizeof(float));
     if(n->weights == NULL)
         errx(EXIT_FAILURE, "Your computer is going to die");
@@ -30,11 +35,15 @@ void free_neurone(neurone *n)
 {
     free(n->weights);
 }
-
+// Puts pseudo-random value in weights and bias.
 void init_neurone(neurone *n)
 {
+    /*
+    ** n : the neurone to initialize.
+    */
     struct timeval t;
     gettimeofday(&t, NULL);
+    // Get a different seed for pseudo random generation every micro seconds.
     srand(t.tv_sec + t.tv_usec * 1000000);
     for(size_t i = 0; i < n->size; ++i)
     {
@@ -43,24 +52,33 @@ void init_neurone(neurone *n)
     n->bias = (float)rand()/(float)(RAND_MAX) * 2 - 1;
 }
 
+// Change the value of 15 weights/bias out of 100.
 void mutate(neurone *n)
 {
+    /*
+    ** n : the neurone to mutate
+    */
     struct timeval t;
     gettimeofday(&t, NULL);
+    // Random seed every micro second.
     srand(t.tv_sec + t.tv_usec * 1000000);
+    // Weights mutation.
     for(unsigned int i = 0; i < n->size; i++)
     {
         if((float)rand()/(float)(RAND_MAX) < 0.15f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
+            // Mutation method.
             *(n->weights + i) += sqrtf(-2 * logf(x1)) * cosf(2 * 3.14159f *x2) / 5;
+            // Weights has been marked out between 1 and -1.
             if (*(n->weights + i) > 1.0f)
                 *(n->weights + i) = 1.0f;
             if (*(n->weights + i) < -1.0f)
                 *(n->weights + i) = -1.0f;
         }
     }
+    // Bias mutation.
     if((float)rand()/(float)(RAND_MAX) < 0.15f)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -75,6 +93,11 @@ void mutate(neurone *n)
 
 void copy_neurone(neurone *n, neurone *copy, char mutated)
 {
+    /*
+    ** n : The neurone to copy into copy.
+    ** copy : The copy of the neurone n.
+    ** mutated : boolean mutating copy if true.
+    */
     if (n->size != copy->size)
         errx(EXIT_FAILURE, "The size can't be different");
     for(unsigned int i = 0; i < n->size; i++)
@@ -87,14 +110,21 @@ void copy_neurone(neurone *n, neurone *copy, char mutated)
         mutate(copy);
     }
 }
-
+// Merges two neurone by way of a calculation method.
 void mix(neurone *n, neurone *m)
 {
+    /*
+    ** n : Neurone to mix into.
+    ** m : Neurone to mix into n.
+    */
+    // N and M must be the same size.
     if (n->size != m->size)
         errx(EXIT_FAILURE, "The size can't be different");
     struct timeval t;
     gettimeofday(&t, NULL);
+    // Random seed every micro second.
     srand(t.tv_sec + t.tv_usec * 1000000);
+    // Mix 1 weight out of 2.
     for(unsigned int i = 0; i < n->size; i++)
     {
         if((float)rand()/(float)(RAND_MAX) < 0.5f)
@@ -104,18 +134,27 @@ void mix(neurone *n, neurone *m)
             {
                 x = (float)rand()/(float)(RAND_MAX);
             }
+            // Mix method.
             *(n->weights + i) += x * (*(m->weights + i) - *(n->weights + i));
             // *(n->weights + i) = *(m->weights + i);
         }
     }
+    // Mix 1 bias out of 2.
     if((float)rand()/(float)(RAND_MAX) < 0.5f)
     {
         n->bias = m->bias;
     }
 }
 
+// Activation function returns a value according to a neurone.
 float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
 {
+    /*
+    ** weight : weights of a neurone to sum to its bias.
+    ** bias : bias of the neurone.
+    ** len_w : the lenght of the weights
+    ** len_b : the lenght of the bias
+    */
     float sum = 0;
     for(size_t i = 0; i < len_w; ++i)
         sum += *(weight + i);
