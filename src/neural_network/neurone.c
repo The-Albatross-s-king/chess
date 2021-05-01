@@ -204,9 +204,13 @@ float activation(float f)
     return first_act(f);
 }
 
-// Probability of a score.
+// Probability of a neurone value.
 float soft_max(neurone *n, float f)
 {
+    /*
+    ** n : the neurone to proceed.
+    ** f : the sum of neurones value in a layer.
+    */
     n->value = expf(n->value) / f;
     return n->value;
 }
@@ -215,6 +219,11 @@ float soft_max(neurone *n, float f)
 // Calculate value of a neurone according to its previous layer.
 void front_prop(neurone *n, layer *prev_l, char is_last)
 {
+    /*
+    ** n : the neurone to proceed.
+    ** prev_l : the layer to front propagate.
+    ** is_last : call activation function if its the last layer of the network.
+    */
     if(n->size != prev_l->size)
         errx(EXIT_FAILURE, "Try to front propagate with wrong sizes");
 

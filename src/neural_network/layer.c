@@ -12,6 +12,7 @@ void print_layer(layer *l)
         print_neurone(l->neurones + i);
 }
 
+// Build a layer 'l' of 'size' neurones.
 void build_layer(layer *l, size_t size)
 {
     l->neurones = malloc(size * sizeof(neurone));
@@ -30,6 +31,7 @@ void free_layer(layer *l)
     free(l->neurones);
 }
 
+// Initialize each neurone of size 'prev_size' in the layer 'l' of size 'size'.
 void init_layer(layer *l, size_t size, size_t prev_size)
 {
     for(size_t i = 0; i < size; ++i)
@@ -39,6 +41,8 @@ void init_layer(layer *l, size_t size, size_t prev_size)
     }
 }
 
+// Copy a layer 'l' to an other named 'copy', each neurone mutates if 'mutated'
+// is true.
 void copy_layer(layer *l, layer *copy, char mutated)
 {
     //build_layer(dest, l->size);
@@ -49,6 +53,9 @@ void copy_layer(layer *l, layer *copy, char mutated)
     }
 }
 
+// Front propagation each neurone of a layer 'l' from its previous layer
+// 'prev_l'; call activation function if 'is_last' is true, meaning its the last
+// layer.
 void front_prop_layer(layer *l, layer *prev_l, char is_last)
 {
     for(size_t i = 0; i < l->size; ++i)
@@ -57,6 +64,7 @@ void front_prop_layer(layer *l, layer *prev_l, char is_last)
         soft_max_layer(l);
 }
 
+// Compute the probability of each neurone in a layer 'l'.
 void soft_max_layer(layer *l)
 {
     float sum = 0;
@@ -67,6 +75,8 @@ void soft_max_layer(layer *l)
         soft_max(l->neurones + i, sum);
 }
 
+// Mix each neurone of a layer 'l', with each neurone of an other
+// layer 'partner'.
 void mix_layer(layer *l, layer *partner)
 {
     if(l->size != partner->size)
@@ -78,6 +88,7 @@ void mix_layer(layer *l, layer *partner)
     }
 }
 
+// Compute mutation for each neurone of layer 'l'.
 void mutate_layer(layer *l)
 {
     for(size_t i = 0; i < l->size; ++i)
