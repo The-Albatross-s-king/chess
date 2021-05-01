@@ -164,13 +164,20 @@ float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
     return 1/(1 + expf(-sum));
 }
 
+// Bunch of activation functions.
 float first_act(float f)
 {
+    /*
+    ** f : a float corresponding to the value of a neurone.
+    */
     return logf(1 + expf(f));
 }
 
 float tanh_act(float f)
 {
+    /*
+    ** f : a float corresponding to the value of a neurone.
+    */
     float exp_f = expf(f);
     float exp_min_f = expf(-f);
     return (exp_f - exp_min_f) / (exp_f + exp_min_f);
@@ -178,6 +185,9 @@ float tanh_act(float f)
 
 float elu_act(float f)
 {
+    /*
+    ** f : a float corresponding to the value of a neurone.
+    */
     float exp_f = expf(f);
     if(f <= 0)
         return 2 * (exp_f - 1);
@@ -187,15 +197,22 @@ float elu_act(float f)
 
 float activation(float f)
 {
+    /*
+    ** f : a float corresponding to the value of a neurone.
+    */
+    // Activation function used for the neurone.
     return first_act(f);
 }
 
+// Probability of a score.
 float soft_max(neurone *n, float f)
 {
     n->value = expf(n->value) / f;
     return n->value;
 }
 
+// Front propagation of a layer.
+// Calculate value of a neurone according to its previous layer.
 void front_prop(neurone *n, layer *prev_l, char is_last)
 {
     if(n->size != prev_l->size)
