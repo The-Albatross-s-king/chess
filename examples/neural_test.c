@@ -38,4 +38,5 @@ int main()
     print_arr(res, sizes[nb - 1]);
     free(res);
     free_network(net);
+    free_network(net2);
 }
