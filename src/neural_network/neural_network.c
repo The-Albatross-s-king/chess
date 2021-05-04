@@ -139,15 +139,15 @@ network *load_network(FILE *file)
     size_t sizes[nb_layer];
     for(size_t i = 0; i < nb_layer; i++)
     {
-        load_layer(&l[i], file);
+        load_layer(l+i, file);
         sizes[i] = l[i].size;
     }
     network *net = build_network(sizes, nb_layer);
     for (size_t i = 0; i < nb_layer; i++)
     {
-        copy_layer(&l[i], net->layers+i, 0);
-        free_layer(&l[i]);
-        *(net->sizes+i) = sizes[i];
+        copy_layer(l+i, net->layers+i, 0);
+        free_layer(l+i);
+        net->sizes[i] = sizes[i];
     }
     return net;
 }

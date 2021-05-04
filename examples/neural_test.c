@@ -29,9 +29,11 @@ int main()
     FILE *file = fopen("save/network.nn", "w");
     save_network(net, file);
     fclose(file);
+    printf("save succesfully\n");
     FILE *file1 = fopen("save/network.nn", "r");
     network *net2 = load_network(file1);
     fclose(file1);
+    printf("load succesfully\n");
     print_network(net2);
     print_arr(res, sizes[nb - 1]);
     free(res);
