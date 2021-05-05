@@ -96,12 +96,15 @@ void print_score(bot *best)
 int main()
 {
     generation *gen = build_generation(1000);
+	play(gen); 
+	sort(gen);
+    bot *best = gen->bots;
+	print_score(best);
     train(gen, 100);
     // generation *best_gen = get_best_bots(gen, 1);
     // bot *best = malloc(sizeof(bot));
     // build_bot(best);
     // copy_bot(best_gen->bots, best, 0);
-    bot *best = gen->bots;
     float inputs[] = {0, 0};
     float expected[] = {1, 0};
     int resultat = 0;
