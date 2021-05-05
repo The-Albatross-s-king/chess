@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     //alpha_beta or NN
     if(want_offline && want_IA)
     {
-        printf("Do you want to play against a neural network (0) or an algorithmique IA (1) ? (q to quit) :\n");
+        printf("Do you want to play against a neural network (0) or an algorithmic IA (1) ? (q to quit) :\n");
         want_alpha = get_answer(buff);
         while(want_alpha == -1)
         {
