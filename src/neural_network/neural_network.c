@@ -121,6 +121,21 @@ void save_network(network *net, FILE *file)
     char str[10];
     sprintf(str, "%lu\n", net->nb_layer);
     fputs(str, file);
+    fputs("[", file);
+    for(size_t i = 0; i < net->nb_layer; i++)
+    {
+        if (i == net->nb_layer - 1)
+        {
+            sprintf(str, "%lu", net->nb_layer);
+            fputs(str, file);
+        }
+        else
+        {
+            sprintf(str, "%lu,", net->nb_layer);
+            fputs(str, file);
+        }
+    }
+    fputs("]\n", file);
     for(size_t i = 0; i < net->nb_layer; i++)
     {
         save_layer(net->layers + i, file);
@@ -133,21 +148,26 @@ network *load_network(FILE *file)
         errx(EXIT_FAILURE, "The file can't be null");
 
     size_t nb_layer = 0;
-    if (fscanf(file, "%lu\n", &nb_layer) <= 0)
+    if (fscanf(file, "%lu\n[", &nb_layer) <= 0)
         errx(EXIT_FAILURE, "Can't read the file in load_network");
-    layer l[nb_layer];
     size_t sizes[nb_layer];
     for(size_t i = 0; i < nb_layer; i++)
     {
-        load_layer(&l[i], file);
-        sizes[i] = l[i].size;
+        if (i == nb_layer - 1)
+        {
+            if (fscanf(file, "%lu]\n", sizes + i) <= 0)
+                errx(EXIT_FAILURE, "Can't read the file in load_network");
+        }
+        else
+        {
+            if (fscanf(file, "%lu,", sizes + i) <= 0)
+                errx(EXIT_FAILURE, "Can't read the file in load_network");
+        }
     }
     network *net = build_network(sizes, nb_layer);
     for (size_t i = 0; i < nb_layer; i++)
     {
-        copy_layer(&l[i], net->layers+i, 0);
-        free_layer(&l[i]);
-        *(net->sizes+i) = sizes[i];
+        load_layer(net->layers+i, file);
     }
     return net;
 }

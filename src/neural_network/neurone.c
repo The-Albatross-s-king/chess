@@ -125,7 +125,7 @@ float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
     return 1/(1 + expf(-sum));
 }
 
-float first_act(float f)
+float softplus_act(float f)
 {
     return logf(1 + expf(f));
 }
@@ -148,7 +148,7 @@ float elu_act(float f)
 
 float activation(float f)
 {
-    return first_act(f);
+    return softplus_act(f);
 }
 
 float soft_max(neurone *n, float f)
