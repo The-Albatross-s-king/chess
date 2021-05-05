@@ -132,7 +132,7 @@ int main(int argc, char** argv)
     if(want_load)
     {
         printf("Please type de name of the save you want :\n");
-        int is_parent=fork();
+        int is_parent = fork();
         if(is_parent)
         {
             int tmp;
@@ -176,7 +176,6 @@ int main(int argc, char** argv)
             fd=open(path, O_RDONLY, 0666);
         }
         close(fd);
-        printf("path : %s\n",path);
         load(&g, path);
 
     }
