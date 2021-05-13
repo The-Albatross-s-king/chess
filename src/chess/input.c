@@ -40,7 +40,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
         }
         else
         {
-            get_moves(game, game->board[get_pos(*x, *y)], *li, NULL);
+            get_moves(game, game->board[get_pos(*x, *y)], *li, NULL, 1);
             if (li == NULL)
                 errx(EXIT_FAILURE, "Move_list is egal to NULL");
             if ((*li)->next == NULL)
@@ -92,15 +92,11 @@ int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
             {
                 case 2:
                     rook = team[0];
-                    game->board[get_pos(rook.x, rook.y + 2)] = game->board[get_pos(rook.x, rook.y)];
-                    game->board[get_pos(rook.x, rook.y)] = NULL;
-                    rook.y = rook.y + 2;
+                    apply_move(game, rook.x, rook.y, rook.x, rook.y+2);
                     break;
                 case -2:
                     rook = team[7];
-                    game->board[get_pos(rook.x, rook.y - 3)] = game->board[get_pos(rook.x, rook.y)];
-                    game->board[get_pos(rook.x, rook.y)] = NULL;
-                    rook.y = rook.y - 3;
+                    apply_move(game, rook.x, rook.y, rook.x, rook.y-3);
                     break;
                 default:
                     break;

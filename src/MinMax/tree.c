@@ -23,6 +23,11 @@ Tree* select_tree(Tree *t, int pos, int old_pos)
         free_tree(tmp);
     }
 
+    if (t == NULL)
+    {   
+        return NULL;
+    }
+
     tmp = t->sibling;
     Tree *tmp2;
 
@@ -32,9 +37,8 @@ Tree* select_tree(Tree *t, int pos, int old_pos)
         free_tree(tmp);
         tmp = tmp2;
     }
-    if (t == NULL)
-        err(3, "the move (old_pos->pos) does not exit");
 
+    t->sibling = NULL;
     return t;
 }
 

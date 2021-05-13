@@ -112,7 +112,7 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
             int old_pos=p->x*8+p->y;
             old_pos=old_pos+1-1;
             old_moved=p->moved;
-            get_moves(g, p, moves, NULL);
+            get_moves(g, p, moves, NULL,0);
             
             while(!is_empty(moves))
             {
@@ -310,8 +310,13 @@ void human_vs_IA(Game *g, int color_human)
             if(T->child!=NULL)
             {
                 select=select_tree(T, pos, old_pos); //got from the human input
-                T->child=select->child;
-                free(select);
+                if(select!=NULL)
+                {
+                    T->child=select->child;
+                    free(select);
+                }
+                else
+                    T->child=NULL;
             }
             alphabeta(g, color, 1, 1, T);
             get_max_tree(T, &pos, &old_pos);

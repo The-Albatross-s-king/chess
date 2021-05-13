@@ -64,7 +64,7 @@ int rec_minmax(Game* g, int cur_color, int depth, int max)
         old_x=p->x;
         old_y=p->y;
         old_moved=p->moved;
-        get_moves(g,p,moves, NULL); //get the moves
+        get_moves(g,p,moves, NULL, 0); //get the moves
         //display_board(g->board, moves, cur_color);
         // sleep(2);
         while(!is_empty(moves))
@@ -145,7 +145,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
         old_x=p->x;
         old_y=p->y;
         old_moved=p->moved;
-        get_moves(g,p,moves, NULL); //get the moves
+        get_moves(g,p,moves, NULL, 0); //get the moves
         //display_board(g->board, moves, cur_color);
         //sleep(2);
         //printf("%lu move of %d at pos %d %d\n", get_size_list(moves), p->type, p->x, p->y); 
@@ -206,10 +206,6 @@ void auto_move_minmax(Game* g, int cur_color)
     //double pos2=position_score(p);
     //printf("Score variation : %lf\n", pos1-pos2);
 
-/*Move_list* l=init_list();
-get_moves(g, p, l, NULL);
-display_list(l);
-free_list(l);*/
 
 }  
 

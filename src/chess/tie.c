@@ -17,7 +17,7 @@ int is_tie(Game *g, enum pieces_colors player)
     {
         if(team[i].alive != 0)
         {
-            get_moves(g, &team[i], mv_list, NULL);
+            get_moves(g, &team[i], mv_list, NULL,0);
             if (team[i].type == KING)
             {
                 king_suicide(g, &team[i], mv_list);
