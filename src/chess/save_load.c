@@ -55,11 +55,9 @@ Piece* put_piece(Game* g, int x, int y, int color, enum pieces_types type)
     return NULL;
 }
 
-int load(Game* g, char* path)
+
+int load_from_str(Game* g, char* file_content)
 {
-    int fd=open(path,O_RDONLY, 0666)  ;
-    char buf[2];
-    int r;
     set_game(g);
     //reset all board
     clear_board(g); 
@@ -67,27 +65,31 @@ int load(Game* g, char* path)
 
     for(int i=0; i<64; i++)
     {
-        r=read(fd, buf, 2); 
-        if(r<0)
-        {
-            errx(3, "critical error while reading file");
-        }
-        if(r==0 || r==1)
-        {
-            printf("Wrong format of the loading file\n");
-            return 0;
-        }
-        if(buf[0]=='0')
+        int x=i*2;//3+1
+        if(file_content[x]=='0')
         {
             continue;
         }
         else
         {
-            put_piece(g, i/8, i%8, buf[0], buf[1]-'0');
+            put_piece(g, i/8, i%8, file_content[x], file_content[x+1]-'0');
         }
 
     }
+    return 1;
+}
 
+
+int load(Game* g, char* path)
+{
+    int fd=open(path,O_RDONLY, 0666);
+    size_t size_file=64*3+1;
+    char file_content[size_file];
+    int rd=read(fd, file_content, size_file);
+    if(rd==-1)
+        errx(3, "Error while reading");
+
+    load_from_str(g,file_content); 
     return 1;
 
 }
