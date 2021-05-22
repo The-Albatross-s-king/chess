@@ -165,7 +165,7 @@ float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
 }
 
 // Bunch of activation functions.
-float first_act(float f)
+float softplus_act(float f)
 {
     /*
     ** f : a float corresponding to the value of a neurone.
@@ -201,7 +201,7 @@ float activation(float f)
     ** f : a float corresponding to the value of a neurone.
     */
     // Activation function used for the neurone.
-    return first_act(f);
+    return softplus_act(f);
 }
 
 // Probability of a neurone value.
