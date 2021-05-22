@@ -109,7 +109,7 @@ int main()
 
     int i = 1;
 
-    while (best->score < 40.0f)
+    while (best->score < 55.0f)
     {
         printf("===============================\n");
         printf("Iteration : %d\n", i);
