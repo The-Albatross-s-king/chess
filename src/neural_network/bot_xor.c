@@ -56,8 +56,8 @@ float scoring(float *resultat, float *expected, size_t size)
     int res = resultat[0] > resultat[1] ? 0 : 1;
     size = 2 * size;
     if (exp != res)
-        return resultat[exp];
-    return 10 + resultat[exp];
+        return 5 * (1 - resultat[exp]) - 5;
+    return  10 + 20 * resultat[exp];
 }
 
 void play_bot(bot *b)

@@ -44,7 +44,8 @@ void init_neurone(neurone *n)
     struct timeval t;
     gettimeofday(&t, NULL);
     // Get a different seed for pseudo random generation every micro seconds.
-    srand(t.tv_sec + t.tv_usec * 1000000);
+    // t.tv_sec + t.tv_usec * 1000000
+    srand(1231);
     for(size_t i = 0; i < n->size; ++i)
     {
         *(n->weights + i) = ((float)rand()/(float)(RAND_MAX) * 2 - 1);
@@ -61,11 +62,12 @@ void mutate(neurone *n)
     struct timeval t;
     gettimeofday(&t, NULL);
     // Random seed every micro second.
-    srand(t.tv_sec + t.tv_usec * 1000000);
+    double seed= t.tv_sec + t.tv_usec * 1000000;
+    srand(seed);
     // Weights mutation.
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 0.15f)
+        if((float)rand()/(float)(RAND_MAX) < 1)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -79,7 +81,7 @@ void mutate(neurone *n)
         }
     }
     // Bias mutation.
-    if((float)rand()/(float)(RAND_MAX) < 0.15f)
+    if((float)rand()/(float)(RAND_MAX) < 1)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
         float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -147,7 +149,7 @@ void mix(neurone *n, neurone *m)
 }
 
 // Activation function returns a value according to a neurone.
-float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
+float sigmoid(float f)
 {
     /*
     ** weight : weights of a neurone to sum to its bias.
@@ -155,13 +157,7 @@ float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b)
     ** len_w : the lenght of the weights
     ** len_b : the lenght of the bias
     */
-    float sum = 0;
-    for(size_t i = 0; i < len_w; ++i)
-        sum += *(weight + i);
-    for(size_t i = 0; i < len_b; ++i)
-        sum += *(bias + i);
-
-    return 1/(1 + expf(-sum));
+    return 1/(1 + expf(-f));
 }
 
 // Bunch of activation functions.
@@ -195,14 +191,21 @@ float elu_act(float f)
 
 }
 
+float leaky_relou(float f)
+{
+    return f < 0 ? 0.01 * f : f;
+}
+
 float activation(float f)
 {
     /*
     ** f : a float corresponding to the value of a neurone.
     */
     // Activation function used for the neurone.
-    return softplus_act(f);
+    return leaky_relou(f);
 }
+
+
 
 // Probability of a neurone value.
 float soft_max(neurone *n, float f)
