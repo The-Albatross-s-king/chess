@@ -12,7 +12,7 @@ void print_bot(bot *b)
 
 void build_bot(bot *b)
 {
-    size_t sizes[] = {2, 2, 2};
+    size_t sizes[] = {2, 4, 2};
     size_t nb_layer = 3;
     network *net = build_network(sizes, nb_layer);
     init_network(net);
