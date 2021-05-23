@@ -6,6 +6,6 @@
 #include "client.h"
 
 int main(){
-	client("localhost", "2048", BLACK);
+	client("localhost", "2048");
 	return 0;
 }

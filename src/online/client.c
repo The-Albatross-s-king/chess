@@ -4,11 +4,10 @@
 #include <string.h>
 #include <err.h>
 #include <netdb.h>
+#include "online_game.h"
 
-void client(char *host, char *port, int color)
+void client(char *host, char *port)
 {
-	color++;
-	
 	struct addrinfo hints;
 	struct addrinfo *results;
 	int e;
@@ -44,6 +43,7 @@ void client(char *host, char *port, int color)
 
 	freeaddrinfo(results);
 	
+	/*
 	char buff[128];
 	char resp[128];
 	while (1)
@@ -57,6 +57,14 @@ void client(char *host, char *port, int color)
 			errx(EXIT_FAILURE, "fail to receive data");
 
 		printf("%s", resp);
-	}
+	}*/
+	
+	char your_color[1];
+	if (recv(cfd, your_color, 1, 0) == -1)
+		errx(EXIT_FAILURE, "fail to receive your color");
+	
+	int color = your_color[0];
+	online_game(cfd, color);
+	
 	close(cfd);
 }

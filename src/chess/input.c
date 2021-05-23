@@ -6,6 +6,7 @@
 #include "input.h"
 #include "rules.h"
 #include "spe_rules.h"
+#include "minmax.h"
 
 int verif_input_letter(char c){
     if (c >= 'a' && c <= 'h')
@@ -28,7 +29,7 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
     int not_valid = 1;
     while (not_valid){
         not_valid = 0;
-        input(x, y);
+        input(game, x, y, c);
         Piece *target = NULL;
         if(!get_piece(game, *x, *y, &target))
             errx(1, "Out of bound in chessboard");
@@ -69,13 +70,14 @@ void can_i_go(Game *game, int *x, int *y, Move_list **li, enum pieces_colors c)
 int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
 {
     printf("Enter targeted postition:\n");
-    input(new_x, new_y);
+	int color = game->board[get_pos(*x, *y)]->color;
+    input(game, new_x, new_y, color);
     //TODO Check if the move is possible ? 
     // Check if a piece is in the way.
     while(!valid_pos(*new_x, *new_y))
     {
         printf("Invalid target\n");
-        input(new_x, new_y);
+        input(game, new_x, new_y, color);
     }
 
     if(in_list(l, *new_x, *new_y))
@@ -113,7 +115,7 @@ int go_to(Game *game, Move_list *l, int *x, int *y, int *new_x, int *new_y)
 // If the input is not valid, recall the function.
 // Set x on abscissa (letter) and y on ordinate (number).
 // If the input is "help", set x and y on -1.
-void input(int *y, int *x){
+void input(Game *game, int *y, int *x, int cur_color){
     char not_valid = 1;
     while (not_valid){
         not_valid = 0;
@@ -131,10 +133,16 @@ void input(int *y, int *x){
             not_valid = 1;
         }
 
-        else if(buf[0] == 'h' && buf[1] == 'e' && buf[2] == 'l' && buf[3] == 'p' && buf[4] == '\n'){
-            printf("aide de l'IA\n");
-            *x = -1;
-            *y = -1;
+        else if(buf[0] == 'h' && buf[1] == 'e' && buf[2] == 'l' && 
+			buf[3] == 'p' && buf[4] == '\n')
+		{
+            Piece* p=NULL;
+			int tmp_x;
+			int tmp_y;
+			minmax(game, &tmp_x, &tmp_y, &p, cur_color);
+			printf("IA helps you! The best move is to move the %s from %c%d to %c%d\n", 
+				get_name(p->type), p->y+'A', p->x+1, tmp_y+'A', tmp_x+1);
+			not_valid = 1;
         }
 
         else{

@@ -8,21 +8,8 @@
 #include <sys/types.h>
 #include "online_game.h"
 
-void rewrite(int fd, const void *buf, size_t count)
-{
-	size_t i = 0;
-	while (i < count)
-	{
-		if (write(fd, (buf+i), 1) == -1)
-			errx(EXIT_FAILURE, "Error while writing in file descriptor: %d", fd);
-		i++;
-	}
-}
-
 void server(char *port, int color)
 {
-	color++;
-
 	struct addrinfo hints;
 	struct addrinfo *result;
 	int e;
@@ -82,7 +69,7 @@ void server(char *port, int color)
 
 	//game(sfd, cfd, color);
 	
-	char buff[128];
+	/*char buff[128];
 	while (1)
 	{
 		int r;
@@ -91,7 +78,14 @@ void server(char *port, int color)
 
 		if (write(cfd, buff, r) == -1)
 			errx(EXIT_FAILURE, "fail to write data");
-	}
+	}*/
+	
+	char enemy_color[1];
+	enemy_color[0] = !color;
+	if(send(cfd, enemy_color, 1, 0) == -1)
+		errx(EXIT_FAILURE, "fail to send color");
+	
+	online_game(cfd, color);
 
 	close(sfd);
 	close(cfd);

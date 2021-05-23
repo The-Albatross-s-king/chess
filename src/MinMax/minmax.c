@@ -187,7 +187,7 @@ void minmax(Game* g, int* x, int* y, Piece** best_piece, int cur_color)
             g->board[get_pos(cur_move.x, cur_move.y)]=piece_eat;
         }
     }
-    printf("best :%lf\n",best_score);
+    //printf("best :%lf\n",best_score);
     free_list(moves);  
 }
 

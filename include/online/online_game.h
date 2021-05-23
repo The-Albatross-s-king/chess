@@ -1,3 +1,3 @@
 #pragma once
 
-void game(int yfd, int efd, int color);
+void online_game(int efd, int color);
