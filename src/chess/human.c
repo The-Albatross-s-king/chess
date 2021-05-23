@@ -6,9 +6,9 @@
 #include "board.h"
 #include "display.h"
 #include "checkmate.h"
-#include "input.h"
-#include "save_load.h"
 #include "tie.h"
+#include "save_load.h"
+#include "input.h"
 
 void human_vs_human(Game* g)
 {

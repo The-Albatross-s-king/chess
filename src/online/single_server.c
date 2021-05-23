@@ -1,14 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+#include <string.h>
 #include <err.h>
 #include <netdb.h>
-#include <signal.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include "online_game.h"
 
-void serveur(char *port)
+void rewrite(int fd, const void *buf, size_t count)
 {
+	size_t i = 0;
+	while (i < count)
+	{
+		if (write(fd, (buf+i), 1) == -1)
+			errx(EXIT_FAILURE, "Error while writing in file descriptor: %d", fd);
+		i++;
+	}
+}
+
+void server(char *port, int color)
+{
+	color++;
+
 	struct addrinfo hints;
 	struct addrinfo *result;
 	int e;
@@ -22,14 +36,64 @@ void serveur(char *port)
 
 	if (e != 0)
 		errx(EXIT_FAILURE, "error get address information with port %s : %s",
-			port, gai_sterror(e));
+			port, gai_strerror(e));
 	
 	int sfd;
 	struct addrinfo *r;
-	for (r = result; r != NULL; r = r->next)
+	for (r = result; r != NULL; r = r->ai_next)
 	{
-		sfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);	
+		sfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol);
+		if (sfd == -1)
+			continue;
+		int val = 1;
+		if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int)) == -1)
+			errx(EXIT_FAILURE, "fail setting socket option");
+
+		if (bind(sfd, r->ai_addr, r->ai_addrlen) == 0)
+			break;
+		close(sfd);
+	}
+
+	if (r == NULL)
+	{
+		freeaddrinfo(result);
+		errx(EXIT_FAILURE, "could not create a socket");
+	}
+	freeaddrinfo(result);
+
+	if (listen(sfd, 5) == -1)
+	{
+		close(sfd);
+		errx(EXIT_FAILURE, "could not listen");
 	}
 	
-	return 0;
+	struct sockaddr addr;
+	socklen_t len;
+	int cfd;
+	if ((cfd = accept(sfd, &addr, &len)) == -1)
+	{
+		close(sfd);
+		close(cfd);
+		errx(EXIT_FAILURE, "could not accept");
+	}
+
+	printf("Connection successful!\n");
+	
+
+	//game(sfd, cfd, color);
+	
+	char buff[128];
+	while (1)
+	{
+		int r;
+		if ((r = recv(cfd, buff, 128, 0)) == -1)
+			errx(EXIT_FAILURE, "fail to receive data");
+
+		if (write(cfd, buff, r) == -1)
+			errx(EXIT_FAILURE, "fail to write data");
+	}
+
+	close(sfd);
+	close(cfd);
+	
 }
