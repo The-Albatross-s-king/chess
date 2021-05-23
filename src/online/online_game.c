@@ -57,6 +57,8 @@ void online_game(int efd, int color) //efd = enemy file directory
 	info[7] = 0;
 	
 	display_board(g->board, moves, color);
+	
+	//TODO manage if the player wants to leave the game.
 
 	while (!black_checkmate && !white_checkmate && !tie)
 	{
@@ -84,7 +86,6 @@ void online_game(int efd, int color) //efd = enemy file directory
 				}
 				tie = is_tie(g, (round + 1) % 2);
 
-				//TODO send information to adversary.
 				info[0] = input_x + '0';
 				info[1] = input_y + '0';
 				info[2] = new_x + '0';
@@ -106,8 +107,6 @@ void online_game(int efd, int color) //efd = enemy file directory
 		else
 		{
 			//waiting for enemy turn...
-			// TODO get information from adversary and set the board.
-			// And get if there is checkmate or tie.
 			display_board(g->board, moves, color);
 			printf("Wait for enemy turn...\n");
 			if (recv(efd, info, info_size, 0) == -1)
