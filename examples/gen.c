@@ -88,7 +88,7 @@ void print_score(bot *best)
     printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
     succ += expected[resultat];
     free(res);
-    printf("Number of good answers: %d/4\n\n", succ);
+    printf("Number of good answers: %d/4\n", succ);
 
 }
 
@@ -118,7 +118,7 @@ int main()
         sort(gen);
 
         print_score(best);
-
+        printf("Average: %f\n\n", gen->average);
         train(gen, 100);
     }
 

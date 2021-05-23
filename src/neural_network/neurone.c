@@ -44,8 +44,8 @@ void init_neurone(neurone *n)
     struct timeval t;
     gettimeofday(&t, NULL);
     // Get a different seed for pseudo random generation every micro seconds.
-    // t.tv_sec + t.tv_usec * 1000000
-    srand(1231);
+    srand(t.tv_sec + t.tv_usec * 1000000);
+    //srand(1234);
     for(size_t i = 0; i < n->size; ++i)
     {
         *(n->weights + i) = ((float)rand()/(float)(RAND_MAX) * 2 - 1);
@@ -67,7 +67,7 @@ void mutate(neurone *n)
     // Weights mutation.
     for(unsigned int i = 0; i < n->size; i++)
     {
-        if((float)rand()/(float)(RAND_MAX) < 1)
+        if((float)rand()/(float)(RAND_MAX) < 0.5f)
         {
             float x1 = 1 - (float)rand()/(float)(RAND_MAX);
             float x2 = 1 - (float)rand()/(float)(RAND_MAX);
@@ -81,7 +81,7 @@ void mutate(neurone *n)
         }
     }
     // Bias mutation.
-    if((float)rand()/(float)(RAND_MAX) < 1)
+    if((float)rand()/(float)(RAND_MAX) < 0.5f)
     {
         float x1 = 1 - (float)rand()/(float)(RAND_MAX);
         float x2 = 1 - (float)rand()/(float)(RAND_MAX);

@@ -60,6 +60,16 @@ float scoring(float *resultat, float *expected, size_t size)
     return  10 + 20 * resultat[exp];
 }
 
+float scoring2(float *resultat, float *expected, size_t size)
+{
+    int exp = expected[0] ? 0 : 1;
+    int res = resultat[0] > resultat[1] ? 0 : 1;
+    size = 2 * size;
+    if (exp != res)
+        return - resultat[exp == 0 ? 1 : 0];
+    return  10 + 20 * resultat[exp];
+}
+
 void play_bot(bot *b)
 {
     float inputs[] = {0, 0};
@@ -68,7 +78,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     float *res = get_output(b->net);
-    score += scoring(res, expected, 2);
+    score += scoring2(res, expected, 2);
     free(res);
 
     inputs [0] = 0;
@@ -78,7 +88,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring(res, expected, 2);
+    score += scoring2(res, expected, 2);
     free(res);
 
     inputs[0] = 1;
@@ -88,7 +98,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring(res, expected, 2);
+    score += scoring2(res, expected, 2);
     free(res);
 
     inputs[0] = 1;
@@ -98,7 +108,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring(res, expected, 2);
+    score += scoring2(res, expected, 2);
     // printf("%f\n", score);
     free(res);
     b->score = score;

@@ -24,6 +24,7 @@ generation *build_generation(size_t size)
     {
         build_bot(g->bots+i);
     }
+    g->average = 0;
 
     return g;
 }
@@ -169,11 +170,48 @@ void mutate_generation(generation *g)
     }
 }
 
+void mutate_generation2(generation *g)
+{
+    // bot *best = g->bots;
+    for(size_t i = 25; i < 50; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        mix_bot(g->bots + i, g->bots + i%50);
+    }
+    for(size_t i = 50; i < 150; i++)
+    {
+        mutate_bot(g->bots+i);
+    }
+    for(size_t i = 150; i < g->size-300; i++)
+    {
+        mix_bot(g->bots + i, g->bots + i%50);
+    }
+    for (size_t i = g->size-300; i < g->size-200; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        //mix_bot(g->bots+i, g->bots+i%40);
+    }
+    for(size_t i = g->size-200; i < g->size-100; i++)
+    {
+        free_bot(g->bots+i);
+        build_bot(g->bots+i);
+    }
+    for(size_t i = g->size-100; i < g->size; i++)
+    {
+        mix_bot(g->bots+i, g->bots+i%50);
+    }
+}
+
 // Play every bot of the generation 'g'.
 void play(generation *g)
 {
+    float average = 0;
     for(size_t i = 0; i < g->size; ++i)
+    {
         play_bot(g->bots + i);
+        average += g->bots[i].score;
+    }
+    g->average = average / g->size;
 }
 
 // Play, sort and mutate the generation 'g'.
@@ -187,7 +225,7 @@ void new_gen2(generation *g, char display_best)
     }
     play(g);
     sort(g);
-    mutate_generation(g);
+    mutate_generation2(g);
 }
 
 // Play the generation 'nb_gen' times.
