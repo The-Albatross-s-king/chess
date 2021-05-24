@@ -290,7 +290,7 @@ void human_vs_IA(Game *g, int color_human)
         if (color==color_human) //sans Tree
         {
             printf("It's your turn !\n");
-            can_i_go(g, &x_input, &y_input, &piece_moves, color_human);
+            can_i_go(g, &x_input, &y_input, &piece_moves, color_human, 0);
             display_board(g->board, piece_moves, color_human);
             if (!go_to(g, piece_moves ,&x_input, &y_input, &new_x, &new_y))
             {

@@ -6,7 +6,26 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <fcntl.h>
 #include "online_game.h"
+#include "save_load.h"
+
+int send_save(int fd, const char* path)
+{
+    size_t size_load_file=file_size;//3+1;
+    char buf[size_load_file];
+    int file=open(path,O_RDONLY, 0666)  ;
+     
+    int rd=read(file, buf, size_load_file);
+    if(rd==-1)
+        errx(3,"Error while reading");
+    rd=write(fd, buf, size_load_file);
+    if(rd==-1)
+        errx(3, "Error while writing");
+    
+    return 1;
+}
+
 
 void server(char *port, int color)
 {
@@ -79,13 +98,48 @@ void server(char *port, int color)
 		if (write(cfd, buff, r) == -1)
 			errx(EXIT_FAILURE, "fail to write data");
 	}*/
-	
+
+	int valid = 0;
+	char buf[32];
+	while (!valid)
+	{
+		printf("Do you want to load a game from a save? (0 for no, 1 for yes)\n");
+		int r = read(STDIN_FILENO, buf, 32);
+		if(r == -1)
+			errx(EXIT_FAILURE, "Error while reading");
+		
+		if((buf[0]=='1'|| buf[0] == '0') && buf[1] == '\n')
+			valid = 1;
+
+		while (r == 32)
+		{
+			r = read(STDIN_FILENO, buf, 32);
+			if (r == -1)
+				errx(EXIT_FAILURE, "Error while reading");
+		}
+	}
+	Game g;
+	if(buf[0]=='1' && buf[1] == '\n')
+	{
+		char* path=load_path();
+		send_save(cfd, path);
+		load(&g, path);
+		printf("Save sent.\n");
+		free(path);
+	}
+	else
+	{
+		load(&g, "save/basic.txt");
+		send_save(cfd, "save/basic.txt");
+		printf("New game synchronisation.");
+	}
+
 	char enemy_color[1];
 	enemy_color[0] = !color;
 	if(send(cfd, enemy_color, 1, 0) == -1)
 		errx(EXIT_FAILURE, "fail to send color");
 	
-	online_game(cfd, color);
+	online_game(&g, cfd, color);
 
 	close(sfd);
 	close(cfd);

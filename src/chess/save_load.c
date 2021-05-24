@@ -1,11 +1,14 @@
 #include <err.h>
-#include "save_load.h"
-#include "board.h"
+#include <wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include "save_load.h"
+#include "board.h"
+
+#define BUFFER_SIZE 32
 
 void clear_board(Game* g)
 {
@@ -17,8 +20,6 @@ void clear_board(Game* g)
         g->whites[i].alive=0;
     }
 }
-
-
 
 Piece* put_piece(Game* g, int x, int y, int color, enum pieces_types type)
 {
@@ -55,8 +56,7 @@ Piece* put_piece(Game* g, int x, int y, int color, enum pieces_types type)
     return NULL;
 }
 
-
-int load_from_str(Game* g, char* file_content)
+void load_from_str(Game* g, char* file_content)
 {
     set_game(g);
     //reset all board
@@ -76,14 +76,13 @@ int load_from_str(Game* g, char* file_content)
         }
 
     }
-    return 1;
 }
 
 
 int load(Game* g, char* path)
 {
     int fd=open(path,O_RDONLY, 0666);
-    size_t size_file=64*3+1;
+    size_t size_file=64*2;//3+1;
     char file_content[size_file];
     int rd=read(fd, file_content, size_file);
     if(rd==-1)
@@ -96,7 +95,7 @@ int load(Game* g, char* path)
 
 int save(Game* g, char* path)
 {
-
+    //TODO get "has moved" and "players turn"
     //save in a file under this form
     //64 couple of int
     // first int is color (1=BLACK, 2=WHITE)
@@ -134,4 +133,55 @@ int save(Game* g, char* path)
 
     close(fd);
     return 1;
+}
+
+char *load_path()
+{
+    printf("Please type de name of the save you want :\n");
+    int is_parent = fork();
+    if(is_parent)
+    {
+        int tmp;
+        waitpid(is_parent, &tmp, 0);
+    }
+    else
+    {
+        char* args[]={"ls", "save/", NULL};
+        execvp("ls", args);
+        errx(EXIT_FAILURE,"couldn’t exec %s or an other argument", args[0]);
+    }
+
+    //recup le path
+    char *path = malloc((5+BUFFER_SIZE)*sizeof(char));
+    path= strcpy(path, "save/");
+    int r = read(STDIN_FILENO, &path[5], BUFFER_SIZE);
+    if (r == -1)
+        errx(EXIT_FAILURE, "critical error while reading answer");
+    if ( r > 1 && path[5] == 'q' && path[6] == '\n')
+        exit(EXIT_SUCCESS);
+    path[r+4] = 0;
+    
+    //check exist
+    int fd=open(path, O_RDONLY, 0666);
+    while(fd==-1)
+    {
+        close(fd);
+        printf("%s does not exist, try again. (q to quit) :\n", path);
+        while(r == BUFFER_SIZE) 
+        {
+            if ((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
+                errx(EXIT_FAILURE, "critical error while reading answer");
+        }
+        
+        if((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
+            errx(EXIT_FAILURE, "critical error while reading answer");
+        
+        if ( r > 1 && path[5] == 'q' && path[6] == '\n')
+            exit(EXIT_SUCCESS);
+        
+        path[r+4] = 0;
+        fd=open(path, O_RDONLY, 0666);
+    }
+    close(fd);
+    return path;
 }

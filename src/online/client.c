@@ -5,6 +5,7 @@
 #include <err.h>
 #include <netdb.h>
 #include "online_game.h"
+#include "save_load.h"
 
 void client(char *host, char *port)
 {
@@ -59,12 +60,19 @@ void client(char *host, char *port)
 		printf("%s", resp);
 	}*/
 	
+	char save_content[file_size];
+	if (recv(cfd, save_content, file_size, 0) == -1)
+		errx(EXIT_FAILURE, "fail to receive your color");
+
+	Game g;
+	load_from_str(&g, save_content);
+
 	char your_color[1];
 	if (recv(cfd, your_color, 1, 0) == -1)
 		errx(EXIT_FAILURE, "fail to receive your color");
 	
 	int color = your_color[0];
-	online_game(cfd, color);
+	online_game(&g, cfd, color);
 	
 	close(cfd);
 }

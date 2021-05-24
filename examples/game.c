@@ -131,53 +131,9 @@ int main(int argc, char** argv)
     //chose the save
     if(want_load)
     {
-        printf("Please type de name of the save you want :\n");
-        int is_parent = fork();
-        if(is_parent)
-        {
-            int tmp;
-            waitpid(is_parent, &tmp, 0);
-        }
-        else
-        {
-            char* args[]={"ls", "save/", NULL};
-            execvp("ls", args);
-            errx(EXIT_FAILURE,"couldn’t exec %s or an other argument", args[0]);
-        }
-
-        //recup le path
-        char path[5+BUFFER_SIZE]="save/";
-        int r = read(STDIN_FILENO, &path[5], BUFFER_SIZE);
-        if (r == -1)
-            errx(EXIT_FAILURE, "critical error while reading answer");
-        if ( r > 1 && path[5] == 'q' && path[6] == '\n')
-            exit(EXIT_SUCCESS);
-        path[r+4] = 0;
-        
-        //check exist
-        int fd=open(path, O_RDONLY, 0666);
-        while(fd==-1)
-        {
-            close(fd);
-            printf("%s does not exist, try again. (q to quit) :\n", path);
-            while(r == BUFFER_SIZE) 
-            {
-                if ((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
-                    errx(EXIT_FAILURE, "critical error while reading answer");
-            }
-            
-            if((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
-                errx(EXIT_FAILURE, "critical error while reading answer");
-            
-            if ( r > 1 && path[5] == 'q' && path[6] == '\n')
-                exit(EXIT_SUCCESS);
-            
-            path[r+4] = 0;
-            fd=open(path, O_RDONLY, 0666);
-        }
-        close(fd);
+        char *path = load_path();
         load(&g, path);
-
+        free(path);
     }
         
     if ((!want_offline && is_host) || want_IA)

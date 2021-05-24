@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <save_load.h>
 #include <err.h>
 #include <stdlib.h>
@@ -116,3 +116,4 @@ int read_answer(Game* g, int fd)
 
 }
 
+*/

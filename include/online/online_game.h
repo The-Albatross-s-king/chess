@@ -1,3 +1,3 @@
 #pragma once
-
-void online_game(int efd, int color);
+#include <board.h>
+void online_game(Game* g, int efd, int color);

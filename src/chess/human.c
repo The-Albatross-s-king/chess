@@ -28,7 +28,7 @@ void human_vs_human(Game* g)
         player = round % 2;
         display_board(g->board, piece_moves, player);
         printf("It's %s's turn !\n", player ? "WHITES" : "BLACKS");
-        can_i_go(g, &x_input, &y_input, &piece_moves, player);
+        can_i_go(g, &x_input, &y_input, &piece_moves, player, 0);
         display_board(g->board, piece_moves, player);
         if(go_to(g, piece_moves , &x_input, &y_input, &new_x, &new_y))
         {
