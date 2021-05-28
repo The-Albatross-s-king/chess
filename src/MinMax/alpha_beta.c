@@ -196,7 +196,7 @@ void IA_vs_IA(Game *g, int nb_turn)
 {
     Tree *T1 = new_tree();
     Tree *T2 = new_tree();
-    int color = 1;
+    int color = g->turn;
     int old_pos;
     int pos;
     Tree* select = NULL;
@@ -272,7 +272,7 @@ void human_vs_IA(Game *g, int color_human)
     int y_input;
     int new_x;
     int new_y;
-    int color = 1;
+    int color = g->turn;
     int checkmate = 0;
     int tie = 0;
     Tree *T = new_tree();
@@ -287,6 +287,7 @@ void human_vs_IA(Game *g, int color_human)
 
     while(!checkmate && !tie)
     {
+        next_turn(g);
         if (color==color_human) //sans Tree
         {
             printf("It's your turn !\n");

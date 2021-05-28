@@ -33,6 +33,7 @@ typedef struct Game
     Piece *board[64];
     Piece blacks[16]; //every black pieces
     Piece whites[16];
+    enum pieces_colors turn;
 }Game;
 
 
@@ -40,6 +41,8 @@ typedef struct Game
 char* get_name(int type);
 //returns in p the piece at x,y. return 0  if out of bound
 int get_piece(Game* g, int x, int y, Piece** p);
+
+void next_turn(Game* g);
 
 //return 1 if pos occupied by opposite color or empty
 int can_move_to(Game* g, int x, int y, Piece* p);

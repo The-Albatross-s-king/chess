@@ -399,11 +399,17 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2)
 
     return target;
 }
+
+void next_turn(Game* g)
+{
+    g->turn = (g->turn + 1)%2;
+}
 void set_game(Game* g)
 {
     // 1 : malloc pieces and init basic data
     // 2 : set type 
     //set blacks (up)
+    g->turn = 1;
     for(int i=0; i<64; i++)
         g->board[i]=NULL;
     for(int i=0; i<2; i++)

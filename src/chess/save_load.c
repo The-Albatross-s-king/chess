@@ -62,17 +62,19 @@ void load_from_str(Game* g, char* file_content)
     //reset all board
     clear_board(g); 
 
-
+    g->turn = file_content[0]-'0'; 
     for(int i=0; i<64; i++)
     {
-        int x=i*2;//3+1
+        int x=i*3+1;
+        printf("%c%c%c\n", file_content[x], file_content[x+1], file_content[x+2]);
         if(file_content[x]=='0')
         {
             continue;
         }
         else
         {
-            put_piece(g, i/8, i%8, file_content[x], file_content[x+1]-'0');
+            put_piece(g, i/8, i%8, file_content[x], file_content[x+2]-'0');
+            g->board[get_pos(i/8, i%8)]->moved=file_content[x+1]-'0';
         }
 
     }
@@ -82,7 +84,7 @@ void load_from_str(Game* g, char* file_content)
 int load(Game* g, char* path)
 {
     int fd=open(path,O_RDONLY, 0666);
-    size_t size_file=64*2;//3+1;
+    size_t size_file=64*3+1;
     char file_content[size_file];
     int rd=read(fd, file_content, size_file);
     if(rd==-1)
@@ -110,20 +112,29 @@ int save(Game* g, char* path)
     Piece* p;
     char* white="2";
     char* black="1";
-    char* null="00";
+    char* null="000";
     int err;
+    char turn = g->turn + '0';
+    err = write(fd, &turn, 1);
+    if(err == -1)
+    {
+        errx(EXIT_FAILURE, "Error while writing");
+    }
     for(int i=0; i<64; i++)
     {
         p=g->board[i];
         if(p==NULL)
         {
-            err = write(fd, null, 2);
+            err = write(fd, null, 3);
             continue;
         }
         if(p->color==WHITE)
             err = write(fd,white, 1);
         else
             err = write(fd,black,1);
+       
+        char moved= p->moved + '0';
+        err = write(fd, &moved, 1);
         char x=(char)(p->type+'0');
         err = write(fd, &x,1);
     }

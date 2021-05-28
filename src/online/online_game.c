@@ -83,7 +83,7 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 				if(go_to(g, moves, &input_x, &input_y, &new_x, &new_y))
 				{
 					round++;
-					
+					next_turn(g);
 					if(color)
 					{
 						black_checkmate = is_checkmate(g, &g->blacks[3]);
@@ -154,6 +154,7 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 			display_list(moves);
 			apply_go_to(g, input_x, input_y, new_x, new_y);
 			round++;
+			next_turn(g);
 			free_list(moves->next);
 			moves->next=NULL;
 		}
