@@ -173,32 +173,32 @@ void mutate_generation(generation *g)
 void mutate_generation2(generation *g)
 {
     // bot *best = g->bots;
-    for(size_t i = 25; i < 50; i++)
+    for(size_t i = g->size / 40; i < g->size / 20; i++)
     {
         copy_bot(g->bots, g->bots+i, 1);
-        mix_bot(g->bots + i, g->bots + i%50);
+        mix_bot(g->bots + i, g->bots + i%(g->size/20));
     }
-    for(size_t i = 50; i < 150; i++)
+    for(size_t i = g->size / 20; i < g->size/6; i++)
     {
         mutate_bot(g->bots+i);
     }
-    for(size_t i = 150; i < g->size-300; i++)
+    for(size_t i = g->size/6; i < g->size/2; i++)
     {
-        mix_bot(g->bots + i, g->bots + i%50);
+        mix_bot(g->bots + i, g->bots + i%(g->size/20));
     }
-    for (size_t i = g->size-300; i < g->size-200; i++)
+    for (size_t i = g->size/2; i < g->size/2 + g->size/10; i++)
     {
         copy_bot(g->bots, g->bots+i, 1);
         //mix_bot(g->bots+i, g->bots+i%40);
     }
-    for(size_t i = g->size-200; i < g->size-100; i++)
+    for(size_t i = g->size/2 + g->size/10; i < g->size/2 + g->size/5; i++)
     {
         free_bot(g->bots+i);
         build_bot(g->bots+i);
     }
-    for(size_t i = g->size-100; i < g->size; i++)
+    for(size_t i = g->size/2 + g->size/5; i < g->size; i++)
     {
-        mix_bot(g->bots+i, g->bots+i%50);
+        mix_bot(g->bots+i, g->bots+i%g->size/20);
     }
 }
 
