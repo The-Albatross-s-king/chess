@@ -1,7 +1,7 @@
 #pragma once
 
 #include "board.h"
-#define file_size 64*2
+#define file_size 64*3+1
 
 void clear_board(Game* g); 
 Piece* put_piece(Game* g, int x, int y , int color, enum pieces_types type);

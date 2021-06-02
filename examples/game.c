@@ -14,6 +14,8 @@
 #include "input.h"
 #include "save_load.h"
 #include "human.h"
+#include "single_server.h"
+#include "client.h"
 
 #define BUFFER_SIZE 32
 
@@ -67,7 +69,7 @@ int main(int argc, char** argv)
     int want_alpha= -1;
     int want_load= -1;
     int want_white= -1;
-    int is_host=1;
+    int want_host= -1;
 
 
     //online offline
@@ -107,14 +109,49 @@ int main(int argc, char** argv)
         }
         want_exit(want_alpha);
     }
-    else if(want_offline)
+    else if(!want_offline)
     {
-        //HUMAN VS HUMAN LOCAL
-    }
-    else
-    {
-        //MANAGE CONNECTION WITH PPL human vs human    
-        printf("HAHA NOT IMPLEMENTED LOOSER ! But play online is covid safe, nice choice !\n");
+        //HUMAN VS HUMAN ONLINE
+		printf("Do you want to join a friend (0) or be the host of the game (1) ? (q to quit) :\n");
+		want_host = get_answer(buff);
+		while(want_host == -1)
+        {
+            printf("You have entered a wrong input, please make sure it is 0, 1 or q :\n");
+            want_alpha = get_answer(buff);
+        }
+        want_exit(want_host);
+		if (want_host)
+		{
+			printf("Do you want to play with blacks (0) or whites (1) ? (q to quit) :\n");
+			want_white = get_answer(buff);
+			while(want_white == -1)
+			{
+				printf("You have entered a wrong input, please make sure it is 0, 1 or q :\n");
+				want_white = get_answer(buff);
+			}
+			want_exit(want_white);			
+			
+			printf("Wait for a connection...\n");
+			server("2048", want_white);
+		}
+		else
+		{
+			printf("Enter the address IP of your friend. Note that you have to be on the same network.\n");
+			int r = 0;
+			if ((r = read(STDIN_FILENO, buff, BUFFER_SIZE)) == -1)
+				errx(EXIT_FAILURE, "critical error while reading answer");
+
+			while(r == BUFFER_SIZE)
+			{
+				if ((r = read(STDIN_FILENO, buff, BUFFER_SIZE)) == -1)
+					errx(EXIT_FAILURE, "critical error while reading answer");
+			}
+
+			buff[r-1] = 0;
+			client(buff, "2048");
+		}
+
+		exit(EXIT_SUCCESS);
     }
 
     Game g;
@@ -136,7 +173,7 @@ int main(int argc, char** argv)
         free(path);
     }
         
-    if ((!want_offline && is_host) || want_IA)
+    if (want_IA)
     {
         printf("Do you want to play with blacks (0) or whites (1) ? (q to quit) :\n");
         want_white = get_answer(buff);
@@ -164,10 +201,7 @@ int main(int argc, char** argv)
     {
         human_vs_human(&g);
     }
-    else
-    {
-        //human_vs_far_human
-    }
 
+	return 0;
 
 }
