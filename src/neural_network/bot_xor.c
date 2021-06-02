@@ -4,13 +4,23 @@
 #include <err.h>
 #include "neural_network.h"
 
-void print_bot(bot *b)
+void print_bot_xor(bot *b)
 {
     printf("Son score est %f\n", b->score);
     print_network(b->net);
 }
 
 void build_bot(bot *b)
+{
+    size_t sizes[] = {64, 32, 32, 2};
+    size_t nb_layer = 4;
+    network *net = build_network(sizes, nb_layer);
+    init_network(net);
+    b->net = net;
+    b->score = 0;
+}
+
+void build_bot_xor(bot *b)
 {
     size_t sizes[] = {2, 4, 2};
     size_t nb_layer = 3;

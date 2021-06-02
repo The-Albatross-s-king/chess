@@ -6,6 +6,8 @@ void print_bot(bot *b);
 
 void build_bot(bot *b);
 
+void build_bot_xor(bot *b);
+
 void free_bot(bot *b);
 
 void copy_bot(bot *b, bot *dest, char mutated);

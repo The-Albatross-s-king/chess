@@ -11,18 +11,30 @@
 #include "board.h"
 #include "checkmate.h"
 #include "tie.h"
-#include "bot.h"
+#include "neural_struct.h"
+#include "neural_network.h"
+#include "alpha_beta.h"
 
 //ALWAYS SUPERIOR TO 2
 #define DEPTH_MAX 4
 #define CRITICAL_SCORE -100
 
 
-double evaluate_bot(Game *g, int cur_color, bot b)
+double evaluate_bot(Game *g, int cur_color, bot *b)
 {
-    // TODO
+    float inputs[64];
+    for(int i = 0; i < 64; ++i)
+    {
+        inputs[i] = (float)g->board[i]->type * cur_color;
+    }
+    
+    feed(b->net, inputs, 2);
+    front_prop_network(b->net);
+    float *res = get_output(b->net);
+    float output  = res[0];
+    free(res);
+    return output;
 }
-
 
 //build tree, compute leafs
 void alphabeta_nn(Game *g, int color, int depth, int max, Tree* parent, bot *bo)
@@ -70,7 +82,7 @@ void alphabeta_nn(Game *g, int color, int depth, int max, Tree* parent, bot *bo)
             C->sum = C->score + parent->sum;
             piece_eat = apply_move(g, C->old_pos/8, C->old_pos%8, C->pos/8, C->pos%8);
 
-            alphabeta(g, !color, depth+1, !max, C);
+            alphabeta_nn(g, !color, depth+1, !max, C, bo);
             apply_move(g, C->pos/8, C->pos%8, C->old_pos/8, C->old_pos%8);
 
             if(piece_eat!=NULL)
@@ -127,7 +139,7 @@ void alphabeta_nn(Game *g, int color, int depth, int max, Tree* parent, bot *bo)
 
                 if(depth<DEPTH_MAX && T->sum > CRITICAL_SCORE) //AND LIMITE
                 {
-                    alphabeta(g, !color, depth+1, !max, T);
+                    alphabeta_nn(g, !color, depth+1, !max, T, bo);
                 }
                 else if (T->sum > CRITICAL_SCORE)
                 {
@@ -171,14 +183,14 @@ void auto_move_alphabeta_nn(Game* g, int cur_color, Tree** T, int oldpos_lastmov
         errx(3, "Can't select Tree");
     *T=select;
     //Launch alphabeta
-    alphabeta(g, cur_color, 1, 1, *T, b);
+    alphabeta_nn(g, cur_color, 1, 1, *T, b);
     //search best "max" from the childs
     //play the best move
 
     //Step forward 1 time with the last move
 }
 
-void IA_vs_IA_nn(Game *g, int nb_turn, bot *b)
+void IA_vs_IA_nn(Game *g, int nb_turn, bot *b1, bot *b2)
 {
     Tree *T1 = new_tree();
     Tree *T2 = new_tree();
@@ -194,7 +206,7 @@ void IA_vs_IA_nn(Game *g, int nb_turn, bot *b)
         {
             //manipule T1
 
-            alphabeta(g, color, 1, 1, T1);
+            alphabeta_nn(g, color, 1, 1, T1, b1);
             get_max_tree(T1, &pos, &old_pos);
             //play T1
             select=select_tree(T1, pos, old_pos);
@@ -214,7 +226,7 @@ void IA_vs_IA_nn(Game *g, int nb_turn, bot *b)
         else
         {
             //manipule T2
-            alphabeta(g, color, 1, 1, T2);
+            alphabeta_nn(g, color, 1, 1, T2, b2);
             get_max_tree(T2, &pos, &old_pos);
             //play T2
             select=select_tree(T2, pos, old_pos);
@@ -252,7 +264,7 @@ void IA_vs_IA_nn(Game *g, int nb_turn, bot *b)
     free_tree(T2);
 }
 
-void human_vs_IA(Game *g, int color_human)
+void human_vs_IA_nn(Game *g, int color_human, bot *b)
 {
     int x_input;
     int y_input;
@@ -299,7 +311,7 @@ void human_vs_IA(Game *g, int color_human)
                 T->child=select->child;
                 free(select);
             }
-            alphabeta(g, color, 1, 1, T);
+            alphabeta_nn(g, color, 1, 1, T, b);
             get_max_tree(T, &pos, &old_pos);
             //play T1
             select=select_tree(T, pos, old_pos);

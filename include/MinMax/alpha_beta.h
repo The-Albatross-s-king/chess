@@ -2,6 +2,8 @@
 
 #include "board.h"
 
+void compute_minmax(int* first_move, int max, Tree* parent, Tree* T);
+
 void alphabeta();
 
 void auto_move_alphabeta(Game* g, int cur_color);
