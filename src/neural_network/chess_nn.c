@@ -25,10 +25,13 @@ double evaluate_bot(Game *g, int cur_color, bot *b)
     float inputs[64];
     for(int i = 0; i < 64; ++i)
     {
-        inputs[i] = (float)g->board[i]->type * cur_color;
+        if (g->board[i] != NULL)
+            inputs[i] = (float)g->board[i]->type * cur_color;
+        else
+            inputs[i] = 0.0f;
     }
     
-    feed(b->net, inputs, 2);
+    feed(b->net, inputs, 64);
     front_prop_network(b->net);
     float *res = get_output(b->net);
     float output  = res[0];

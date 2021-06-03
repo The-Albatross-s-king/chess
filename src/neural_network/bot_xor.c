@@ -12,7 +12,7 @@ void print_bot_xor(bot *b)
 
 void build_bot(bot *b)
 {
-    size_t sizes[] = {64, 32, 32, 2};
+    size_t sizes[] = {64, 32, 32, 64};
     size_t nb_layer = 4;
     network *net = build_network(sizes, nb_layer);
     init_network(net);
