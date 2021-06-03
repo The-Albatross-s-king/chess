@@ -1,5 +1,7 @@
 #include "neural_struct.h"
 #include "bot_xor.h"
+#include "board.h"
+#include "chess_nn.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -7,6 +9,8 @@
 #include <math.h>
 #include <sys/time.h>
 #include <err.h>
+
+void play(generation *g);
 
 // Build a 'size' bots generation.
 generation *build_generation(size_t size)
@@ -203,7 +207,7 @@ void mutate_generation2(generation *g)
 }
 
 // Play every bot of the generation 'g'.
-void play(generation *g)
+void play_xor(generation *g)
 {
     float average = 0;
     for(size_t i = 0; i < g->size; ++i)
@@ -218,14 +222,49 @@ void play(generation *g)
 void new_gen2(generation *g, char display_best)
 {
     //play(g);
-    if(display_best)
-    {
-        // Play Function
-        play_bot(g->bots);
-    }
+
+    (void)display_best;
+
     play(g);
     sort(g);
     mutate_generation2(g);
+}
+
+
+
+// Play the generation 'nb_gen' times.
+void train_xor(generation *g, size_t nb_gen)
+{
+    for(size_t i = 0; i < nb_gen; ++i)
+    {
+        play(g);
+        if(i % 100 == 0)
+        {
+            new_gen2(g, 1);
+        }
+        else
+        {
+            new_gen2(g, 0);
+        }
+
+        // printf("%zu", i);
+    }
+}
+
+void play(generation *g)
+{
+    for(size_t i = 0; i < g->size - 1; ++i)
+    {
+        Game game;
+        set_game(&game); //remplit le plateau de pieces
+
+        IA_vs_IA_nn(&game, 20, g->bots+i, g->bots+i+1);
+
+        g->bots[i].score = scoring(&game, 0);
+        g->bots[i + 1].score = scoring(&game, 1);
+
+        sort(g);
+    }
 }
 
 // Play the generation 'nb_gen' times.
@@ -233,7 +272,7 @@ void train(generation *g, size_t nb_gen)
 {
     for(size_t i = 0; i < nb_gen; ++i)
     {
-        play(g);
+        // play(g);
         if(i % 100 == 0)
         {
             new_gen2(g, 1);

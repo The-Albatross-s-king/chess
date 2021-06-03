@@ -12,13 +12,11 @@
 
 int main()
 {
-    bot b1;
-    bot b2;
-    build_bot(&b1);
-    build_bot(&b2);
-    
-    Game g;
-    set_game(&g); //remplit le plateau de pieces
-
-    IA_vs_IA_nn(&g, 20, &b1, &b2);
+    generation *g = build_generation(10);
+    train(g, 10);
+    // Generer la generation
+    // Training - > Mutation.
+    //      Jouer une partie entre 2 bots.
+    //      Attribuer des scores.
+    //      Selectionner les meilleurs -> Mutation de la generation.
 }

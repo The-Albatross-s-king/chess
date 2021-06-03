@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <err.h>
+
+#include "evaluate.h"
 #include "neural_network.h"
 
 void print_bot_xor(bot *b)
@@ -60,7 +62,7 @@ void mutate_bot(bot *b)
     mutate_network(b->net);
 }
 
-float scoring(float *resultat, float *expected, size_t size)
+float scoring_xor(float *resultat, float *expected, size_t size)
 {
     int exp = expected[0] ? 0 : 1;
     int res = resultat[0] > resultat[1] ? 0 : 1;
@@ -70,7 +72,12 @@ float scoring(float *resultat, float *expected, size_t size)
     return  10 + 20 * resultat[exp];
 }
 
-float scoring2(float *resultat, float *expected, size_t size)
+double scoring(Game *g, int color)
+{
+    return get_atk_def_pos(g, color);
+}
+
+float scoring_xor_2(float *resultat, float *expected, size_t size)
 {
     int exp = expected[0] ? 0 : 1;
     int res = resultat[0] > resultat[1] ? 0 : 1;
@@ -88,7 +95,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     float *res = get_output(b->net);
-    score += scoring2(res, expected, 2);
+    score += scoring_xor_2(res, expected, 2);
     free(res);
 
     inputs [0] = 0;
@@ -98,7 +105,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring2(res, expected, 2);
+    score += scoring_xor_2(res, expected, 2);
     free(res);
 
     inputs[0] = 1;
@@ -108,7 +115,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring2(res, expected, 2);
+    score += scoring_xor_2(res, expected, 2);
     free(res);
 
     inputs[0] = 1;
@@ -118,7 +125,7 @@ void play_bot(bot *b)
     feed(b->net, inputs, 2);
     front_prop_network(b->net);
     res = get_output(b->net);
-    score += scoring2(res, expected, 2);
+    score += scoring_xor_2(res, expected, 2);
     // printf("%f\n", score);
     free(res);
     b->score = score;

@@ -1,4 +1,5 @@
 #include "neural_struct.h"
+#include "board.h"
 
 #pragma once
 
@@ -18,7 +19,7 @@ void mutate_bot(bot *b);
 
 void mix_bot(bot *b, bot *partner);
 
-size_t scoring(float *resultat, float *expected, size_t size);
+size_t scoring(Game *g, int color);
 
 void play_bot(bot *b);
 
