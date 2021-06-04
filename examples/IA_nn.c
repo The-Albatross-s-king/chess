@@ -13,10 +13,11 @@
 int main()
 {
     generation *g = build_generation(10);
-    train(g, 10);
+    train(g, 1);
     // Generer la generation
     // Training - > Mutation.
     //      Jouer une partie entre 2 bots.
     //      Attribuer des scores.
     //      Selectionner les meilleurs -> Mutation de la generation.
+    free_generation(g);
 }

@@ -26,7 +26,7 @@ double evaluate_bot(Game *g, int cur_color, bot *b)
     for(int i = 0; i < 64; ++i)
     {
         if (g->board[i] != NULL)
-            inputs[i] = (float)g->board[i]->type * cur_color;
+            inputs[i] = (float)g->board[i]->type * (float)(cur_color == (int)g->board[i]->color ? 1 : -1);
         else
             inputs[i] = 0.0f;
     }
