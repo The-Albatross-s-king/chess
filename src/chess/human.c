@@ -61,4 +61,5 @@ void human_vs_human(Game* g)
         else
             printf("Tie\nNo one won !\n");
     }
+    free_list(piece_moves);
 }
