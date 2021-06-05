@@ -2,6 +2,7 @@
 #include "bot_xor.h"
 #include "board.h"
 #include "chess_nn.h"
+#include <pthread.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -206,6 +207,34 @@ void mutate_generation2(generation *g)
     }
 }
 
+void mutate_generation3(generation *g)
+{
+    // bot *best = g->bots;
+    for(size_t i = 1; i < 5; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        mix_bot(g->bots + i, g->bots);
+    }
+    for(size_t i = 5; i < 7; i++)
+    {
+        mutate_bot(g->bots+i);
+    }
+    for(size_t i = 7; i < 8; i++)
+    {
+        mix_bot(g->bots + i, g->bots);
+    }
+    for (size_t i = 8; i < 9; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        //mix_bot(g->bots+i, g->bots+i%40);
+    }
+    for(size_t i = 9; i < 10; i++)
+    {
+        free_bot(g->bots+i);
+        build_bot(g->bots+i);
+    }
+}
+
 // Play every bot of the generation 'g'.
 void play_xor(generation *g)
 {
@@ -224,10 +253,10 @@ void new_gen2(generation *g, char display_best)
     //play(g);
 
     (void)display_best;
-
     play(g);
     sort(g);
-    mutate_generation2(g);
+    mutate_generation3(g);
+
 }
 
 
@@ -251,20 +280,36 @@ void train_xor(generation *g, size_t nb_gen)
     }
 }
 
+void* play_thread(void *arg)
+{
+    bot *b = (bot *)arg;
+    Game game;
+    set_game(&game); //remplit le plateau de pieces
+    IA_vs_IA_nn(&game, 20, b, b + 1);
+
+    b->score = scoring(&game, 0);
+    (b + 1)->score = scoring(&game, 1);
+
+    pthread_exit(0);
+}
+
+
 void play(generation *g)
 {
-    for(size_t i = 0; i < g->size - 1; ++i)
+    pthread_t thr[4];
+    size_t j = 0;
+    for(size_t i = 0; i < g->size - 1; i += 2)
     {
-        Game game;
-        set_game(&game); //remplit le plateau de pieces
 
-        IA_vs_IA_nn(&game, 20, g->bots+i, g->bots+i+1);
-
-        g->bots[i].score = scoring(&game, 0);
-        g->bots[i + 1].score = scoring(&game, 1);
-
-        sort(g);
+        pthread_create(thr + j % 4, NULL, play_thread, (void *)(g->bots + i));
+        if (j >= 3)
+            pthread_join(thr[(j + 1 )% 4], NULL);
+        j++;
     }
+    for(size_t i = 0; i < 4; ++i)
+        pthread_join(thr[i], NULL);
+    
+    sort(g);
 }
 
 // Play the generation 'nb_gen' times.
@@ -272,7 +317,15 @@ void train(generation *g, size_t nb_gen)
 {
     for(size_t i = 0; i < nb_gen; ++i)
     {
-        // play(g);
+        if(i % 2)
+        {
+            copy_bot(load_bot("save/bot_chess.nn"), g->bots + i, 1);
+        }
+    }
+    
+    for(size_t i = 0; i < nb_gen; ++i)
+    {
+            // play(g);
         if(i % 100 == 0)
         {
             new_gen2(g, 1);

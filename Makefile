@@ -6,16 +6,16 @@ DIRS_INCLUDE = ${patsubst %/, -I%/, ${LIB_DIRS}}
 # Setting the compiler and the default linker program
 # CC = gcc
 # Compiler for debug target
-CC = gcc -g3 -fsanitize=address
+CC = gcc -g3 #-fsanitize=address
 # Options for pre-processor (-I, -include, -D ... )
 CPPFLAGS = ${DIRS_INCLUDE}
 
 # Main compilation options
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O2
+CFLAGS = -Wall -Wextra -Werror -std=c99 -O2 
 # Linker options (probably always empty)
 LDFLAGS =
 # Libs and path for linker
-LDLIBS = -lm
+LDLIBS = -lm -lpthread
 
 # Executables names
 EXAMPLES_DIR = examples/

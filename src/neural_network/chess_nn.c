@@ -170,9 +170,7 @@ void alphabeta_nn(Game *g, int color, int depth, int max, Tree* parent, bot *bo)
     free_list(moves);
 }
 
-//GESTION DE LA SENTINEL PROCHAINE FOIS A VERIFIER !!!
 
-//IL FAUT TROUVER UN MOYEN DE RECUP LE DERNIER MOVE CORRECTEMENT
 void auto_move_alphabeta_nn(Game* g, int cur_color, Tree** T, int oldpos_lastmove, int pos_lastmove, bot *b)
 {
     //Step forward 1 times:

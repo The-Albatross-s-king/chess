@@ -401,7 +401,7 @@ int is_one_check(Game *g, Piece *k, Piece **p)
             }
         }
     }
-     
+    free_list(opp_list);
     return nb_check;
 }
 

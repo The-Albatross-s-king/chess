@@ -19,5 +19,6 @@ int main()
     //      Jouer une partie entre 2 bots.
     //      Attribuer des scores.
     //      Selectionner les meilleurs -> Mutation de la generation.
+    save_bot(g->bots, "save/bot_chess.nn");
     free_generation(g);
 }
