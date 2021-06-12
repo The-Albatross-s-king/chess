@@ -10,14 +10,27 @@
 #include "tie.h"
 //#include "data_transfert.h"
 #include "input.h"
+#include "spe_rules.h"
 
 
-void apply_go_to(Game *g, int x, int y, int new_x, int new_y)
+void apply_go_to(Game *g, int x, int y, int new_x, int new_y, int new_id, int color)
 {
 	apply_move(g, x, y, new_x, new_y);
 	Piece p = *g->board[get_pos(new_x, new_y)];
-	/*if (p.type == PAWN)
-		pawn_transformation(g, &p);*/
+	if (p.type == PAWN && new_id != -1)
+	{
+		if (color == WHITE)
+		{
+			Piece *new = &g->blacks[new_id];
+			replace(g, &p, new);
+		}
+		else
+		{	
+			Piece *new = &g->whites[new_id-8];
+			replace(g, &p, new);
+		}
+		
+	}
 	if (p.type == KING)
 	{
 		Piece *team = p.color == WHITE ? g->whites : g->blacks;
@@ -51,12 +64,10 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 	int tie = 0;
 	Move_list *moves = init_list();
 	
-	int info_size = 7; //we need following information: x, y, new_x, new_y, checkmate, tie, disconnect.
-	//deconnexion with value = 1
+	int info_size = 8; //we need following information: x, y, new_x, new_y, checkmate, tie, disconnect.
+	//deconnexion with value = 1, the value of pawn transformation.
 	char info[info_size];
 	info[6] = '0';
-
-
 	
 	display_board(g->board, moves, color);
 	
@@ -69,7 +80,6 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 			//it's your turn !
 			//get input
 			display_board(g->board, moves, color);
-		
 			can_i_go(g, &input_x, &input_y, &moves, color, 1);
 			if(input_x==-1 && input_y == -1)
 			{
@@ -79,9 +89,10 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 			else
 			{
 				display_board(g->board, moves, color);
-				
+				int piece_id = g->board[get_pos(input_x, input_y)]->id;
 				if(go_to(g, moves, &input_x, &input_y, &new_x, &new_y))
 				{
+					int new_id = g->board[get_pos(new_x,new_y)]->id;
 					round++;
 					next_turn(g);
 					if(color)
@@ -95,6 +106,11 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 						info[4] = white_checkmate + '0';
 					}
 					tie = is_tie(g, (round + 1) % 2);
+					
+					if(piece_id != new_id)
+						info[7] = (char) (new_id % 16) + '0';
+					else
+						info[7] = -1 + '0';
 
 					info[0] = input_x + '0';
 					info[1] = input_y + '0';
@@ -102,20 +118,22 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 					info[3] = new_y + '0';
 					info[5] = tie + '0';
 					info[6] = '0';
+					
+					if (send(efd, info, info_size, 0) == -1)
+						errx(EXIT_FAILURE, "fail to send data");
 				}
-				//TODO take the value of piece transformation (need to modify function in input.c)
 			
 				else
 					printf("Wrong move, try again.\n");
 			}
-			if (send(efd, info, info_size, 0) == -1)
-					errx(EXIT_FAILURE, "fail to send data");
 			
 			free_list(moves->next);
 	        moves->next=NULL;
 			
 			if(info[6] == '1')
 			{
+				if (send(efd, info, info_size, 0) == -1)
+					errx(EXIT_FAILURE, "fail to send data");
 				close(efd);
 				free_list(moves);
 				return; //TODO Check if exit() is not accurate
@@ -144,15 +162,16 @@ void online_game(Game* g, int efd, int color) //efd = enemy file directory
 			new_x = info[2] - '0';
 			new_y = info[3] - '0';
 			tie = info[5] - '0';
+			int piece_id = info[7] - '0';
 
 			if (color)
 				black_checkmate = info[4] - '0';
 			else
 				white_checkmate = info[4] - '0';
 		
-			get_moves(g, g->board[get_pos(input_x, input_y)], moves, NULL, 1);
-			display_list(moves);
-			apply_go_to(g, input_x, input_y, new_x, new_y);
+			//get_moves(g, g->board[get_pos(input_x, input_y)], moves, NULL, 1);
+			//display_list(moves);
+			apply_go_to(g, input_x, input_y, new_x, new_y, piece_id, color);
 			round++;
 			next_turn(g);
 			free_list(moves->next);
