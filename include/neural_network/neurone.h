@@ -18,7 +18,7 @@ void print_neurone(neurone *n);
 
 float activation(float f);
 
-float sigmoid(float *weight, float *bias, size_t len_w, size_t len_b);
+float sigmoid(float f);
 
 float soft_max(neurone *n, float f);
 
