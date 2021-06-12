@@ -33,5 +33,6 @@ typedef struct generation
 {
     bot *bots;
     size_t size;
+    float average;
 }generation;
 

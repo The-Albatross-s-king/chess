@@ -88,19 +88,15 @@ void print_score(bot *best)
     printf("  %s\n", expected[resultat] ? " \033[42m OK \033[0m" : " \033[41m KO \033[0m");
     succ += expected[resultat];
     free(res);
-    printf("Number of good answers: %d/4\n\n", succ);
+    printf("Number of good answers: %d/4\n", succ);
 
 }
 
 
 int main()
 {
-    generation *gen = build_generation(1000);
-	play(gen); 
-	sort(gen);
-    bot *best = gen->bots;
-	print_score(best);
-    train(gen, 100);
+    generation *gen = build_generation(100);
+    train(gen, 10);
     // generation *best_gen = get_best_bots(gen, 1);
     // bot *best = malloc(sizeof(bot));
     // build_bot(best);
@@ -112,7 +108,7 @@ int main()
 
     int i = 1;
 
-    while (best->score < 40.0f)
+    for(;;)
     {
         printf("===============================\n");
         printf("Iteration : %d\n", i);
@@ -121,7 +117,7 @@ int main()
         sort(gen);
 
         print_score(best);
-
+        printf("Average: %f\n\n", gen->average);
         train(gen, 100);
     }
 

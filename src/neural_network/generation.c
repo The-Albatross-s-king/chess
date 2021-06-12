@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <err.h>
 
+// Build a 'size' bots generation.
 generation *build_generation(size_t size)
 {
     generation *g = malloc(sizeof(generation));
@@ -23,6 +24,7 @@ generation *build_generation(size_t size)
     {
         build_bot(g->bots+i);
     }
+    g->average = 0;
 
     return g;
 }
@@ -35,8 +37,13 @@ void free_generation(generation *g)
     free(g);
 }
 
+// Bubble sort puts the best bots in first in the generation 'g'.
 void sort(generation *g)
 {
+    /* Bubble sort :
+    ** Compare each bot size times, and put the worst at the end.
+    ** Do it again if the array is not sorted for --size.
+    */
     char sorted;
     for(ssize_t i = g->size - 1; i > -1; --i)
     {
@@ -58,6 +65,7 @@ void sort(generation *g)
     }
 }
 
+// Keep the 'n' best bots in the 'g' generation.
 generation *get_best_bots(generation *g, size_t n)
 {
     sort(g);
@@ -71,10 +79,12 @@ generation *get_best_bots(generation *g, size_t n)
     return best;
 }
 
+// Select "random" (tendancy to last) bot according to a factor 'fitness_sum"
 bot *select_bot_with_factor(generation *g, size_t fitness_sum)
 {
     struct timeval t;
     gettimeofday(&t, NULL);
+    // Random seed generation every micro second.
     srand(t.tv_sec + t.tv_usec * 1000000);
     float x = (float)rand()/(float)(RAND_MAX);
     float s = 0;
@@ -88,17 +98,21 @@ bot *select_bot_with_factor(generation *g, size_t fitness_sum)
     return g->bots;
 }
 
+// Select a random bot among the [100, size] bots.
 bot *select_bot_random(generation *g)
 {
     if(g->size < 100)
         errx(EXIT_FAILURE, "Generation has too few bots");
     struct timeval t;
     gettimeofday(&t, NULL);
+    // Random seed generation every micro second.
     srand(t.tv_sec + t.tv_usec * 1000000);
     size_t x = (rand() % g->size - 100) + 99;
     return g->bots + x;
 }
 
+// Copy, mix and mutate every bot of generation 'g' with generation 'gen'.
+// Into 'g'.
 void duplicate(generation *g, generation *gen)
 {
     size_t sum = 0;
@@ -108,18 +122,22 @@ void duplicate(generation *g, generation *gen)
     gen->bots[0] = g->bots[0];
     for(size_t i = 1; i < g->size; i++)
     {
+        // Copy and mix
         crossover(select_bot_with_factor(g, sum), select_bot_with_factor(g, sum), gen->bots + i);
+        //Mutate
         mutate_bot(gen->bots + i);
     }
     *g = *gen;
 }
 
+// Sort the 'g' generation, then duplicate it with a new one.
 void new_gen(generation *g, char display_best)
 {
     sort(g);
     if(display_best)
     {
-        // Play Function
+        // Take inputs, generate expected output, front propagate the network.
+        // Get the score.
         play_bot(g->bots);
     }
 
@@ -128,6 +146,10 @@ void new_gen(generation *g, char display_best)
     free(gen);
 }
 
+// Custom Mutate, Mix [0, 20] bots with [20, 200] bots, Mutate [20, 200] bots.
+// Copy first bot on [size-200, size-100] bots and mutate them,
+// mix them with 20 bests.
+// Reset last 100 bots.
 void mutate_generation(generation *g)
 {
     // bot *best = g->bots;
@@ -148,12 +170,51 @@ void mutate_generation(generation *g)
     }
 }
 
-void play(generation *g)
+void mutate_generation2(generation *g)
 {
-    for(size_t i = 0; i < g->size; ++i)
-        play_bot(g->bots + i);
+    // bot *best = g->bots;
+    for(size_t i = g->size / 40; i < g->size / 20; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        mix_bot(g->bots + i, g->bots + i%(g->size/20));
+    }
+    for(size_t i = g->size / 20; i < g->size/6; i++)
+    {
+        mutate_bot(g->bots+i);
+    }
+    for(size_t i = g->size/6; i < g->size/2; i++)
+    {
+        mix_bot(g->bots + i, g->bots + i%(g->size/20));
+    }
+    for (size_t i = g->size/2; i < g->size/2 + g->size/10; i++)
+    {
+        copy_bot(g->bots, g->bots+i, 1);
+        //mix_bot(g->bots+i, g->bots+i%40);
+    }
+    for(size_t i = g->size/2 + g->size/10; i < g->size/2 + g->size/5; i++)
+    {
+        free_bot(g->bots+i);
+        build_bot(g->bots+i);
+    }
+    for(size_t i = g->size/2 + g->size/5; i < g->size; i++)
+    {
+        mix_bot(g->bots+i, g->bots+i%g->size/20);
+    }
 }
 
+// Play every bot of the generation 'g'.
+void play(generation *g)
+{
+    float average = 0;
+    for(size_t i = 0; i < g->size; ++i)
+    {
+        play_bot(g->bots + i);
+        average += g->bots[i].score;
+    }
+    g->average = average / g->size;
+}
+
+// Play, sort and mutate the generation 'g'.
 void new_gen2(generation *g, char display_best)
 {
     //play(g);
@@ -164,10 +225,10 @@ void new_gen2(generation *g, char display_best)
     }
     play(g);
     sort(g);
-    mutate_generation(g);
+    mutate_generation2(g);
 }
 
-
+// Play the generation 'nb_gen' times.
 void train(generation *g, size_t nb_gen)
 {
     for(size_t i = 0; i < nb_gen; ++i)
