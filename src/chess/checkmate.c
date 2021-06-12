@@ -26,7 +26,7 @@ int is_check_coord(Game *g, int x, int y, enum pieces_colors player)
         int y_opp = opp_list[i].y;
         Piece *tmp = g->board[get_pos(x_opp, y_opp)];
         if(tmp != NULL)
-            get_moves(g, tmp, opp_li_moves, NULL);
+            get_moves(g, tmp, opp_li_moves, NULL,0);
         if(in_list(opp_li_moves, x, y))
         {
             free_list(opp_li_moves);
@@ -112,7 +112,7 @@ int is_checkmate(Game* g, Piece *king)
         }
 
         Move_list *p_li_moves=init_list();
-        get_moves(g, p, p_li_moves, NULL);
+        get_moves(g, p, p_li_moves, NULL, 0);
         if(p->type != KING)
             is_treason(g, p, p_li_moves);
         Move_list *begin = p_li_moves;

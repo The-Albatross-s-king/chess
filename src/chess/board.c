@@ -290,7 +290,7 @@ void get_queen_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
     get_diagonal_moves(g,p, atk, def);
 
 }
-void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
+void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def, int get_rock)
 {
 
     int moves_x[8]={1,1,1,-1,-1,-1,0,0};
@@ -308,38 +308,41 @@ void get_king_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
             secure_add_list(def, p->x+moves_x[i], p->y+moves_y[i]);
         }
     }
-    Piece *team = p->color == WHITE ? g->whites : g->blacks;
-    if (p->moved == 0 && (p->y == 3))
+    if (get_rock)
     {
-        if(team[7].alive && !team[7].moved)
+        Piece *team = p->color == WHITE ? g->whites : g->blacks;
+        if (p->moved == 0 && (p->y == 3))
         {
-            if(g->board[get_pos(p->x, p->y+1)] == NULL &&
-                    g->board[get_pos(p->x, p->y+2)] == NULL &&
-                    g->board[get_pos(p->x, p->y+3)] == NULL)
+            if(team[7].alive && !team[7].moved)
             {
-                if(is_check(g, p) || is_check_coord(g, p->x, p->y+2, p->color))
-                    return;
-                secure_add_list(atk, p->x, p->y+2);
+                if(g->board[get_pos(p->x, p->y+1)] == NULL &&
+                        g->board[get_pos(p->x, p->y+2)] == NULL &&
+                        g->board[get_pos(p->x, p->y+3)] == NULL)
+                {
+                    if(is_check(g, p) || is_check_coord(g, p->x, p->y+2, p->color))
+                        return;
+                    secure_add_list(atk, p->x, p->y+2);
+                }
             }
-        }
-        if(team[0].alive && !team[0].moved)
-        {
-            if(g->board[get_pos(p->x, p->y - 1)] == NULL &&
-                    g->board[get_pos(p->x, p->y - 2)] == NULL)
+            if(team[0].alive && !team[0].moved)
             {
-                if(is_check(g, p) || is_check_coord(g, p->x, p->y-2, p->color))
-                    return;
-                secure_add_list(atk, p->x, p->y-2);
+                if(g->board[get_pos(p->x, p->y - 1)] == NULL &&
+                        g->board[get_pos(p->x, p->y - 2)] == NULL)
+                {
+                    if(is_check(g, p) || is_check_coord(g, p->x, p->y-2, p->color))
+                        return;
+                    secure_add_list(atk, p->x, p->y-2);
+                }
             }
-        }
 
+        }
     }
 }
 
 //atk can't be null but def yes.
 //atk : returns a list of eatable pieces and null cases
 //def : returns if not null all defended pieces
-void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
+void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def, int get_rock)
 {
     if (p == NULL)
         errx(1, "Get_moves: The piece can't be null");
@@ -363,25 +366,13 @@ void get_moves(Game* g, Piece* p,  Move_list* atk, Move_list* def)
             get_queen_moves(g,p,atk,def);
             break;
         case KING:
-            get_king_moves(g,p,atk,def);
+            get_king_moves(g,p,atk,def,get_rock);
             break;
     }
 
 
 }
-//return 1 if move applied
-int move(Game* g, Piece* p, int x2, int y2)
-{
-    Move_list* l=init_list();
-    get_moves(g, p, l, NULL);
-    if(in_list(l, x2, y2)){
-        free_list(l);
-        apply_move(g, p->x, p->y, x2, y2);
-        return 1;
-    }
-    free_list(l);
-    return 0;
-}
+
 Piece* apply_move(Game* g,int x, int y, int x2, int y2)
 {
     Piece* p=g->board[get_pos(x,y)];
@@ -408,11 +399,17 @@ Piece* apply_move(Game* g,int x, int y, int x2, int y2)
 
     return target;
 }
+
+void next_turn(Game* g)
+{
+    g->turn = (g->turn + 1)%2;
+}
 void set_game(Game* g)
 {
     // 1 : malloc pieces and init basic data
     // 2 : set type 
     //set blacks (up)
+    g->turn = 1;
     for(int i=0; i<64; i++)
         g->board[i]=NULL;
     for(int i=0; i<2; i++)
@@ -472,7 +469,7 @@ void show_moves(Game* g, Piece* p)
 {
     Move_list* atk=init_list();
     Move_list* def=init_list();
-    get_moves(g, p, atk, def);
+    get_moves(g, p, atk, def,1);
     display_board((Piece**)&g->board, atk, WHITE);
     display_board((Piece**)&g->board, def, WHITE);
 

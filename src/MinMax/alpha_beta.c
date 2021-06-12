@@ -112,7 +112,7 @@ void alphabeta(Game *g, int color, int depth, int max, Tree* parent)
             int old_pos=p->x*8+p->y;
             old_pos=old_pos+1-1;
             old_moved=p->moved;
-            get_moves(g, p, moves, NULL);
+            get_moves(g, p, moves, NULL,0);
             
             while(!is_empty(moves))
             {
@@ -196,7 +196,7 @@ void IA_vs_IA(Game *g, int nb_turn)
 {
     Tree *T1 = new_tree();
     Tree *T2 = new_tree();
-    int color = 1;
+    int color = g->turn;
     int old_pos;
     int pos;
     Tree* select = NULL;
@@ -272,7 +272,7 @@ void human_vs_IA(Game *g, int color_human)
     int y_input;
     int new_x;
     int new_y;
-    int color = 1;
+    int color = g->turn;
     int checkmate = 0;
     int tie = 0;
     Tree *T = new_tree();
@@ -287,10 +287,11 @@ void human_vs_IA(Game *g, int color_human)
 
     while(!checkmate && !tie)
     {
+        next_turn(g);
         if (color==color_human) //sans Tree
         {
             printf("It's your turn !\n");
-            can_i_go(g, &x_input, &y_input, &piece_moves, color_human);
+            can_i_go(g, &x_input, &y_input, &piece_moves, color_human, 0);
             display_board(g->board, piece_moves, color_human);
             if (!go_to(g, piece_moves ,&x_input, &y_input, &new_x, &new_y))
             {
@@ -310,8 +311,13 @@ void human_vs_IA(Game *g, int color_human)
             if(T->child!=NULL)
             {
                 select=select_tree(T, pos, old_pos); //got from the human input
-                T->child=select->child;
-                free(select);
+                if(select!=NULL)
+                {
+                    T->child=select->child;
+                    free(select);
+                }
+                else
+                    T->child=NULL;
             }
             alphabeta(g, color, 1, 1, T);
             get_max_tree(T, &pos, &old_pos);

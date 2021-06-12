@@ -233,7 +233,7 @@ void king_suicide(Game *g, Piece *p, Move_list *king_moves)
 
         else
         {
-            get_moves(g, enemy+i, enemy_moves, enemy_protect);
+            get_moves(g, enemy+i, enemy_moves, enemy_protect,1);
 
             int rx = (enemy+i)->x - p->x;
             int ry = (enemy+i)->y - p->y;
@@ -364,7 +364,7 @@ int is_one_check(Game *g, Piece *k, Piece **p)
     {
         if (i == 3 || !(enemy+i)->alive)
             continue;
-        get_moves(g, enemy+i, opp_list, NULL);
+        get_moves(g, enemy+i, opp_list, NULL, 0);
         while (pop_list(opp_list, &x, &y) && (x != k->x || y != k->y))
         {
             continue;

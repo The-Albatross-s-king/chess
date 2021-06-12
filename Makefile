@@ -11,7 +11,7 @@ CC = gcc -g3 #-fsanitize=address
 CPPFLAGS = ${DIRS_INCLUDE}
 
 # Main compilation options
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O2 
+CFLAGS = -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200112L -std=c99 -O2
 # Linker options (probably always empty)
 LDFLAGS =
 # Libs and path for linker

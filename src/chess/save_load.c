@@ -1,11 +1,14 @@
 #include <err.h>
-#include "save_load.h"
-#include "board.h"
+#include <wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include "save_load.h"
+#include "board.h"
+
+#define BUFFER_SIZE 32
 
 void clear_board(Game* g)
 {
@@ -17,8 +20,6 @@ void clear_board(Game* g)
         g->whites[i].alive=0;
     }
 }
-
-
 
 Piece* put_piece(Game* g, int x, int y, int color, enum pieces_types type)
 {
@@ -55,46 +56,47 @@ Piece* put_piece(Game* g, int x, int y, int color, enum pieces_types type)
     return NULL;
 }
 
-int load(Game* g, char* path)
+void load_from_str(Game* g, char* file_content)
 {
-    int fd=open(path,O_RDONLY, 0666)  ;
-    char buf[2];
-    int r;
     set_game(g);
     //reset all board
     clear_board(g); 
 
-
+    g->turn = file_content[0]-'0'; 
     for(int i=0; i<64; i++)
     {
-        r=read(fd, buf, 2); 
-        if(r<0)
-        {
-            errx(3, "critical error while reading file");
-        }
-        if(r==0 || r==1)
-        {
-            printf("Wrong format of the loading file\n");
-            return 0;
-        }
-        if(buf[0]=='0')
+        int x=i*3+1;
+        if(file_content[x]=='0')
         {
             continue;
         }
         else
         {
-            put_piece(g, i/8, i%8, buf[0], buf[1]-'0');
+            put_piece(g, i/8, i%8, file_content[x], file_content[x+2]-'0');
+            g->board[get_pos(i/8, i%8)]->moved=file_content[x+1]-'0';
         }
 
     }
+}
 
+
+int load(Game* g, char* path)
+{
+    int fd=open(path,O_RDONLY, 0666);
+    size_t size_file=64*3+1;
+    char file_content[size_file];
+    int rd=read(fd, file_content, size_file);
+    if(rd==-1)
+        errx(3, "Error while reading");
+
+    load_from_str(g,file_content); 
     return 1;
 
 }
 
 int save(Game* g, char* path)
 {
-
+    //TODO get "has moved" and "players turn"
     //save in a file under this form
     //64 couple of int
     // first int is color (1=BLACK, 2=WHITE)
@@ -109,20 +111,29 @@ int save(Game* g, char* path)
     Piece* p;
     char* white="2";
     char* black="1";
-    char* null="00";
+    char* null="000";
     int err;
+    char turn = g->turn + '0';
+    err = write(fd, &turn, 1);
+    if(err == -1)
+    {
+        errx(EXIT_FAILURE, "Error while writing");
+    }
     for(int i=0; i<64; i++)
     {
         p=g->board[i];
         if(p==NULL)
         {
-            err = write(fd, null, 2);
+            err = write(fd, null, 3);
             continue;
         }
         if(p->color==WHITE)
             err = write(fd,white, 1);
         else
             err = write(fd,black,1);
+       
+        char moved= p->moved + '0';
+        err = write(fd, &moved, 1);
         char x=(char)(p->type+'0');
         err = write(fd, &x,1);
     }
@@ -132,4 +143,55 @@ int save(Game* g, char* path)
 
     close(fd);
     return 1;
+}
+
+char *load_path()
+{
+    printf("Please enter the name of the save you want :\n");
+    int is_parent = fork();
+    if(is_parent)
+    {
+        int tmp;
+        waitpid(is_parent, &tmp, 0);
+    }
+    else
+    {
+        char* args[]={"ls", "save/", NULL};
+        execvp("ls", args);
+        errx(EXIT_FAILURE,"couldn’t exec %s or an other argument", args[0]);
+    }
+
+    //recup le path
+    char *path = malloc((5+BUFFER_SIZE)*sizeof(char));
+    path= strcpy(path, "save/");
+    int r = read(STDIN_FILENO, &path[5], BUFFER_SIZE);
+    if (r == -1)
+        errx(EXIT_FAILURE, "critical error while reading answer");
+    if ( r > 1 && path[5] == 'q' && path[6] == '\n')
+        exit(EXIT_SUCCESS);
+    path[r+4] = 0;
+    
+    //check exist
+    int fd=open(path, O_RDONLY, 0666);
+    while(fd==-1)
+    {
+        close(fd);
+        printf("%s does not exist, try again. (q to quit) :\n", path);
+        while(r == BUFFER_SIZE) 
+        {
+            if ((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
+                errx(EXIT_FAILURE, "critical error while reading answer");
+        }
+        
+        if((r = read(STDIN_FILENO, &path[5], BUFFER_SIZE)) == -1)
+            errx(EXIT_FAILURE, "critical error while reading answer");
+        
+        if ( r > 1 && path[5] == 'q' && path[6] == '\n')
+            exit(EXIT_SUCCESS);
+        
+        path[r+4] = 0;
+        fd=open(path, O_RDONLY, 0666);
+    }
+    close(fd);
+    return path;
 }

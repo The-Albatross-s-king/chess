@@ -151,7 +151,7 @@ double get_atk_def_pos(Game *game, int cur_color)
     for(int i=0;i<16; i++)
     {
         //atk & def
-        get_moves(game, &cur_pieces[i], atk, def);
+        get_moves(game, &cur_pieces[i], atk, def, 0);
         
         int x=0;
         int y=0;
