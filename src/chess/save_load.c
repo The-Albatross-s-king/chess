@@ -66,7 +66,6 @@ void load_from_str(Game* g, char* file_content)
     for(int i=0; i<64; i++)
     {
         int x=i*3+1;
-        //printf("%c%c%c\n", file_content[x], file_content[x+1], file_content[x+2]);
         if(file_content[x]=='0')
         {
             continue;

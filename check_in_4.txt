@@ -1,0 +1,20 @@
+valgrind --track-origins=yes --leak-check=full ./game.out
+
+1
+0
+0
+d7
+d5
+d2
+d4
+c8
+f5
+e2
+e3
+e8
+a4
+h2
+h3
+a4
+c2
+
