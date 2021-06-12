@@ -1,21 +1,34 @@
-Chess web
-=========
-Description
------------
+# Chess web
+## Description
 This is a simple chess game in terminal with 3 artificial intelligences. There is Minmax and
 Alpha-Bêta algorithme and a neural network which is used as an evaluation
 function by Alpha-Bêta.
 You can also play with a friend on a local network.
 
-Compile and play
-----------------
+## Compile and play
+When you have all the source files you can compile the project with the
+commande:
 ```bash
 make game.out
+```
+
+Now you have to execute this line:
+```bash
 ./game.out
 ```
 
-Albatros Members:
------------------
+Then, you need to answer some question like if you want to play or offline. When
+all the questions are answered, the game is launched.
+
+## Use AI
+In order to get some help from the AI, you have to type this command at your
+first input:
+```bash
+help
+```
+
+
+## Albatros Members:
 ##### - [Alan GUERET](https://github.com/alanretgue)
 ##### - [Theo DARONAT](https://github.com/Theo-DARONAT)
 ##### - [Félix LENA](https://github.com/felixlena)
