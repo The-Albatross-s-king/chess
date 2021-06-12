@@ -113,7 +113,7 @@ void alphabeta_nn(Game *g, int color, int depth, int max, Tree* parent, bot *bo)
             int old_pos=p->x*8+p->y;
             old_pos=old_pos+1-1;
             old_moved=p->moved;
-            get_moves(g, p, moves, NULL);
+            get_moves(g, p, moves, NULL, 0);
 
             while(!is_empty(moves))
             {
@@ -289,7 +289,7 @@ void human_vs_IA_nn(Game *g, int color_human, bot *b)
         if (color==color_human) //sans Tree
         {
             printf("It's your turn !\n");
-            can_i_go(g, &x_input, &y_input, &piece_moves, color_human);
+            can_i_go(g, &x_input, &y_input, &piece_moves, color_human, 0);
             display_board(g->board, piece_moves, color_human);
             if (!go_to(g, piece_moves ,&x_input, &y_input, &new_x, &new_y))
             {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "board.h"
+#include "tree.h"
 
 void compute_minmax(int* first_move, int max, Tree* parent, Tree* T);
 

@@ -315,14 +315,16 @@ void play(generation *g)
 // Play the generation 'nb_gen' times.
 void train(generation *g, size_t nb_gen)
 {
-    for(size_t i = 0; i < nb_gen; ++i)
+    /*
+	for(size_t i = 0; i < nb_gen; ++i)
     {
         if(i % 2)
         {
             copy_bot(load_bot("save/bot_chess.nn"), g->bots + i, 1);
         }
     }
-    
+	*/
+
     for(size_t i = 0; i < nb_gen; ++i)
     {
             // play(g);

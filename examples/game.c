@@ -16,6 +16,9 @@
 #include "human.h"
 #include "single_server.h"
 #include "client.h"
+#include "neural_struct.h"
+#include "bot_xor.h"
+#include "chess_nn.h"
 
 #define BUFFER_SIZE 32
 
@@ -194,7 +197,8 @@ int main(int argc, char** argv)
         }
         else
         {
-            // human_vs_nn
+			bot *b = load_bot("nn/bot_chess.nn");
+            human_vs_IA_nn(&g, want_white, b);
         }
     }
     else if(want_offline)

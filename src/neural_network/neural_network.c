@@ -126,12 +126,12 @@ void save_network(network *net, FILE *file)
     {
         if (i == net->nb_layer - 1)
         {
-            sprintf(str, "%lu", net->nb_layer);
+            sprintf(str, "%lu", net->sizes[i]);
             fputs(str, file);
         }
         else
         {
-            sprintf(str, "%lu,", net->nb_layer);
+            sprintf(str, "%lu,", net->sizes[i]);
             fputs(str, file);
         }
     }
