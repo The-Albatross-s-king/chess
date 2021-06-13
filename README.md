@@ -17,14 +17,22 @@ Now you have to execute this line:
 ./game.out
 ```
 
-Then, you need to answer some question like if you want to play or offline. When
-all the questions are answered, the game is launched.
+Then, you need to answer some question like if you want to play online or
+offline. When all the questions are answered, the game is launched.
 
 ## Use AI
 In order to get some help from the AI, you have to type this command at your
 first input:
 ```bash
 help
+```
+
+## Save a game
+At any time you can save a game in order to restart the game later. It's
+possible by the command:
+
+```bash
+save
 ```
 
 
