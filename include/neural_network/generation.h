@@ -3,6 +3,8 @@
 
 generation *build_generation(size_t size);
 
+generation *build_generation_xor(size_t size);
+
 void free_generation(generation *g);
 
 void sort(generation *g);
@@ -19,6 +21,10 @@ void new_gen(generation *g, char display_best);
 
 void play(generation *g);
 
+void play_xor(generation *g);
+
 void train(generation *g, size_t nb_gen);
+
+void train_xor(generation *g, size_t nb_gen);
 
 generation *build_generation_from_file(size_t size, char *path);

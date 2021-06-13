@@ -5,6 +5,8 @@
 
 void print_bot(bot *b);
 
+void print_bot_xor(bot *b);
+
 void build_bot(bot *b);
 
 void build_bot_xor(bot *b);

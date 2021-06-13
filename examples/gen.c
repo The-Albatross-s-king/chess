@@ -1,9 +1,11 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "bot_xor.h"
 #include "generation.h"
 #include "neural_network.h"
 #include "neurone.h"
 #include "layer.h"
-#include <stdlib.h>
 
 void print_arr(float *arr, size_t len)
 {
@@ -95,8 +97,8 @@ void print_score(bot *best)
 
 int main()
 {
-    generation *gen = build_generation(100);
-    train(gen, 10);
+    generation *gen = build_generation_xor(100);
+	train_xor(gen, 10);
     // generation *best_gen = get_best_bots(gen, 1);
     // bot *best = malloc(sizeof(bot));
     // build_bot(best);
@@ -113,18 +115,19 @@ int main()
         printf("===============================\n");
         printf("Iteration : %d\n", i);
         i++;
-        play(gen);
+        play_xor(gen);
         sort(gen);
 
-        print_score(best);
+        print_score(gen->bots);
         printf("Average: %f\n\n", gen->average);
-        train(gen, 100);
+        train_xor(gen, 10);
+		sleep(1);
     }
 
     printf("===============================\n");
     printf("Iteration : %d\n", i);
-    print_score(best);
-    save_bot(best, "save/best.nn");
+    print_score(gen->bots);
+    save_bot(gen->bots, "save/best.nn");
     free_generation(gen);
     // free_generation(best_gen);
     // free_bot(best);

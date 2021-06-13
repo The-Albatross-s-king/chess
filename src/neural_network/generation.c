@@ -34,6 +34,26 @@ generation *build_generation(size_t size)
     return g;
 }
 
+generation *build_generation_xor(size_t size)
+{
+    generation *g = malloc(sizeof(generation));
+    if(g == NULL)
+        errx(EXIT_FAILURE, "Can not allocate memory");
+
+    g->bots = malloc(size * sizeof(bot));
+    if(g->bots == NULL)
+        errx(EXIT_FAILURE, "Can not allocate memory");
+
+    g->size = size;
+    for(size_t i = 0; i < size; ++i)
+    {
+        build_bot_xor(g->bots+i);
+    }
+    g->average = 0;
+
+    return g;
+}
+
 void free_generation(generation *g)
 {
     for (size_t i = 0; i < g->size; i++)
@@ -175,7 +195,7 @@ void mutate_generation(generation *g)
     }
 }
 
-void mutate_generation2(generation *g)
+void mutate_generation_xor(generation *g)
 {
     // bot *best = g->bots;
     for(size_t i = g->size / 40; i < g->size / 20; i++)
@@ -199,7 +219,7 @@ void mutate_generation2(generation *g)
     for(size_t i = g->size/2 + g->size/10; i < g->size/2 + g->size/5; i++)
     {
         free_bot(g->bots+i);
-        build_bot(g->bots+i);
+        build_bot_xor(g->bots+i);
     }
     for(size_t i = g->size/2 + g->size/5; i < g->size; i++)
     {
@@ -247,6 +267,7 @@ void play_xor(generation *g)
     g->average = average / g->size;
 }
 
+
 // Play, sort and mutate the generation 'g'.
 void new_gen2(generation *g, char display_best)
 {
@@ -259,21 +280,30 @@ void new_gen2(generation *g, char display_best)
 
 }
 
+void new_gen_xor(generation *g, char display_best)
+{
+    //play(g);
 
+    (void)display_best;
+    play_xor(g);
+    sort(g);
+    mutate_generation_xor(g);
+
+}
 
 // Play the generation 'nb_gen' times.
 void train_xor(generation *g, size_t nb_gen)
 {
     for(size_t i = 0; i < nb_gen; ++i)
     {
-        play(g);
+        play_xor(g);
         if(i % 100 == 0)
         {
-            new_gen2(g, 1);
+            new_gen_xor(g, 1);
         }
         else
         {
-            new_gen2(g, 0);
+            new_gen_xor(g, 0);
         }
 
         // printf("%zu", i);
