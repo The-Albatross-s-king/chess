@@ -98,7 +98,7 @@ void print_score(bot *best)
 int main()
 {
     generation *gen = build_generation_xor(100);
-	train_xor(gen, 10);
+    train_xor(gen, 10);
     // generation *best_gen = get_best_bots(gen, 1);
     // bot *best = malloc(sizeof(bot));
     // build_bot(best);
@@ -121,7 +121,7 @@ int main()
         print_score(gen->bots);
         printf("Average: %f\n\n", gen->average);
         train_xor(gen, 10);
-		sleep(1);
+        sleep(1);
     }
 
     printf("===============================\n");
